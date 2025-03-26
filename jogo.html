@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personagens Selecionados</title>
+    <link rel="stylesheet" href="./css/jogo.css" />
+    <link rel="stylesheet" href="./css/personagens.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Jogo de Batalha</h1>
+
+      <!-- Player 1 Section -->
+      <div class="player-container" id="player1">
+        <h2>Jogador 1</h2>
+        <div><strong>Personagem:</strong> <span
+            id="player1Character"></span></div>
+        <div><strong>Vida:</strong> <span id="player1Vida"></span></div>
+        <div><strong>Dano:</strong> <span id="player1Dano"></span></div>
+        <div><strong>Armadura:</strong> <span id="player1Armadura"></span></div>
+        <div><strong>Esquiva:</strong> <span id="player1Esquiva"></span></div>
+        <div><strong>Peso:</strong> <span id="player1Peso"></span></div>
+        <div><strong>Stamina:</strong> <span id="player1Stamina"></span></div>
+        <div><strong>Dado Especial:</strong> <span
+            id="player1DadoEspecial"></span></div>
+        <div><strong>Custo de Stamina:</strong> <span
+            id="player1Custo"></span></div>
+        <div><strong>Penalidade:</strong> <span
+            id="player1Penalidade"></span></div>
+        <h3>Rolagens de Dados</h3>
+        <div><strong>D20:</strong> <span id="player1D20">?</span>
+          <button id="player1D20Btn" onclick="rolarDado('D20', 1)">Rolar
+            D20</button>
+        </div>
+      </div>
+
+      <!-- Player 2 Section -->
+      <div class="player-container" id="player2">
+        <h2>Jogador 2</h2>
+        <div><strong>Personagem:</strong> <span
+            id="player2Character"></span></div>
+        <div><strong>Vida:</strong> <span id="player2Vida"></span></div>
+        <div><strong>Dano:</strong> <span id="player2Dano"></span></div>
+        <div><strong>Armadura:</strong> <span id="player2Armadura"></span></div>
+        <div><strong>Esquiva:</strong> <span id="player2Esquiva"></span></div>
+        <div><strong>Peso:</strong> <span id="player2Peso"></span></div>
+        <div><strong>Stamina:</strong> <span id="player2Stamina"></span></div>
+        <div><strong>Dado Especial:</strong> <span
+            id="player2DadoEspecial"></span></div>
+        <div><strong>Custo de Stamina:</strong> <span
+            id="player2Custo"></span></div>
+        <div><strong>Penalidade:</strong> <span
+            id="player2Penalidade"></span></div>
+        <h3>Rolagens de Dados</h3>
+        <div><strong>D20:</strong>
+          <span id="player2D20">?</span>
+          <button id="player2D20Btn" onclick="rolarDado('D20', 2)">Rolar
+            D20</button>
+        </div>
+      </div>
+
+      <div class="turno-container">
+        <p id="contadorTurno">Turno: 1</p>
+        <p id="resultadoTurno"></p>
+      </div>
+
+      <div id="resultadoTurnoAnterior">
+        <h3>Resultado do Turno Anterior:</h3>
+        <div id="mensagemBatalha"></div>
+      </div>
+    </div>
+
+    <script src="./js/modalpersonagens.js"></script>
+    <script src="./js/dados.js"></script>
+    <script src="./js/turnos.js"></script>
+    <script src="./js/jogo.js"></script>
+    <script src="./js/batalha.js"></script>
+  </body>
+</html>

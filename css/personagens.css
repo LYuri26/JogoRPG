@@ -1,0 +1,33 @@
+/* Estilos para os botões de dados */
+button.dice-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid #000;
+  border-radius: 5px;
+  background-color: #2db671;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  text-align: center;
+  display: inline-block;
+  margin: 0;
+}
+
+/* Estilo ao passar o mouse sobre os botões */
+button.dice-button:hover {
+  background-color: #4a9b9b;
+}
+
+/* Estilo quando o botão estiver desabilitado */
+button.dice-button:disabled {
+  background-color: #bbb;
+  cursor: not-allowed;
+}
+
+/* Estilos gerais para os containers de dados dos jogadores */
+#player1-dados-container,
+#player2-dados-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
