@@ -35,6 +35,9 @@ document.addEventListener("DOMContentLoaded", function () {
       dadoEspecial: player1Data.specialDice,
       custoStamina: player1Data.cost,
       penalidade: player1Data.penalty,
+      // Propriedades específicas de classes
+      usosRestantes: player1Data.title === "Ladino" ? 2 : null,
+      foiAtacado: false,
     };
 
     window.player2Character = {
@@ -50,6 +53,9 @@ document.addEventListener("DOMContentLoaded", function () {
       dadoEspecial: player2Data.specialDice,
       custoStamina: player2Data.cost,
       penalidade: player2Data.penalty,
+      // Propriedades específicas de classes
+      usosRestantes: player2Data.title === "Ladino" ? 2 : null,
+      foiAtacado: false,
     };
 
     // Atualiza a interface
@@ -84,50 +90,70 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /**
- * Carrega e valida os dados dos jogadores do localStorage
- * @returns {Object|null} Objeto com os dados dos jogadores ou null se inválido
+ * Atualiza as informações do jogador na interface
+ * @param {string} playerId - ID do jogador
+ * @param {Object} character - Objeto do personagem
+ * @param {string} playerName - Nome do jogador
  */
-function carregarDadosJogadores() {
-  try {
-    const player1Character = localStorage
-      .getItem("player1Character")
-      ?.trim()
-      .replace(/^"|"$/g, "");
-    const player2Character = localStorage
-      .getItem("player2Character")
-      ?.trim()
-      .replace(/^"|"$/g, "");
-    const player1Name = localStorage.getItem("player1Name")?.trim();
-    const player2Name = localStorage.getItem("player2Name")?.trim();
-
-    if (
-      !player1Character ||
-      !player2Character ||
-      !player1Name ||
-      !player2Name
-    ) {
-      throw new Error("Dados dos jogadores incompletos");
-    }
-
-    console.log("Jogadores carregados:", {
-      player1Name,
-      player1Character,
-      player2Name,
-      player2Character,
-    });
-
-    return {
-      player1Character,
-      player2Character,
-      player1Name,
-      player2Name,
-    };
-  } catch (error) {
-    console.error("Erro ao carregar dados:", error);
-    alert("Configuração de jogo inválida! Redirecionando...");
-    window.location.href = "../index.html";
-    return null;
+function atualizarInformacoesJogador(playerId, character, playerName) {
+  if (!character) {
+    console.error(`Personagem ${playerId} não definido`);
+    return;
   }
+
+  console.log(`Atualizando ${playerId}:`, character);
+
+  // Elementos obrigatórios
+  const elementos = [
+    {
+      id: `${playerId}Character`,
+      value: `${playerName} - ${character.classe} - ${character.nome}`,
+    },
+    { id: `${playerId}Vida`, value: character.vida },
+    { id: `${playerId}Dano`, value: character.danoBase },
+    { id: `${playerId}Armadura`, value: character.armadura },
+    { id: `${playerId}Esquiva`, value: character.esquiva },
+    {
+      id: `${playerId}Stamina`,
+      value: `${character.staminaMana}/${character.staminaManaMax}`,
+    },
+    { id: `${playerId}DadoEspecial`, value: character.dadoEspecial },
+    { id: `${playerId}Custo`, value: character.custoStamina || "-" },
+    {
+      id: `${playerId}PenalidadeAtiva`,
+      value: character.penalidade || "Nenhuma",
+    },
+  ];
+
+  // Atualiza a interface
+  elementos.forEach((item) => {
+    const elemento = document.getElementById(item.id);
+    if (elemento) {
+      elemento.textContent = item.value;
+    } else {
+      console.warn(`Elemento ${item.id} não encontrado`);
+    }
+  });
+}
+
+function formatarPenalidade(classe) {
+  const penalidades = {
+    Guerreiro: "-1 defesa no turno seguinte",
+    Ladino: "Só pode ser usado a cada 2 turnos",
+    Mago: "-1 esquiva no turno seguinte",
+    // ... outras classes
+  };
+  return penalidades[classe] || "Nenhuma";
+}
+
+function obterCustoHabilidade(classe) {
+  const custos = {
+    Guerreiro: 2,
+    Ladino: 3,
+    Mago: 3,
+    // Adicione outras classes conforme necessário
+  };
+  return custos[classe] || "-";
 }
 
 /**
@@ -313,4 +339,53 @@ function carregarPersonagemPadrao(playerId, playerName) {
   };
 
   atualizarInformacoesJogador(playerId, personagemPadrao, playerName);
+}
+/**
+ * Função auxiliar para formatar a descrição da penalidade
+ */
+function formatarPenalidade(classe) {
+  const penalidades = {
+    Guerreiro: "-1 defesa no turno seguinte",
+    Ladino: "Só pode ser usado a cada 2 turnos",
+    Mago: "-1 esquiva no turno seguinte",
+    Paladino: "-2 no próximo ataque",
+    Bárbaro: "Só pode ser usado uma vez por combate",
+    Arqueiro: "-1 esquiva no turno seguinte",
+    Monge: "-1 dano no próximo ataque",
+    Cavaleiro: "Não pode atacar no turno seguinte",
+    Assassino: "Custa 2 Stamina adicionais se falhar",
+    Druida: "Só pode ser usado 3 vezes por combate",
+    Gladiador: "Não pode usar outra habilidade no próximo turno",
+    Caçador: "Só pode ser usado a cada 3 turnos",
+    Mercenário: "-1 esquiva no turno seguinte",
+    Feiticeiro: "Reduz 2 de vida ao usar",
+    Samurai: "Só pode ser usado 2 vezes por combate",
+  };
+
+  return penalidades[classe] || "-";
+}
+
+/**
+ * Função auxiliar para obter o custo da habilidade por classe
+ */
+function obterCustoHabilidade(classe) {
+  const custos = {
+    Guerreiro: 2,
+    Ladino: 3,
+    Mago: 3,
+    Paladino: 2,
+    Bárbaro: 3,
+    Arqueiro: 2,
+    Monge: 2,
+    Cavaleiro: 3,
+    Assassino: 3,
+    Druida: 3,
+    Gladiador: 2,
+    Caçador: 3,
+    Mercenário: 2,
+    Feiticeiro: 3,
+    Samurai: 3,
+  };
+
+  return custos[classe] || "-";
 }

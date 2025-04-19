@@ -11,6 +11,9 @@ const GerenciadorTurnos = {
   iniciarTurno: function () {
     console.log(`Iniciando turno ${this.estado.turnoAtual}`);
 
+    aplicarPenalidades(1);
+    aplicarPenalidades(2);
+
     DadosManager.resetarDados();
     this.estado.jogadorAtivo = this.estado.turnoAtual % 2 === 1 ? 1 : 2;
     this.definirFase("inicial");

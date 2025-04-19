@@ -2,110 +2,271 @@
 let jogoPausado = false;
 let avisoExibido = false;
 
+// Objeto para armazenar penalidades ativas
+const PenalidadesAtivas = {
+  player1: { defesa: 0, esquiva: 0, dano: 0 },
+  player2: { defesa: 0, esquiva: 0, dano: 0 },
+};
+
 function parseDanoBase(dano) {
-  // Extrai número de strings como "2 Stamina"
-  const num = parseInt(dano.toString().replace(/\D/g, ""));
-  return isNaN(num) ? 0 : num;
+  if (typeof dano === "number") return dano;
+  if (typeof dano === "string") {
+    const num = parseInt(dano.replace(/\D/g, ""));
+    return isNaN(num) ? 0 : num;
+  }
+  return 0;
 }
 
-/**
- * Inicia a fase de batalha após a disputa do D20
- * @param {number} atacanteNum - Número do jogador atacante (1 ou 2)
- * @param {number} defensorNum - Número do jogador defensor (1 ou 2)
- */
-function iniciarBatalha(atacanteNum, defensorNum) {
-  if (jogoPausado) return;
+function aplicarPenalidades(jogador) {
+  const personagem =
+    jogador === 1 ? window.player1Character : window.player2Character;
+  const penalidades = PenalidadesAtivas[`player${jogador}`];
 
-  const atacante =
-    atacanteNum === 1 ? window.player1Character : window.player2Character;
-  const defensor =
-    defensorNum === 1 ? window.player1Character : window.player2Character;
+  // Aplica penalidades aos valores base
+  const armaduraBase = personagem.armaduraBase || personagem.armadura;
+  const esquivaBase = personagem.esquivaBase || personagem.esquiva;
+  const danoBase = personagem.danoBaseBase || personagem.danoBase;
 
-  if (!atacante || !defensor) {
-    console.error("Personagens não encontrados para a batalha");
-    return;
+  personagem.armadura = Math.max(0, armaduraBase - penalidades.defesa);
+  personagem.esquiva = Math.max(0, esquivaBase - penalidades.esquiva);
+  personagem.danoBase = Math.max(1, danoBase - penalidades.dano);
+
+  // Atualiza a interface
+  atualizarPenalidadesInterface(jogador);
+
+  // Limpa penalidades para o próximo turno
+  PenalidadesAtivas[`player${jogador}`] = { defesa: 0, esquiva: 0, dano: 0 };
+  // Atualiza stamina na interface
+  document.getElementById(
+    `player${jogador}Stamina`
+  ).textContent = `${personagem.staminaMana}/${personagem.staminaManaMax}`;
+}
+
+function atualizarPenalidadesInterface(jogador) {
+  const penalidades = PenalidadesAtivas[`player${jogador}`];
+
+  // Atualiza os valores com penalidades
+  document.getElementById(`player${jogador}Armadura`).textContent = (
+    jogador === 1 ? window.player1Character : window.player2Character
+  ).armadura;
+
+  document.getElementById(`player${jogador}Esquiva`).textContent = (
+    jogador === 1 ? window.player1Character : window.player2Character
+  ).esquiva;
+
+  document.getElementById(`player${jogador}Dano`).textContent = (
+    jogador === 1 ? window.player1Character : window.player2Character
+  ).danoBase;
+
+  // Mostra as penalidades aplicadas
+  const armaduraPenalidade = document.getElementById(
+    `player${jogador}ArmaduraPenalidade`
+  );
+  const esquivaPenalidade = document.getElementById(
+    `player${jogador}EsquivaPenalidade`
+  );
+
+  if (penalidades.defesa > 0) {
+    armaduraPenalidade.textContent = `-${penalidades.defesa}`;
+    armaduraPenalidade.style.display = "inline";
+  } else {
+    armaduraPenalidade.style.display = "none";
   }
 
-  console.log(`Iniciando batalha com Jogador ${atacanteNum} atacando`);
+  if (penalidades.esquiva > 0) {
+    esquivaPenalidade.textContent = `-${penalidades.esquiva}`;
+    esquivaPenalidade.style.display = "inline";
+  } else {
+    esquivaPenalidade.style.display = "none";
+  }
 
-  // Exibe a mensagem no HTML
-  document.getElementById(
-    "resultadoTurno"
-  ).textContent = `Jogador ${atacanteNum} (${atacante.nome}) pode atacar!`;
-  document.getElementById(
-    "mensagemBatalha"
-  ).textContent = `Escolha seu ataque contra Jogador ${defensorNum} (${defensor.nome})`;
+  // Atualiza a mensagem de penalidade ativa
+  const penalidadeAtiva = document.getElementById(
+    `player${jogador}PenalidadeAtiva`
+  );
+  if (
+    penalidades.defesa > 0 ||
+    penalidades.esquiva > 0 ||
+    penalidades.dano > 0
+  ) {
+    let mensagens = [];
+    if (penalidades.defesa > 0) mensagens.push(`Defesa -${penalidades.defesa}`);
+    if (penalidades.esquiva > 0)
+      mensagens.push(`Esquiva -${penalidades.esquiva}`);
+    if (penalidades.dano > 0) mensagens.push(`Dano -${penalidades.dano}`);
 
-  // Habilita os botões de ataque conforme a classe
-  habilitarAtaques(atacanteNum, atacante.classe);
+    penalidadeAtiva.textContent = mensagens.join(", ");
+  } else {
+    penalidadeAtiva.textContent = "Nenhuma";
+  }
 }
 
-/**
- * Habilita os botões de ataque conforme a classe do personagem
- * @param {number} jogador - Número do jogador (1 ou 2)
- * @param {string} classe - Classe do personagem (Guerreiro, Ladino, Mago)
- */
-function habilitarAtaques(jogador, classe) {
-  // Desabilita todos os botões primeiro
-  document
-    .querySelectorAll(`#player${jogador} button.dice-button`)
-    .forEach((btn) => {
-      btn.disabled = true;
-    });
+function registrarPenalidade(jogador, tipo, valor) {
+  PenalidadesAtivas[`player${jogador}`][tipo] += valor;
+}
 
-  // Habilita D6 (ataque básico) para todos
-  const btnD6 = document.getElementById(`player${jogador}D6Btn`);
-  if (btnD6) btnD6.disabled = false;
+function verificarRestricoesEspeciais(jogador, tipoDado) {
+  const personagem =
+    jogador === 1 ? window.player1Character : window.player2Character;
 
-  // Habilita dados especiais conforme classe
-  switch (classe) {
+  switch (personagem.classe) {
+    case "Ladino":
+      if (tipoDado === "D10" && personagem.foiAtacado) {
+        alert("Ladino não pode usar Ataque Sorrateiro após ser atacado!");
+        return false;
+      }
+      if (tipoDado === "D10" && personagem.usosRestantes <= 0) {
+        alert("Ataque Sorrateiro só pode ser usado a cada 2 turnos!");
+        return false;
+      }
+      break;
+
+    case "Bárbaro":
+      if (tipoDado === "D10" && personagem.vida >= 15) {
+        alert("Bárbaro só pode usar Fúria quando a vida está abaixo de 15!");
+        return false;
+      }
+      if (tipoDado === "D10" && personagem.usosRestantes <= 0) {
+        alert("Fúria só pode ser usada uma vez por combate!");
+        return false;
+      }
+      break;
+
+    case "Samurai":
+      if (tipoDado === "D10" && personagem.usosRestantes <= 0) {
+        alert("Foco Perfeito só pode ser usado 2 vezes por combate!");
+        return false;
+      }
+      break;
+
+    // Adicione outras classes conforme necessário
+  }
+
+  return true;
+}
+
+function aplicarCustoHabilidade(jogador, tipoDado) {
+  const personagem =
+    jogador === 1 ? window.player1Character : window.player2Character;
+  let custo = 0;
+
+  // Define o custo baseado na classe e tipo de dado
+  switch (personagem.classe) {
     case "Guerreiro":
-      document.getElementById(`player${jogador}D8Btn`).disabled = false;
+      if (tipoDado === "D8") custo = 2;
       break;
     case "Ladino":
-      document.getElementById(`player${jogador}D10Btn`).disabled = false;
+      if (tipoDado === "D10") custo = 3;
       break;
     case "Mago":
-      document.getElementById(`player${jogador}D12Btn`).disabled = false;
+      if (tipoDado === "D12") custo = 3;
       break;
+    case "Paladino":
+      if (tipoDado === "D8") custo = 2;
+      break;
+    case "Bárbaro":
+      if (tipoDado === "D10") custo = 3;
+      break;
+    case "Arqueiro":
+      if (tipoDado === "D8") custo = 2;
+      break;
+    case "Monge":
+      if (tipoDado === "D6") custo = 2;
+      break;
+    case "Cavaleiro":
+      if (tipoDado === "D8") custo = 3;
+      break;
+    case "Assassino":
+      if (tipoDado === "D12") custo = 3;
+      break;
+    case "Druida":
+      if (tipoDado === "D8") custo = 3;
+      break;
+    case "Gladiador":
+      if (tipoDado === "D6") custo = 2;
+      break;
+    case "Caçador":
+      if (tipoDado === "D12") custo = 3;
+      break;
+    case "Mercenário":
+      if (tipoDado === "D6") custo = 2;
+      break;
+    case "Feiticeiro":
+      if (tipoDado === "D20") custo = 3;
+      break;
+    case "Samurai":
+      if (tipoDado === "D10") custo = 3;
+      break;
+  }
+
+  if (personagem.staminaMana < custo) {
+    alert("Recursos insuficientes para usar esta habilidade!");
+    return false;
+  }
+
+  personagem.staminaMana -= custo;
+
+  // Atualiza a interface
+  document.getElementById(
+    `player${jogador}Stamina`
+  ).textContent = `${personagem.staminaMana}/${personagem.staminaManaMax}`;
+
+  return true;
+}
+
+function aplicarEfeitosPosHabilidade(jogador, tipoDado) {
+  const personagem =
+    jogador === 1 ? window.player1Character : window.player2Character;
+
+  switch (personagem.classe) {
+    case "Guerreiro":
+      if (tipoDado === "D8") registrarPenalidade(jogador, "defesa", 1);
+      break;
+    case "Ladino":
+      if (tipoDado === "D10") personagem.usosRestantes--;
+      break;
+    case "Mago":
+      if (tipoDado === "D12") registrarPenalidade(jogador, "esquiva", 1);
+      break;
+    // Adicione outras classes conforme a tabela
   }
 }
 
-/**
- * Finaliza um ataque, calcula dano e aplica ao defensor
- * @param {number} jogador - Número do jogador atacante (1 ou 2)
- * @param {string} tipoDado - Tipo de dado usado no ataque (D6, D8, D10, D12)
- */
 function finalizarAtaque(jogador, tipoDado) {
   if (jogoPausado) return;
 
-  // Pausa o jogo para evitar múltiplos ataques
+  // Verifica requisitos antes de prosseguir
+  if (!verificarRequisitosAtaque(jogador, tipoDado)) return;
+  if (!aplicarCustoHabilidade(jogador, tipoDado)) return;
+
   jogoPausado = true;
 
   // Rola o dado
   const faces = parseInt(tipoDado.replace("D", ""));
   const resultado = Math.floor(Math.random() * faces) + 1;
-
-  // Atualiza a interface com o resultado
   document.getElementById(`player${jogador}${tipoDado}`).textContent =
     resultado;
 
   // Calcula o dano
-  const dano = calcularDano(jogador, tipoDado, resultado);
+  const dano = Math.max(1, calcularDano(jogador, tipoDado, resultado));
 
-  // Aplica o dano ao defensor
+  // Aplica efeitos pós-habilidade
+  aplicarEfeitosPosHabilidade(jogador, tipoDado);
+
+  // Aplica o dano
   const defensorNum = jogador === 1 ? 2 : 1;
   aplicarDano(defensorNum, dano);
 
-  // Exibe o aviso de dano (apenas uma vez por turno)
   if (!avisoExibido) {
     avisoExibido = true;
-    const defensor =
-      defensorNum === 1 ? window.player1Character : window.player2Character;
-
     setTimeout(() => {
-      alert(`${defensor.nome} sofreu ${dano} de dano!`);
-      // Finaliza o turno após o alerta
+      if (dano > 0) {
+        alert(
+          `${
+            window[`player${defensorNum}Character`].nome
+          } sofreu ${dano} de dano!`
+        );
+      }
       GerenciadorTurnos.finalizarTurno();
       jogoPausado = false;
       avisoExibido = false;
@@ -120,49 +281,157 @@ function finalizarAtaque(jogador, tipoDado) {
  * @param {number} resultado - Resultado do dado rolado
  * @returns {number} Dano total após cálculos
  */
-function calcularDano(jogador, tipoDado, resultado) {
-  const atacante =
+
+// Função para inicializar personagens com valores padrão
+function inicializarPersonagem(personagem) {
+  // Define usos restantes baseado na classe
+  switch (personagem.classe) {
+    case "Ladino":
+      personagem.usosRestantes = 2; // Pode usar a cada 2 turnos
+      personagem.foiAtacado = false;
+      break;
+    case "Bárbaro":
+      personagem.usosRestantes = 1; // 1 uso por combate
+      break;
+    case "Samurai":
+      personagem.usosRestantes = 2; // 2 usos por combate
+      break;
+    case "Assassino":
+      personagem.usosRestantes = 3; // 3 críticos por combate
+      break;
+    case "Druida":
+      personagem.usosRestantes = 3; // 3 curas por combate
+      break;
+  }
+
+  // Inicializa atributos base para cálculo de penalidades
+  personagem.armaduraBase = personagem.armadura;
+  personagem.esquivaBase = personagem.esquiva;
+  personagem.danoBaseBase = personagem.danoBase;
+
+  // Inicializa stamina/mana se não existir
+  personagem.staminaMana = personagem.staminaMana || 6;
+  personagem.staminaManaMax = personagem.staminaManaMax || 6;
+}
+
+// Função para finalizar o turno com reset de estados
+function finalizarTurno() {
+  // Resetar estado de "foiAtacado" para o próximo turno
+  window.player1Character.foiAtacado = false;
+  window.player2Character.foiAtacado = false;
+
+  // Recarregar usos do Ladino se necessário
+  if (
+    window.player1Character.classe === "Ladino" &&
+    window.player1Character.usosRestantes === 0
+  ) {
+    window.player1Character.usosRestantes = 2;
+  }
+  if (
+    window.player2Character.classe === "Ladino" &&
+    window.player2Character.usosRestantes === 0
+  ) {
+    window.player2Character.usosRestantes = 2;
+  }
+
+  // Recarregar stamina/mana parcialmente
+  window.player1Character.staminaMana = Math.min(
+    window.player1Character.staminaMana + 2,
+    window.player1Character.staminaManaMax
+  );
+  window.player2Character.staminaMana = Math.min(
+    window.player2Character.staminaMana + 2,
+    window.player2Character.staminaManaMax
+  );
+
+  // Atualizar interface
+  document.getElementById(
+    "player1Stamina"
+  ).textContent = `${window.player1Character.staminaMana}/${window.player1Character.staminaManaMax}`;
+  document.getElementById(
+    "player2Stamina"
+  ).textContent = `${window.player2Character.staminaMana}/${window.player2Character.staminaManaMax}`;
+}
+
+// Função para verificar requisitos antes do ataque
+function verificarRequisitosAtaque(jogador, tipoDado) {
+  const personagem =
     jogador === 1 ? window.player1Character : window.player2Character;
-  const defensor =
-    jogador === 1 ? window.player2Character : window.player1Character;
 
-  // Converte danoBase para número se necessário
-  const danoBase =
-    typeof atacante.danoBase === "number"
-      ? atacante.danoBase
-      : parseDanoBase(atacante.danoBase);
+  switch (personagem.classe) {
+    case "Ladino":
+      if (tipoDado === "D10") {
+        if (personagem.foiAtacado) {
+          alert("Ladino não pode usar Ataque Sorrateiro após ser atacado!");
+          return false;
+        }
+        if (personagem.usosRestantes <= 0) {
+          alert("Ataque Sorrateiro só pode ser usado a cada 2 turnos!");
+          return false;
+        }
+      }
+      break;
 
-  let dano = danoBase + resultado;
+    case "Bárbaro":
+      if (tipoDado === "D10") {
+        if (personagem.vida >= 15) {
+          alert("Bárbaro só pode usar Fúria quando a vida está abaixo de 15!");
+          return false;
+        }
+        if (personagem.usosRestantes <= 0) {
+          alert("Fúria só pode ser usada uma vez por combate!");
+          return false;
+        }
+      }
+      break;
 
-  // Aplica bônus de classe
-  if (tipoDado === "D8" && atacante.classe === "Guerreiro") {
-    dano += 2;
-  } else if (tipoDado === "D10" && atacante.classe === "Ladino") {
-    dano += 3;
-  } else if (tipoDado === "D12" && atacante.classe === "Mago") {
-    dano += 4;
+    // Adicione verificações para outras classes
   }
 
-  // Reduz pela armadura (garante que é número)
-  const armadura =
-    typeof defensor.armadura === "number"
-      ? defensor.armadura
-      : parseDanoBase(defensor.armadura);
+  return true;
+}
 
-  dano = Math.max(1, dano - armadura);
+// Função final de ataque (ajustada)
+function finalizarAtaque(jogador, tipoDado) {
+  if (jogoPausado) return;
 
-  // Verifica esquiva
-  const esquiva =
-    typeof defensor.esquiva === "number"
-      ? defensor.esquiva
-      : parseDanoBase(defensor.esquiva);
+  // Verifica requisitos antes de prosseguir
+  if (!verificarRequisitosAtaque(jogador, tipoDado)) return;
+  if (!aplicarCustoHabilidade(jogador, tipoDado)) return;
 
-  if (Math.random() < esquiva / 10) {
-    dano = 0;
-    document.getElementById("mensagemBatalha").textContent += " (ESQUIVOU!)";
+  jogoPausado = true;
+
+  // Rola o dado
+  const faces = parseInt(tipoDado.replace("D", ""));
+  const resultado = Math.floor(Math.random() * faces) + 1;
+  document.getElementById(`player${jogador}${tipoDado}`).textContent =
+    resultado;
+
+  // Calcula o dano
+  const dano = calcularDano(jogador, tipoDado, resultado);
+
+  // Aplica efeitos pós-habilidade
+  aplicarEfeitosPosHabilidade(jogador, tipoDado);
+
+  // Aplica o dano
+  const defensorNum = jogador === 1 ? 2 : 1;
+  aplicarDano(defensorNum, dano);
+
+  if (!avisoExibido) {
+    avisoExibido = true;
+    setTimeout(() => {
+      if (dano > 0) {
+        alert(
+          `${
+            window[`player${defensorNum}Character`].nome
+          } sofreu ${dano} de dano!`
+        );
+      }
+      GerenciadorTurnos.finalizarTurno();
+      jogoPausado = false;
+      avisoExibido = false;
+    }, 500);
   }
-
-  return dano;
 }
 
 /**
@@ -250,6 +519,16 @@ function verificarFimDeJogo() {
   return false;
 }
 
+function adicionarLogBatalha(mensagem) {
+  const logElement = document.getElementById("logBatalha");
+  if (logElement) {
+    const novoLog = document.createElement("p");
+    novoLog.textContent = mensagem;
+    logElement.appendChild(novoLog);
+    logElement.scrollTop = logElement.scrollHeight;
+  }
+}
+
 // Configura os eventos de ataque quando o DOM estiver carregado
 document.addEventListener("DOMContentLoaded", function () {
   // Configura eventos para todos os botões de ataque
@@ -264,3 +543,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 });
+
+inicializarPersonagem(window.player1Character);
+inicializarPersonagem(window.player2Character);

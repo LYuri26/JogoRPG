@@ -22,7 +22,12 @@ window.guerreiro = {
 
     const dano = this.danoBase + Math.floor(Math.random() * 8) + 1;
     this.staminaMana -= this.custoStamina;
-    this.aplicarPenalidade();
+
+    // Aplica penalidade
+    if (typeof registrarPenalidade === "function") {
+      registrarPenalidade(this.playerId === "player1" ? 1 : 2, "defesa", 1);
+    }
+
     return dano;
   },
 

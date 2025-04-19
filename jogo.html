@@ -55,12 +55,14 @@
                 <div class="stat-item">
                   <span class="stat-label">Armadura:</span>
                   <span class="stat-value float-end" id="player1Armadura">5</span>
+                  <small class="text-danger" id="player1ArmaduraPenalidade"></small>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="stat-item">
                   <span class="stat-label">Esquiva:</span>
                   <span class="stat-value float-end" id="player1Esquiva">2</span>
+                  <small class="text-danger" id="player1EsquivaPenalidade"></small>
                 </div>
                 <div class="stat-item">
                   <span class="stat-label">Stamina:</span>
@@ -69,6 +71,16 @@
                 <div class="stat-item">
                   <span class="stat-label">Habilidade:</span>
                   <span class="stat-value float-end" id="player1DadoEspecial">D8</span>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="stat-item">
+                  <span class="stat-label">Custo Habilidade:</span>
+                  <span class="stat-value float-end" id="player1Custo">2 Stamina</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Penalidade Ativa:</span>
+                  <span class="stat-value float-end text-danger" id="player1PenalidadeAtiva">Nenhuma</span>
                 </div>
               </div>
             </div>
@@ -129,6 +141,7 @@
             </div>
 
             <!-- Stats Grid -->
+            <!-- No player-card, dentro da seção de stats, substitua a parte dos stats por: -->
             <div class="row">
               <div class="col-md-6">
                 <div class="stat-item">
@@ -142,12 +155,14 @@
                 <div class="stat-item">
                   <span class="stat-label">Armadura:</span>
                   <span class="stat-value float-end" id="player2Armadura">5</span>
+                  <small class="text-danger" id="player2ArmaduraPenalidade"></small>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="stat-item">
                   <span class="stat-label">Esquiva:</span>
                   <span class="stat-value float-end" id="player2Esquiva">2</span>
+                  <small class="text-danger" id="player2EsquivaPenalidade"></small>
                 </div>
                 <div class="stat-item">
                   <span class="stat-label">Stamina:</span>
@@ -158,8 +173,17 @@
                   <span class="stat-value float-end" id="player2DadoEspecial">D8</span>
                 </div>
               </div>
+              <div class="col-12">
+                <div class="stat-item">
+                  <span class="stat-label">Custo Habilidade:</span>
+                  <span class="stat-value float-end" id="player2Custo">2 Stamina</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Penalidade Ativa:</span>
+                  <span class="stat-value float-end text-danger" id="player2PenalidadeAtiva">Nenhuma</span>
+                </div>
+              </div>
             </div>
-
             <!-- Dice Section -->
             <div class="dice-section">
               <h3><i class="fas fa-dice me-2"></i>Rolagem de Dados</h3>
@@ -219,6 +243,7 @@
           <div class="battle-message mt-3 text-center" id="mensagemBatalha"></div>
           <h4 class="text-center mb-3"><i class="fas fa-scroll me-2"></i>Registro de Batalha</h4>
           <div id="battleLogContent">
+            <div id="logBatalha" style="height: 100px; overflow-y: scroll; border: 1px solid #ccc; padding: 5px;"></div>
             <div class="log-entry text-muted">A batalha começou!</div>
           </div>
         </div>
@@ -235,6 +260,7 @@
   <script src="./assets/js/dados.js"></script>
   <script src="./assets/js/turnos.js"></script>
   <script src="./assets/js/jogo.js"></script>
+  <script src="./assets/js/dano.js"></script>
   <script src="./assets/js/batalha.js"></script>
 
 

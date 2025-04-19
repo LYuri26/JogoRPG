@@ -292,3 +292,47 @@ body {
 .fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
+
+.stat-item {
+  position: relative;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background-color: var(--dark-700);
+  border-radius: 6px;
+  border-left: 3px solid var(--rpg-gold);
+}
+
+.stat-item.penalidade {
+  border-left: 3px solid var(--rpg-red);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #adb5bd;
+  display: inline-block;
+  width: 60%;
+}
+
+.stat-value {
+  font-weight: 700;
+  font-size: 1rem;
+  color: white;
+  display: inline-block;
+  width: 40%;
+  text-align: right;
+}
+
+.text-danger {
+  color: var(--rpg-red) !important;
+}
+
+.text-warning {
+  color: var(--rpg-orange) !important;
+}
+
+.penalidade-value {
+  position: absolute;
+  right: 0.75rem;
+  color: var(--rpg-red);
+  font-weight: bold;
+}

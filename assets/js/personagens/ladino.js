@@ -34,9 +34,7 @@ window.ladino = {
     const dano = this.danoBase + Math.floor(Math.random() * 10) + 1;
     this.staminaMana -= this.custoStamina;
     this.usosRestantes--;
-    this.foiAtacado = true;
 
-    console.log(`Ataque especial causou ${dano} de dano!`);
     return dano;
   },
 
