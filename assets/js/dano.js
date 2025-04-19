@@ -1,16 +1,13 @@
-// dano.js - Módulo de cálculo de dano
+// dano.js - Complete corrected version with accurate damage and dodge calculations
 
-// Função auxiliar para parsear o dano base
+// Helper function to parse damage values
 function parseDanoBase(dano) {
   if (typeof dano === "number") return dano;
-  if (typeof dano === "string") {
-    const num = parseInt(dano.replace(/\D/g, ""));
-    return isNaN(num) ? 0 : num;
-  }
+  if (typeof dano === "string") return parseInt(dano.replace(/\D/g, "")) || 0;
   return 0;
 }
 
-// Função para registrar penalidades
+// Function to register penalties
 function registrarPenalidade(jogador, tipo, valor) {
   if (!window.PenalidadesAtivas) {
     window.PenalidadesAtivas = {
@@ -21,7 +18,7 @@ function registrarPenalidade(jogador, tipo, valor) {
   window.PenalidadesAtivas[`player${jogador}`][tipo] += valor;
 }
 
-// Função para atualizar a barra de vida
+// Function to update health bar
 function atualizarBarraVida(jogador, vidaAtual, vidaMaxima) {
   const porcentagemVida = (vidaAtual / vidaMaxima) * 100;
   const barraVida = document.getElementById(`player${jogador}HealthBar`);
@@ -42,7 +39,7 @@ function atualizarBarraVida(jogador, vidaAtual, vidaMaxima) {
   }
 }
 
-// Função para adicionar log de batalha
+// Function to add battle log messages
 function adicionarLogBatalha(mensagem) {
   const logElement = document.getElementById("logBatalha");
   if (logElement) {
@@ -53,32 +50,34 @@ function adicionarLogBatalha(mensagem) {
   }
 }
 
-// Função principal de cálculo de dano
+// Main damage calculation function
 function calcularDano(jogador, tipoDado, resultado) {
   const atacante =
     jogador === 1 ? window.player1Character : window.player2Character;
   const defensor =
     jogador === 1 ? window.player2Character : window.player1Character;
 
-  // Garante valores numéricos válidos
-  const danoBase = parseDanoBase(atacante.danoBase) || 0;
-  const armaduraDefensor = parseDanoBase(defensor.armadura) || 0;
+  // Get base values
+  const danoBase = parseDanoBase(atacante.danoBase);
+  const armaduraDefensor = parseDanoBase(defensor.armadura);
+  const esquivaDefensor = parseDanoBase(defensor.esquiva);
 
-  let dano = danoBase + resultado;
+  let danoTotal = danoBase + resultado;
   let mensagemExtra = "";
   let bloqueado = false;
 
-  // Aplica bônus de classe e verifica requisitos
+  // Apply class-specific abilities
   switch (atacante.classe) {
     case "Guerreiro":
       if (tipoDado === "D8") {
-        if (atacante.staminaMana < 2) {
-          alert("Stamina insuficiente para Golpe Poderoso!");
-          bloqueado = true;
-        } else {
-          dano += 2;
+        if (atacante.staminaMana >= 2) {
+          danoTotal += 2;
           mensagemExtra = " (Golpe Poderoso +2)";
           registrarPenalidade(jogador, "defesa", 1);
+          atacante.staminaMana -= 2;
+        } else {
+          bloqueado = true;
+          alert("Stamina insuficiente para Golpe Poderoso!");
         }
       }
       break;
@@ -95,9 +94,10 @@ function calcularDano(jogador, tipoDado, resultado) {
           alert("Stamina insuficiente para Ataque Sorrateiro!");
           bloqueado = true;
         } else {
-          dano += 3;
+          danoTotal += 3;
           mensagemExtra = " (Ataque Sorrateiro +3)";
           atacante.usosRestantes--;
+          atacante.staminaMana -= 3;
         }
       }
       break;
@@ -114,9 +114,10 @@ function calcularDano(jogador, tipoDado, resultado) {
           alert("Stamina insuficiente para Fúria!");
           bloqueado = true;
         } else {
-          dano += 4;
+          danoTotal += 4;
           mensagemExtra = " (Fúria +4)";
           atacante.usosRestantes--;
+          atacante.staminaMana -= 3;
         }
       }
       break;
@@ -127,9 +128,10 @@ function calcularDano(jogador, tipoDado, resultado) {
           alert("Mana insuficiente para Bola de Fogo!");
           bloqueado = true;
         } else {
-          dano += 4;
+          danoTotal += 4;
           mensagemExtra = " (Bola de Fogo +4)";
           registrarPenalidade(jogador, "esquiva", 1);
+          atacante.staminaMana -= 3;
         }
       }
       break;
@@ -143,8 +145,9 @@ function calcularDano(jogador, tipoDado, resultado) {
           alert("Stamina insuficiente para Golpe Mortal!");
           bloqueado = true;
         } else {
-          dano += 5;
+          danoTotal += 5;
           mensagemExtra = " (Golpe Mortal +5)";
+          atacante.staminaMana -= 3;
         }
       }
       break;
@@ -158,9 +161,10 @@ function calcularDano(jogador, tipoDado, resultado) {
           alert("Stamina insuficiente para Foco Perfeito!");
           bloqueado = true;
         } else {
-          dano += 3;
+          danoTotal += 3;
           mensagemExtra = " (Foco Perfeito +3)";
           atacante.usosRestantes--;
+          atacante.staminaMana -= 3;
         }
       }
       break;
@@ -171,9 +175,10 @@ function calcularDano(jogador, tipoDado, resultado) {
           alert("Stamina insuficiente para Proteção Divina!");
           bloqueado = true;
         } else {
-          dano += 2;
+          danoTotal += 2;
           mensagemExtra = " (Proteção Divina +2)";
           registrarPenalidade(jogador, "dano", 2);
+          atacante.staminaMana -= 2;
         }
       }
       break;
@@ -184,9 +189,10 @@ function calcularDano(jogador, tipoDado, resultado) {
           alert("Stamina insuficiente para Tiro Preciso!");
           bloqueado = true;
         } else {
-          dano += 2;
+          danoTotal += 2;
           mensagemExtra = " (Tiro Preciso +2)";
           registrarPenalidade(jogador, "esquiva", 1);
+          atacante.staminaMana -= 2;
         }
       }
       break;
@@ -204,6 +210,7 @@ function calcularDano(jogador, tipoDado, resultado) {
           atualizarBarraVida(jogador, atacante.vida, atacante.vidaMaxima);
           mensagemExtra = ` (Cura Natural +${cura})`;
           adicionarLogBatalha(`${atacante.nome} curou ${cura} de vida!`);
+          atacante.staminaMana -= 3;
           return 0;
         }
       }
@@ -212,20 +219,12 @@ function calcularDano(jogador, tipoDado, resultado) {
 
   if (bloqueado) return 0;
 
-  // Calcula dano final garantindo mínimo de 1
-  dano = Math.max(1, dano - armaduraDefensor);
-  mensagemExtra += ` [${danoBase}+${resultado}-${armaduraDefensor}=${dano}]`;
-
-  // Verifica esquiva
-  const esquivaDefensor = parseDanoBase(defensor.esquiva) || 0;
-  const chanceEsquiva = esquivaDefensor / 10;
-
-  if (Math.random() < chanceEsquiva) {
-    dano = 0;
-    mensagemExtra += " (ESQUIVOU!)";
+  // Dodge check - NEW SYSTEM
+  if (danoTotal <= esquivaDefensor) {
+    mensagemExtra += ` (ESQUIVOU! ${danoTotal} ≤ ${esquivaDefensor})`;
     atacante.foiAtacado = true;
 
-    // Contra-ataque do Mercenário
+    // Mercenary counter-attack
     if (defensor.classe === "Mercenário" && defensor.staminaMana >= 2) {
       defensor.staminaMana -= 2;
       const contraAtaque = Math.max(
@@ -241,16 +240,29 @@ function calcularDano(jogador, tipoDado, resultado) {
       );
       return -contraAtaque;
     }
+
+    adicionarLogBatalha(
+      `${atacante.nome} usou ${tipoDado} (${resultado})${mensagemExtra}`
+    );
+    return 0;
   }
 
-  // Exibe mensagem detalhada
+  // Calculate final damage if not dodged
+  const danoFinal = Math.max(1, danoTotal - armaduraDefensor);
+  mensagemExtra += ` [${danoBase}+${resultado}-${armaduraDefensor}=${danoFinal}]`;
+
+  // Update stamina display
+  document.getElementById(
+    `player${jogador}Stamina`
+  ).textContent = `${atacante.staminaMana}/${atacante.staminaManaMax}`;
+
   adicionarLogBatalha(
     `${atacante.nome} usou ${tipoDado} (${resultado})${mensagemExtra}`
   );
-  return dano;
+  return danoFinal;
 }
 
-// Exporta a função principal para uso em outros arquivos
+// Export the main function for use in other files
 if (typeof module !== "undefined" && module.exports) {
   module.exports = { calcularDano };
 } else {

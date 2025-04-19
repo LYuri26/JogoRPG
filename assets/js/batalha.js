@@ -439,13 +439,16 @@ function finalizarAtaque(jogador, tipoDado) {
  * @param {number} defensorNum - Número do jogador defensor (1 ou 2)
  * @param {number} dano - Quantidade de dano a ser aplicada
  */
+
 function aplicarDano(defensorNum, dano) {
   const defensor =
     defensorNum === 1 ? window.player1Character : window.player2Character;
   const vidaAtual = parseInt(
     document.getElementById(`player${defensorNum}Vida`).textContent
   );
-  const novaVida = Math.max(0, vidaAtual - dano);
+
+  // Aplica dano apenas se for positivo
+  const novaVida = dano > 0 ? Math.max(0, vidaAtual - dano) : vidaAtual;
 
   // Atualiza a vida na interface
   document.getElementById(`player${defensorNum}Vida`).textContent = novaVida;
@@ -455,9 +458,15 @@ function aplicarDano(defensorNum, dano) {
   atualizarBarraVida(defensorNum, novaVida, defensor.vidaMaxima);
 
   // Exibe mensagem do resultado
-  document.getElementById("mensagemBatalha").innerHTML = `<p>Jogador ${
-    defensorNum === 1 ? 2 : 1
-  } causou ${dano} de dano! Vida restante: ${novaVida}</p>`;
+  if (dano > 0) {
+    document.getElementById("mensagemBatalha").innerHTML = `<p>Jogador ${
+      defensorNum === 1 ? 2 : 1
+    } causou ${dano} de dano! Vida restante: ${novaVida}</p>`;
+  } else {
+    document.getElementById(
+      "mensagemBatalha"
+    ).innerHTML = `<p>${defensor.nome} esquivou do ataque!</p>`;
+  }
 
   // Verifica se o jogo terminou
   verificarFimDeJogo();
