@@ -1,80 +1,243 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personagens Selecionados</title>
-    <link rel="stylesheet" href="./css/jogo.css" />
-    <link rel="stylesheet" href="./css/personagens.css" />
-  </head>
-  <body>
-    <div class="container">
-      <h1>Jogo de Batalha</h1>
 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batalha RPG - Combate de Turnos</title>
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Poppins:wght@400;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- CSS Customizado -->
+  <link rel="stylesheet" href="./assets/css/jogo.css">
+  <link rel="stylesheet" href="./assets/css/dados.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="text-center mb-4">
+      <h1 class="game-title">BATALHA RPG</h1>
+      <p class="text-muted">Combate estratégico baseado em turnos</p>
+    </div>
+
+    <div class="row">
       <!-- Player 1 Section -->
-      <div class="player-container" id="player1">
-        <h2>Jogador 1</h2>
-        <div><strong>Personagem:</strong> <span
-            id="player1Character"></span></div>
-        <div><strong>Vida:</strong> <span id="player1Vida"></span></div>
-        <div><strong>Dano:</strong> <span id="player1Dano"></span></div>
-        <div><strong>Armadura:</strong> <span id="player1Armadura"></span></div>
-        <div><strong>Esquiva:</strong> <span id="player1Esquiva"></span></div>
-        <div><strong>Peso:</strong> <span id="player1Peso"></span></div>
-        <div><strong>Stamina:</strong> <span id="player1Stamina"></span></div>
-        <div><strong>Dado Especial:</strong> <span
-            id="player1DadoEspecial"></span></div>
-        <div><strong>Custo de Stamina:</strong> <span
-            id="player1Custo"></span></div>
-        <div><strong>Penalidade:</strong> <span
-            id="player1Penalidade"></span></div>
-        <h3>Rolagens de Dados</h3>
-        <div><strong>D20:</strong> <span id="player1D20">?</span>
-          <button id="player1D20Btn" onclick="rolarDado('D20', 1)">Rolar
-            D20</button>
+      <div class="col-lg-6 mb-4">
+        <div class="player-card" id="player1">
+          <div class="player-header">
+            <h2 class="character-name mb-0" id="player1Character">Jogador 1</h2>
+          </div>
+          <div class="player-body">
+            <!-- Health Bar -->
+            <div class="health-bar progress">
+              <div class="progress-bar" id="player1HealthBar" role="progressbar" style="width: 100%"></div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="stat-item">
+                  <span class="stat-label">Vida:</span>
+                  <span class="stat-value float-end" id="player1Vida">30</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Dano Base:</span>
+                  <span class="stat-value float-end" id="player1Dano">3</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Armadura:</span>
+                  <span class="stat-value float-end" id="player1Armadura">5</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="stat-item">
+                  <span class="stat-label">Esquiva:</span>
+                  <span class="stat-value float-end" id="player1Esquiva">2</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Stamina:</span>
+                  <span class="stat-value float-end" id="player1Stamina">6/6</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Habilidade:</span>
+                  <span class="stat-value float-end" id="player1DadoEspecial">D8</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dice Section -->
+            <div class="dice-section">
+              <h3><i class="fas fa-dice me-2"></i>Rolagem de Dados</h3>
+
+              <div class="dice-row mb-2">
+                <button id="player1D20Btn" class="btn btn-danger btn-sm dice-button" data-dado="D20">
+                  <i class="fas fa-dice-d20 me-1"></i> D20
+                </button>
+                <span class="badge bg-dark ms-2" id="player1D20">0</span>
+              </div>
+
+              <div class="dice-row mb-2">
+                <button id="player1D6Btn" class="btn btn-secondary btn-sm dice-button" data-dado="D6" disabled>
+                  <i class="fas fa-dice-six me-1"></i> D6
+                </button>
+                <span class="badge bg-dark ms-2" id="player1D6">0</span>
+              </div>
+
+              <div class="dice-row mb-2">
+                <button id="player1D8Btn" class="btn btn-info btn-sm dice-button" data-dado="D8" disabled>
+                  <i class="fas fa-dice-eight me-1"></i> D8
+                </button>
+                <span class="badge bg-dark ms-2" id="player1D8">0</span>
+              </div>
+
+              <div class="dice-row mb-2">
+                <button id="player1D10Btn" class="btn btn-success btn-sm dice-button" data-dado="D10" disabled>
+                  <i class="fas fa-dice-ten me-1"></i> D10
+                </button>
+                <span class="badge bg-dark ms-2" id="player1D10">0</span>
+              </div>
+
+              <div class="dice-row">
+                <button id="player1D12Btn" class="btn btn-warning btn-sm dice-button" data-dado="D12" disabled>
+                  <i class="fas fa-dice-twelve me-1"></i> D12
+                </button>
+                <span class="badge bg-dark ms-2" id="player1D12">0</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Player 2 Section -->
-      <div class="player-container" id="player2">
-        <h2>Jogador 2</h2>
-        <div><strong>Personagem:</strong> <span
-            id="player2Character"></span></div>
-        <div><strong>Vida:</strong> <span id="player2Vida"></span></div>
-        <div><strong>Dano:</strong> <span id="player2Dano"></span></div>
-        <div><strong>Armadura:</strong> <span id="player2Armadura"></span></div>
-        <div><strong>Esquiva:</strong> <span id="player2Esquiva"></span></div>
-        <div><strong>Peso:</strong> <span id="player2Peso"></span></div>
-        <div><strong>Stamina:</strong> <span id="player2Stamina"></span></div>
-        <div><strong>Dado Especial:</strong> <span
-            id="player2DadoEspecial"></span></div>
-        <div><strong>Custo de Stamina:</strong> <span
-            id="player2Custo"></span></div>
-        <div><strong>Penalidade:</strong> <span
-            id="player2Penalidade"></span></div>
-        <h3>Rolagens de Dados</h3>
-        <div><strong>D20:</strong>
-          <span id="player2D20">?</span>
-          <button id="player2D20Btn" onclick="rolarDado('D20', 2)">Rolar
-            D20</button>
+      <div class="col-lg-6 mb-4">
+        <div class="player-card" id="player2">
+          <div class="player-header">
+            <h2 class="character-name mb-0" id="player2Character">Jogador 2</h2>
+          </div>
+          <div class="player-body">
+            <!-- Health Bar -->
+            <div class="health-bar progress">
+              <div class="progress-bar" id="player2HealthBar" role="progressbar" style="width: 100%"></div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="stat-item">
+                  <span class="stat-label">Vida:</span>
+                  <span class="stat-value float-end" id="player2Vida">30</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Dano Base:</span>
+                  <span class="stat-value float-end" id="player2Dano">3</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Armadura:</span>
+                  <span class="stat-value float-end" id="player2Armadura">5</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="stat-item">
+                  <span class="stat-label">Esquiva:</span>
+                  <span class="stat-value float-end" id="player2Esquiva">2</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Stamina:</span>
+                  <span class="stat-value float-end" id="player2Stamina">6/6</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Habilidade:</span>
+                  <span class="stat-value float-end" id="player2DadoEspecial">D8</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dice Section -->
+            <div class="dice-section">
+              <h3><i class="fas fa-dice me-2"></i>Rolagem de Dados</h3>
+
+              <div class="dice-row mb-2">
+                <button id="player2D20Btn" class="btn btn-danger btn-sm dice-button" data-dado="D20">
+                  <i class="fas fa-dice-d20 me-1"></i> D20
+                </button>
+                <span class="badge bg-dark ms-2" id="player2D20">0</span>
+              </div>
+
+              <div class="dice-row mb-2">
+                <button id="player2D6Btn" class="btn btn-secondary btn-sm dice-button" data-dado="D6" disabled>
+                  <i class="fas fa-dice-six me-1"></i> D6
+                </button>
+                <span class="badge bg-dark ms-2" id="player2D6">0</span>
+              </div>
+
+              <div class="dice-row mb-2">
+                <button id="player2D8Btn" class="btn btn-info btn-sm dice-button" data-dado="D8" disabled>
+                  <i class="fas fa-dice-eight me-1"></i> D8
+                </button>
+                <span class="badge bg-dark ms-2" id="player2D8">0</span>
+              </div>
+
+              <div class="dice-row mb-2">
+                <button id="player2D10Btn" class="btn btn-success btn-sm dice-button" data-dado="D10" disabled>
+                  <i class="fas fa-dice-ten me-1"></i> D10
+                </button>
+                <span class="badge bg-dark ms-2" id="player2D10">0</span>
+              </div>
+
+              <div class="dice-row">
+                <button id="player2D12Btn" class="btn btn-warning btn-sm dice-button" data-dado="D12" disabled>
+                  <i class="fas fa-dice-twelve me-1"></i> D12
+                </button>
+                <span class="badge bg-dark ms-2" id="player2D12">0</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div class="turno-container">
-        <p id="contadorTurno">Turno: 1</p>
-        <p id="resultadoTurno"></p>
-      </div>
-
-      <div id="resultadoTurnoAnterior">
-        <h3>Resultado do Turno Anterior:</h3>
-        <div id="mensagemBatalha"></div>
       </div>
     </div>
 
-    <script src="./js/modalpersonagens.js"></script>
-    <script src="./js/dados.js"></script>
-    <script src="./js/turnos.js"></script>
-    <script src="./js/jogo.js"></script>
-    <script src="./js/batalha.js"></script>
-  </body>
+    <!-- Game Info Section -->
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <div class="turn-info">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="mb-0" id="contadorTurno">Turno: 1</h3>
+            <span class="badge bg-primary" id="currentPhase">Fase: Inicial</span>
+          </div>
+          <p class="mb-0 mt-2" id="resultadoTurno">Jogador 1 começa o turno</p>
+        </div>
+
+        <div class="battle-log mt-4">
+          <div class="battle-message mt-3 text-center" id="mensagemBatalha"></div>
+          <h4 class="text-center mb-3"><i class="fas fa-scroll me-2"></i>Registro de Batalha</h4>
+          <div id="battleLogContent">
+            <div class="log-entry text-muted">A batalha começou!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5.3 JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS -->
+  <script src="./assets/js/config.js"></script>
+  <script src="./assets/js/personagens/guerreiro.js"></script>
+  <script src="./assets/js/personagens/ladino.js"></script>
+  <script src="./assets/js/dados.js"></script>
+  <script src="./assets/js/turnos.js"></script>
+  <script src="./assets/js/jogo.js"></script>
+  <script src="./assets/js/batalha.js"></script>
+
+
+</body>
+
 </html>

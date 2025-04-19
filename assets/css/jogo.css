@@ -1,0 +1,294 @@
+/* Estilos globais e layout principal */
+:root {
+  --dark-900: #121212;
+  --dark-800: #1a1a1a;
+  --dark-700: #222222;
+  --dark-600: #2a2a2a;
+  --rpg-gold: #ffc107;
+  --rpg-gold-dark: #e0a800;
+  --rpg-red: #dc3545;
+  --rpg-red-dark: #bd2130;
+  --rpg-blue: #0d6efd;
+  --rpg-blue-dark: #0b5ed7;
+  --rpg-green: #28a745;
+  --rpg-green-dark: #218838;
+  --rpg-orange: #fd7e14;
+  --rpg-orange-dark: #e36209;
+  --rpg-cyan: #17a2b8;
+  --rpg-cyan-dark: #138496;
+  --rpg-gray: #6c757d;
+  --rpg-gray-dark: #5a6268;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--dark-900);
+  color: #f8f9fa;
+  padding-top: 20px;
+  min-height: 100vh;
+}
+
+/* Títulos e textos */
+.game-title {
+  font-family: "MedievalSharp", cursive;
+  color: var(--rpg-gold);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.section-title {
+  font-family: "MedievalSharp", cursive;
+  color: var(--rpg-gold);
+  position: relative;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--rpg-gold),
+    transparent
+  );
+}
+
+/* Cards de jogador */
+.player-card {
+  background-color: var(--dark-800);
+  border-radius: 10px;
+  border: 1px solid var(--dark-600);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.player-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(255, 193, 7, 0.15);
+}
+
+.player-header {
+  border-bottom: 1px solid var(--dark-600);
+  padding: 1rem;
+  background-color: var(--dark-700);
+  position: relative;
+}
+
+.character-name {
+  font-family: "MedievalSharp", cursive;
+  color: var(--rpg-gold);
+  font-size: 1.5rem;
+  margin-bottom: 0;
+}
+
+.player-body {
+  padding: 1.5rem;
+}
+
+/* Barras de status */
+.health-bar {
+  height: 20px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  background-color: var(--dark-600);
+  overflow: hidden;
+}
+
+.health-bar .progress-bar {
+  background-color: var(--rpg-red);
+  transition: width 0.5s ease;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.stamina-bar {
+  height: 8px;
+  border-radius: 4px;
+  background-color: var(--dark-600);
+  margin-top: 0.5rem;
+}
+
+.stamina-bar .progress-bar {
+  background-color: var(--rpg-blue);
+  transition: width 0.5s ease;
+}
+
+/* Estatísticas */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-item {
+  background-color: var(--dark-700);
+  border-radius: 6px;
+  padding: 0.75rem;
+  border-left: 3px solid var(--rpg-gold);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #adb5bd;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: white;
+}
+
+/* Informações de turno */
+.turn-info {
+  background-color: var(--dark-700);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid var(--rpg-gold);
+}
+
+.turn-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.turn-number {
+  font-weight: 700;
+  color: var(--rpg-gold);
+}
+
+.phase-badge {
+  background-color: var(--dark-600);
+  color: var(--rpg-gold);
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.turn-message {
+  margin-bottom: 0;
+}
+
+/* Registro de batalha */
+.battle-log {
+  background-color: var(--dark-700);
+  border-radius: 10px;
+  padding: 1.25rem;
+  min-height: 150px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--dark-600);
+}
+
+.battle-log-title {
+  color: var(--rpg-gold);
+  text-align: center;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.log-entry {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--dark-600);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.log-entry:last-child {
+  border-bottom: none;
+}
+
+.log-entry.attack {
+  color: var(--rpg-red);
+}
+
+.log-entry.defense {
+  color: var(--rpg-cyan);
+}
+
+.log-entry.special {
+  color: var(--rpg-gold);
+}
+
+.log-entry.damage {
+  font-weight: 700;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .player-card {
+    margin-bottom: 1rem;
+  }
+
+  .character-name {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .game-title {
+    font-size: 1.8rem;
+  }
+
+  .player-body {
+    padding: 1rem;
+  }
+}
+
+/* Animações */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}

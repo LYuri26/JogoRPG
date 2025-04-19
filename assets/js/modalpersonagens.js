@@ -200,6 +200,9 @@ const characterData = {
 
 // Função para abrir o modal e carregar os dados do personagem
 function openModal(character) {
+  document.getElementById(
+    "characterImage"
+  ).src = `./assets/images/${character.toLowerCase()}.jpeg`;
   // Verificar se o personagem existe na lista de dados
   if (characterData[character]) {
     // Atualiza as informações do modal com os dados do personagem selecionado

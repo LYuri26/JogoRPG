@@ -59,9 +59,8 @@ Criar um jogo de combate tático onde dois jogadores escolhem classes distintas 
 │
 ├── /assets
 │   ├── /images         # Imagens do projeto (se necessário)
-│   └── /fonts          # Fontes personalizadas, se necessário
-│
-├── /css
+│   ├── /fonts          # Fontes personalizadas, se necessário
+│   ├── /css
 │   ├── style.css       # Arquivo principal de estilo CSS
 │   ├── /classes
 │   │   ├── guerreiro.css
@@ -79,9 +78,8 @@ Criar um jogo de combate tático onde dois jogadores escolhem classes distintas 
 │   │   ├── mercenario.css
 │   │   ├── feiticeiro.css
 │   │   └── samurai.css
-│   └── modal.css       # Estilos para o modal de cada personagem
-│
-├── /js
+│   ├── modal.css       # Estilos para o modal de cada personagem
+│   ├── /js
 │   ├── data.js         # Lógica de dados e cálculos (rolagens, habilidades, etc)
 │   ├── guerreiro.js    # Funções específicas do Guerreiro
 │   ├── ladino.js       # Funções específicas do Ladino

@@ -1,387 +1,364 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <head>
-        <!-- Meta tags para configurar o charset e responsividade -->
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <!-- Título da página -->
-        <title>Seleção de Personagem</title>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seleção de Personagem - RPG Combat</title>
 
-        <!-- Inclusão do Bootstrap para estilos prontos -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
-            rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-        <!-- Inclusão de um arquivo de estilo externo para customizações -->
-        <link rel="stylesheet" href="./css/style.css" />
-    </head>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <body>
-        <!-- Container principal -->
-        <div class="container text-center">
-            <!-- Seção para mostrar o status dos jogadores -->
-            <div id="playerStatus" class="status-container">
-                <!-- Título da página -->
-                <h1 class="my-5">Escolha seu Personagem</h1>
-                <h2 id="playerStatusTitle">Jogador 1 Selecionando
-                    Personagem</h2>
-                <p id="player1Status">Jogador 1 Selecionando Personagem</p>
-                <p id="player2Status">Jogador 2 Aguardando...</p>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Poppins:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="./assets/css/personagens.css" />
+</head>
+
+<body class="bg-dark text-light">
+    <!-- Header Hero Section -->
+    <header class="hero-section py-5 mb-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h1 class="display-4 fw-bold mb-3 game-title">RPG COMBAT</h1>
+                    <p class="lead mb-4">Escolha seus personagens e prepare-se para a batalha!</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <span class="badge bg-danger fs-5">D20</span>
+                        <span class="badge bg-warning text-dark fs-5">D12</span>
+                        <span class="badge bg-success fs-5">D10</span>
+                        <span class="badge bg-primary fs-5">D8</span>
+                        <span class="badge bg-info text-dark fs-5">D6</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mb-5">
+        <!-- Player Status Section -->
+        <section class="player-status mb-5 p-4 rounded-3 bg-dark-800 border border-secondary">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2 class="mb-3 text-center text-md-start" id="playerStatusTitle">
+                        <i class="fas fa-user me-2"></i>Jogador 1 Selecionando
+                    </h2>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                        <button id="startGameButton" class="btn btn-success btn-lg px-4" onclick="startGame()"
+                            style="display:none;">
+                            <i class="fas fa-play me-2"></i>Iniciar Jogo
+                        </button>
+                        <button id="continueButton" class="btn btn-warning btn-lg px-4" onclick="continueGame()"
+                            style="display:none;">
+                            <i class="fas fa-arrow-right me-2"></i>Continuar
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Botões de controle do jogo -->
-            <div class="mt-4">
-                <button id="startGameButton" class="btn btn-success"
-                    onclick="startGame()" style="display:none;">Iniciar
-                    Jogo</button>
-                <button id="continueButton" class="btn btn-warning"
-                    onclick="continueGame()"
-                    style="display:none;">Continuar</button>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="player-card bg-dark-700 p-3 rounded mb-3">
+                        <h3 class="h5"><i class="fas fa-user me-2"></i>Jogador 1</h3>
+                        <p id="player1Status" class="mb-0">Selecionando personagem...</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="player-card bg-dark-700 p-3 rounded">
+                        <h3 class="h5"><i class="fas fa-user me-2"></i>Jogador 2</h3>
+                        <p id="player2Status" class="mb-0">Aguardando seleção...</p>
+                    </div>
+                </div>
             </div>
-            <!-- Botão para iniciar o jogo, inicialmente escondido -->
-            <button
-                id="startGameButton"
-                class="btn btn-success mt-4"
-                onclick="startGame()"
-                style="display:none;">
-                Iniciar Jogo
-            </button>
+        </section>
 
-            <!-- Botão para continuar o jogo, inicialmente escondido -->
-            <button
-                id="continueButton"
-                class="btn btn-warning mt-4"
-                onclick="continueGame()"
-                style="display:none;">
-                Continuar
-            </button>
+        <!-- Character Selection Grid -->
+        <section class="character-selection">
+            <h2 class="text-center mb-4 section-title">ESCOLHA SEU PERSONAGEM</h2>
 
-            <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
-                <!-- Cartões de Personagens -->
-
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
                 <!-- Guerreiro -->
                 <div class="col">
-                    <div class="card" id="GuerreiroCard">
-                        <img src="./assets/images/guerreiro.jpeg"
-                            alt="Guerreiro"
-                            class="card-img-top img-fluid">
+                    <div class="card character-card h-100" id="GuerreiroCard">
+                        <div class="card-img-container">
+                            <img src="./assets/images/guerreiro.jpeg" alt="Guerreiro" class="card-img-top">
+                            <div class="character-badge bg-danger">FORÇA</div>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Vegeta</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Força e resistência</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Guerreiro -->
-                            <button id="GuerreiroBtn" class="btn btn-primary"
-                                onclick="openModal('Guerreiro')">Ver
-                                Detalhes</button>
+                            <h3 class="card-title character-name">Vegeta</h3>
+                            <p class="card-text character-desc">Força e resistência</p>
+                            <div class="character-stats d-flex justify-content-between mb-3">
+                                <span class="badge bg-dark"><i class="fas fa-heart text-danger me-1"></i> 30</span>
+                                <span class="badge bg-dark"><i class="fas fa-shield-alt text-primary me-1"></i> 5</span>
+                                <span class="badge bg-dark"><i class="fas fa-bolt text-warning me-1"></i> 6</span>
+                            </div>
+                            <button id="GuerreiroBtn" class="btn btn-primary w-100" onclick="openModal('Guerreiro')">
+                                <i class="fas fa-search me-2"></i>Detalhes
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Ladino -->
                 <div class="col">
-                    <div class="card" id="LadinoCard">
-                        <img src="./assets/images/ladino.jpeg" alt="Ladino"
-                            class="card-img-top img-fluid">
+                    <div class="card character-card h-100" id="LadinoCard">
+                        <div class="card-img-container">
+                            <img src="./assets/images/ladino.jpeg" alt="Ladino" class="card-img-top">
+                            <div class="character-badge bg-success">AGILIDADE</div>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Mulher Gato</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Habilidade e agilidade</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Ladino -->
-                            <button id="LadinoBtn" class="btn btn-primary"
-                                onclick="openModal('Ladino')">Ver
-                                Detalhes</button>
+                            <h3 class="card-title character-name">Mulher Gato</h3>
+                            <p class="card-text character-desc">Habilidade e agilidade</p>
+                            <div class="character-stats d-flex justify-content-between mb-3">
+                                <span class="badge bg-dark"><i class="fas fa-heart text-danger me-1"></i> 25</span>
+                                <span class="badge bg-dark"><i class="fas fa-shield-alt text-primary me-1"></i> 2</span>
+                                <span class="badge bg-dark"><i class="fas fa-bolt text-warning me-1"></i> 6</span>
+                            </div>
+                            <button id="LadinoBtn" class="btn btn-primary w-100" onclick="openModal('Ladino')">
+                                <i class="fas fa-search me-2"></i>Detalhes
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Mago -->
                 <div class="col">
-                    <div class="card" id="MagoCard">
-                        <img src="./assets/images/mago.jpeg" alt="Mago"
-                            class="card-img-top img-fluid">
+                    <div class="card character-card h-100" id="MagoCard">
+                        <div class="card-img-container">
+                            <img src="./assets/images/mago.jpeg" alt="Mago" class="card-img-top">
+                            <div class="character-badge bg-info text-dark">MAGIA</div>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Patolino</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Poder mágico</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Mago -->
-                            <button id="MagoBtn" class="btn btn-primary"
-                                onclick="openModal('Mago')">Ver
-                                Detalhes</button>
+                            <h3 class="card-title character-name">Patolino</h3>
+                            <p class="card-text character-desc">Poder mágico</p>
+                            <div class="character-stats d-flex justify-content-between mb-3">
+                                <span class="badge bg-dark"><i class="fas fa-heart text-danger me-1"></i> 20</span>
+                                <span class="badge bg-dark"><i class="fas fa-shield-alt text-primary me-1"></i> 1</span>
+                                <span class="badge bg-dark"><i class="fas fa-bolt text-warning me-1"></i> 9</span>
+                            </div>
+                            <button id="MagoBtn" class="btn btn-primary w-100" onclick="openModal('Mago')">
+                                <i class="fas fa-search me-2"></i>Detalhes
+                            </button>
                         </div>
                     </div>
                 </div>
 
+                <!-- Adicione os outros personagens seguindo o mesmo padrão -->
                 <!-- Paladino -->
                 <div class="col">
-                    <div class="card" id="PaladinoCard">
-                        <img src="./assets/images/paladino.jpeg" alt="Paladino"
-                            class="card-img-top img-fluid">
+                    <div class="card character-card h-100" id="PaladinoCard">
+                        <div class="card-img-container">
+                            <img src="./assets/images/paladino.jpeg" alt="Paladino" class="card-img-top">
+                            <div class="character-badge bg-primary">PROTEÇÃO</div>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Garen</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Proteção divina</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Paladino -->
-                            <button id="PaladinoBtn" class="btn btn-primary"
-                                onclick="openModal('Paladino')">Ver
-                                Detalhes</button>
+                            <h3 class="card-title character-name">Garen</h3>
+                            <p class="card-text character-desc">Proteção divina</p>
+                            <div class="character-stats d-flex justify-content-between mb-3">
+                                <span class="badge bg-dark"><i class="fas fa-heart text-danger me-1"></i> 35</span>
+                                <span class="badge bg-dark"><i class="fas fa-shield-alt text-primary me-1"></i> 4</span>
+                                <span class="badge bg-dark"><i class="fas fa-bolt text-warning me-1"></i> 6</span>
+                            </div>
+                            <button id="PaladinoBtn" class="btn btn-primary w-100" onclick="openModal('Paladino')">
+                                <i class="fas fa-search me-2"></i>Detalhes
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Bárbaro -->
                 <div class="col">
-                    <div class="card" id="BarbaroCard">
-                        <img src="./assets/images/barbaro.jpeg" alt="Bárbaro"
-                            class="card-img-top img-fluid">
+                    <div class="card character-card h-100" id="BarbaroCard">
+                        <div class="card-img-container">
+                            <img src="./assets/images/barbaro.jpeg" alt="Bárbaro" class="card-img-top">
+                            <div class="character-badge bg-danger">FÚRIA</div>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Konan</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Fúria e poder</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Bárbaro -->
-                            <button id="BarbaroBtn" class="btn btn-primary"
-                                onclick="openModal('Barbaro')">Ver
-                                Detalhes</button>
+                            <h3 class="card-title character-name">Konan</h3>
+                            <p class="card-text character-desc">Fúria e poder</p>
+                            <div class="character-stats d-flex justify-content-between mb-3">
+                                <span class="badge bg-dark"><i class="fas fa-heart text-danger me-1"></i> 35</span>
+                                <span class="badge bg-dark"><i class="fas fa-shield-alt text-primary me-1"></i> 3</span>
+                                <span class="badge bg-dark"><i class="fas fa-bolt text-warning me-1"></i> 6</span>
+                            </div>
+                            <button id="BarbaroBtn" class="btn btn-primary w-100" onclick="openModal('Barbaro')">
+                                <i class="fas fa-search me-2"></i>Detalhes
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Arqueiro -->
                 <div class="col">
-                    <div class="card" id="ArqueiroCard">
-                        <img src="./assets/images/arqueiro.jpeg" alt="Arqueiro"
-                            class="card-img-top img-fluid">
+                    <div class="card character-card h-100" id="ArqueiroCard">
+                        <div class="card-img-container">
+                            <img src="./assets/images/arqueiro.jpeg" alt="Arqueiro" class="card-img-top">
+                            <div class="character-badge bg-success">PRECISÃO</div>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Legolas</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Precisão e agilidade</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Arqueiro -->
-                            <button id="ArqueiroBtn" class="btn btn-primary"
-                                onclick="openModal('Arqueiro')">Ver
-                                Detalhes</button>
+                            <h3 class="card-title character-name">Legolas</h3>
+                            <p class="card-text character-desc">Precisão e agilidade</p>
+                            <div class="character-stats d-flex justify-content-between mb-3">
+                                <span class="badge bg-dark"><i class="fas fa-heart text-danger me-1"></i> 25</span>
+                                <span class="badge bg-dark"><i class="fas fa-shield-alt text-primary me-1"></i> 2</span>
+                                <span class="badge bg-dark"><i class="fas fa-bolt text-warning me-1"></i> 6</span>
+                            </div>
+                            <button id="ArqueiroBtn" class="btn btn-primary w-100" onclick="openModal('Arqueiro')">
+                                <i class="fas fa-search me-2"></i>Detalhes
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Monge -->
                 <div class="col">
-                    <div class="card" id="MongeCard">
-                        <img src="./assets/images/monge.jpeg" alt="Monge"
-                            class="card-img-top img-fluid">
+                    <div class="card character-card h-100" id="MongeCard">
+                        <div class="card-img-container">
+                            <img src="./assets/images/monge.jpeg" alt="Monge" class="card-img-top">
+                            <div class="character-badge bg-warning text-dark">DESTREZA</div>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Liu Kang</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Velocidade e destreza</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Monge -->
-                            <button id="MongeBtn" class="btn btn-primary"
-                                onclick="openModal('Monge')">Ver
-                                Detalhes</button>
+                            <h3 class="card-title character-name">Liu Kang</h3>
+                            <p class="card-text character-desc">Velocidade e destreza</p>
+                            <div class="character-stats d-flex justify-content-between mb-3">
+                                <span class="badge bg-dark"><i class="fas fa-heart text-danger me-1"></i> 30</span>
+                                <span class="badge bg-dark"><i class="fas fa-shield-alt text-primary me-1"></i> 3</span>
+                                <span class="badge bg-dark"><i class="fas fa-bolt text-warning me-1"></i> 6</span>
+                            </div>
+                            <button id="MongeBtn" class="btn btn-primary w-100" onclick="openModal('Monge')">
+                                <i class="fas fa-search me-2"></i>Detalhes
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Cavaleiro -->
                 <div class="col">
-                    <div class="card" id="CavaleiroCard">
-                        <img src="./assets/images/cavaleiro.jpeg"
-                            alt="Cavaleiro"
-                            class="card-img-top img-fluid">
+                    <div class="card character-card h-100" id="CavaleiroCard">
+                        <div class="card-img-container">
+                            <img src="./assets/images/cavaleiro.jpeg" alt="Cavaleiro" class="card-img-top">
+                            <div class="character-badge bg-primary">DEFESA</div>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Seia</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Defesa e força</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Cavaleiro -->
-                            <button id="CavaleiroBtn" class="btn btn-primary"
-                                onclick="openModal('Cavaleiro')">Ver
-                                Detalhes</button>
+                            <h3 class="card-title character-name">Seiya</h3>
+                            <p class="card-text character-desc">Defesa e força</p>
+                            <div class="character-stats d-flex justify-content-between mb-3">
+                                <span class="badge bg-dark"><i class="fas fa-heart text-danger me-1"></i> 35</span>
+                                <span class="badge bg-dark"><i class="fas fa-shield-alt text-primary me-1"></i> 5</span>
+                                <span class="badge bg-dark"><i class="fas fa-bolt text-warning me-1"></i> 6</span>
+                            </div>
+                            <button id="CavaleiroBtn" class="btn btn-primary w-100" onclick="openModal('Cavaleiro')">
+                                <i class="fas fa-search me-2"></i>Detalhes
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Assassino -->
-                <div class="col">
-                    <div class="card" id="AssassinoCard">
-                        <img src="./assets/images/assassino.jpeg"
-                            alt="Assassino"
-                            class="card-img-top img-fluid">
-                        <div class="card-body">
-                            <h5 class="card-title">Vetor</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Silencioso e letal</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Assassino -->
-                            <button id="AssassinoBtn" class="btn btn-primary"
-                                onclick="openModal('Assassino')">Ver
-                                Detalhes</button>
+                <!-- Adicione os demais personagens seguindo o mesmo padrão -->
+                <!-- ... -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Detalhes do Personagem -->
+    <div id="characterModal" class="modal fade" tabindex="-1" aria-labelledby="characterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header border-secondary">
+                    <h2 id="characterTitle" class="modal-title fs-3"></h2>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img id="characterImage" src="" alt="Personagem" class="img-fluid rounded mb-3">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <div class="stat-box bg-dark-800 p-3 rounded">
+                                        <h4 class="h6 text-warning"><i class="fas fa-heart me-2"></i>Vida</h4>
+                                        <p id="characterLife" class="h4 mb-0"></p>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="stat-box bg-dark-800 p-3 rounded">
+                                        <h4 class="h6 text-primary"><i class="fas fa-fist-raised me-2"></i>Dano</h4>
+                                        <p id="characterDamage" class="h4 mb-0"></p>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="stat-box bg-dark-800 p-3 rounded">
+                                        <h4 class="h6 text-info"><i class="fas fa-shield-alt me-2"></i>Armadura</h4>
+                                        <p id="characterArmor" class="h4 mb-0"></p>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="stat-box bg-dark-800 p-3 rounded">
+                                        <h4 class="h6 text-success"><i class="fas fa-running me-2"></i>Esquiva</h4>
+                                        <p id="characterDodge" class="h4 mb-0"></p>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="stat-box bg-dark-800 p-3 rounded">
+                                        <h4 class="h6 text-secondary"><i class="fas fa-weight-hanging me-2"></i>Peso
+                                        </h4>
+                                        <p id="characterWeight" class="h4 mb-0"></p>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="stat-box bg-dark-800 p-3 rounded">
+                                        <h4 class="h6 text-danger"><i class="fas fa-bolt me-2"></i>Stamina/Mana</h4>
+                                        <p id="characterStamina" class="h4 mb-0"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="special-ability bg-dark-800 p-3 rounded mb-3">
+                                <h3 class="h5 text-warning"><i class="fas fa-fire me-2"></i>Habilidade Especial</h3>
+                                <p id="characterSkill" class="mb-2"></p>
+                                <p class="mb-1"><strong>Custo:</strong> <span id="characterCost"
+                                        class="badge bg-danger"></span></p>
+                                <p class="mb-0"><strong>Penalidade:</strong> <span id="characterPenalty"
+                                        class="badge bg-secondary"></span></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Druida -->
-                <div class="col">
-                    <div class="card" id="DruidaCard">
-                        <img src="./assets/images/druida.jpeg" alt="Druida"
-                            class="card-img-top img-fluid">
-                        <div class="card-body">
-                            <h5 class="card-title">Branca de Neve</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Conexão com a natureza</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Druida -->
-                            <button id="DruidaBtn" class="btn btn-primary"
-                                onclick="openModal('Druida')">Ver
-                                Detalhes</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gladiador -->
-                <div class="col">
-                    <div class="card" id="GladiadorCard">
-                        <img src="./assets/images/gladiador.jpeg"
-                            alt="Gladiador"
-                            class="card-img-top img-fluid">
-                        <div class="card-body">
-                            <h5 class="card-title">Maximus</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Força bruta e resistência</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Gladiador -->
-                            <button id="GladiadorBtn" class="btn btn-primary"
-                                onclick="openModal('Gladiador')">Ver
-                                Detalhes</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Caçador -->
-                <div class="col">
-                    <div class="card" id="CacadorCard">
-                        <img src="./assets/images/cacador.jpeg" alt="Caçador"
-                            class="card-img-top img-fluid">
-                        <div class="card-body">
-                            <h5 class="card-title">Hisoka</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Precisão e armadilhas</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Caçador -->
-                            <button id="CacadorBtn" class="btn btn-primary"
-                                onclick="openModal('Cacador')">Ver
-                                Detalhes</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mercenário -->
-                <div class="col">
-                    <div class="card" id="MercenarioCard">
-                        <img src="./assets/images/mercenario.jpeg"
-                            alt="Mercenário"
-                            class="card-img-top img-fluid">
-                        <div class="card-body">
-                            <h5 class="card-title">Lady Deadpool</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Combate e estratégias</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Mercenário -->
-                            <button id="MercenarioBtn" class="btn btn-primary"
-                                onclick="openModal('Mercenario')">Ver
-                                Detalhes</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feiticeiro -->
-                <div class="col">
-                    <div class="card" id="FeiticeiroCard">
-                        <img src="./assets/images/feiticeiro.jpeg"
-                            alt="Feiticeiro"
-                            class="card-img-top img-fluid">
-                        <div class="card-body">
-                            <h5 class="card-title">Harry Potter</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Magia pura</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Feiticeiro -->
-                            <button id="FeiticeiroBtn" class="btn btn-primary"
-                                onclick="openModal('Feiticeiro')">Ver
-                                Detalhes</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Samurai -->
-                <div class="col">
-                    <div class="card" id="SamuraiCard">
-                        <img src="./assets/images/samurai.jpeg" alt="Samurai"
-                            class="card-img-top img-fluid">
-                        <div class="card-body">
-                            <h5 class="card-title">Kenshin Himura</h5>
-                            <!-- Nome do personagem -->
-                            <p class="card-text">Honra e destreza</p>
-                            <!-- Descrição das habilidades -->
-                            <!-- Botão que abre o modal com mais detalhes sobre o Samurai -->
-                            <button id="SamuraiBtn" class="btn btn-primary"
-                                onclick="openModal('Samurai')">Ver
-                                Detalhes</button>
-                        </div>
-                    </div>
+                <div class="modal-footer border-secondary justify-content-center">
+                    <button class="btn btn-primary btn-lg px-4" onclick="selectCharacter()">
+                        <i class="fas fa-check me-2"></i>Selecionar Personagem
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Modal de Detalhes do Personagem -->
-        <div id="characterModal" class="modal fade" tabindex="-1"
-            aria-labelledby="characterModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <!-- Cabeçalho do Modal -->
-                    <div class="modal-header">
-                        <h5 id="characterTitle"
-                            class="modal-title">Personagem</h5>
-                        <!-- Botão de fechar o modal -->
-                        <button type="button" class="btn-close"
-                            data-bs-dismiss="modal" aria-label="Close"
-                            onclick="closeModal()"></button>
-                    </div>
-                    <!-- Corpo do Modal com as informações do personagem -->
-                    <div class="modal-body">
-                        <p>Vida: <span id="characterLife"></span></p>
-                        <p>Dano: <span id="characterDamage"></span></p>
-                        <p>Armadura: <span id="characterArmor"></span></p>
-                        <p>Esquiva: <span id="characterDodge"></span></p>
-                        <p>Peso: <span id="characterWeight"></span></p>
-                        <p>Stamina/Magia: <span
-                                id="characterStamina"></span></p>
-                        <p>Habilidade: <span id="characterSkill"></span></p>
-                        <p>Custo: <span id="characterCost"></span></p>
-                        <p>Penalidade: <span id="characterPenalty"></span></p>
-                    </div>
-                    <!-- Rodapé do Modal com o botão para selecionar o personagem -->
-                    <div class="modal-footer d-flex justify-content-center">
-                        <button class="btn btn-primary"
-                            onclick="selectCharacter()">
-                            Selecionar Personagem
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <!-- Footer -->
+    <footer class="bg-dark-900 text-center py-4 mt-5 border-top border-secondary">
+        <div class="container">
+            <p class="mb-0">RPG Combat - Um jogo de estratégia e sorte</p>
+            <p class="text-muted small mb-0">Desenvolvido com <i class="fas fa-heart text-danger"></i> Lenon Yuri</p>
         </div>
+    </footer>
 
-        <!-- Scripts de dependências do Bootstrap e arquivos personalizados -->
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="./js/selecao.js"></script>
-        <!-- Dados dos personagens -->
-        <script src="./js/modalpersonagens.js"></script>
-        <!-- Funções do modal -->
-    </body>
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="./assets/js/config.js"></script>
+    <script src="./assets/js/selecao.js"></script>
+    <script src="./assets/js/modalpersonagens.js"></script>
+</body>
+
 </html>
