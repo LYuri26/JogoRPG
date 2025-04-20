@@ -1,206 +1,240 @@
-/**
- * DANO.JS - Sistema completo de cálculo de dano e habilidades
- * Versão corrigida e aprimorada
- */
+// Definir PenalidadesAtivas globalmente
+window.PenalidadesAtivas = {
+  player1: { defesa: 0, esquiva: 0, dano: 0 },
+  player2: { defesa: 0, esquiva: 0, dano: 0 },
+};
 
 window.DanoSystem = {
-  // Configurações completas de todas as classes
+  // Configurações completas de todas as classes conforme tabela
   ClassConfig: {
     Guerreiro: {
       dice: "D8",
       cost: 2,
       resource: "staminaMana",
       effect: function (attacker) {
-        DanoSystem.registerPenalty(
-          attacker.playerId || (attacker === window.player1Character ? 1 : 2),
-          "defesa",
-          1
-        );
+        DanoSystem.registerPenalty(attacker.playerId, "defesa", 1);
       },
-      modifier: null,
+      description: "Golpe Brutal: +1D8 no ataque",
       conditions: [],
-      description: "Golpe Poderoso: reduz a defesa do alvo em 1 ponto",
     },
     Ladino: {
       dice: "D10",
       cost: 3,
       resource: "staminaMana",
-      condition: (char) => !char.foiAtacado,
-      effect: (attacker) => {
-        attacker.usosRestantes = (attacker.usosRestantes || 0) - 1;
+      effect: function (attacker) {
+        attacker.nextAvailableTurn = GerenciadorTurnos.estado.turnoAtual + 2;
       },
-      modifier: (damage) => damage * 2,
-      maxUses: 2,
+      description: "Ataque Furtivo: +1D10 no ataque",
       conditions: [
         {
-          condicao: (char) => char.foiAtacado,
-          mensagem: "Ladino não pode usar Ataque Sorrateiro após ser atacado!",
-        },
-        {
-          condicao: (char) => (char.usosRestantes || 0) <= 0,
-          mensagem: "Ataque Sorrateiro só pode ser usado a cada 2 turnos!",
+          condicao: (char) =>
+            char.nextAvailableTurn > GerenciadorTurnos.estado.turnoAtual,
+          mensagem: "Ataque Furtivo só pode ser usado a cada 2 turnos!",
         },
       ],
-      description: "Ataque Sorrateiro: causa dano dobrado se não foi atacado",
-    },
-    Bárbaro: {
-      dice: "D10",
-      cost: 3,
-      resource: "staminaMana",
-      condition: (char) => char.vida < 15,
-      effect: (attacker) => {
-        attacker.usosRestantes = (attacker.usosRestantes || 0) - 1;
-      },
-      modifier: (damage) => Math.floor(damage * 1.5),
-      maxUses: 1,
-      conditions: [
-        {
-          condicao: (char) => char.vida >= 15,
-          mensagem:
-            "Bárbaro só pode usar Fúria quando a vida está abaixo de 15!",
-        },
-        {
-          condicao: (char) => (char.usosRestantes || 0) <= 0,
-          mensagem: "Fúria só pode ser usada uma vez por combate!",
-        },
-      ],
-      description: "Fúria: aumenta dano em 50% quando com vida baixa",
     },
     Mago: {
       dice: "D12",
       cost: 3,
-      resource: "staminaMana",
+      resource: "mana",
       effect: function (attacker) {
-        DanoSystem.registerPenalty(
-          attacker.playerId || (attacker === window.player1Character ? 1 : 2),
-          "esquiva",
-          1
-        );
+        DanoSystem.registerPenalty(attacker.playerId, "esquiva", 2);
       },
-      modifier: null,
+      description: "Bola de Fogo: +1D12 no ataque",
       conditions: [],
-      description: "Feitiço Arcano: reduz esquiva do alvo em 1 ponto",
     },
     Paladino: {
       dice: "D8",
       cost: 2,
       resource: "staminaMana",
-      effect: null,
-      modifier: null,
+      effect: function (attacker) {
+        attacker.vida = Math.max(1, attacker.vida - 2);
+        atualizarInterfacePersonagem(
+          attacker.playerId === "player1" ? 1 : 2,
+          attacker
+        );
+      },
+      description: "Ira Sagrada: +1D8 no ataque",
       conditions: [],
-      description: "Golpe Divino: ataque básico com custo reduzido",
+    },
+    Bárbaro: {
+      dice: "D12",
+      cost: 6,
+      resource: "staminaMana",
+      effect: function (attacker) {
+        attacker.usedThisCombat = true;
+      },
+      description: "Fúria Primordial: +1D12 no ataque (se vida ≤15)",
+      conditions: [
+        {
+          condicao: (char) => char.vida > 15,
+          mensagem: "Fúria só pode ser usada com vida ≤15!",
+        },
+        {
+          condicao: (char) => char.usedThisCombat,
+          mensagem: "Fúria só pode ser usada 1x por combate!",
+        },
+      ],
     },
     Arqueiro: {
       dice: "D8",
       cost: 2,
       resource: "staminaMana",
-      effect: null,
-      modifier: null,
+      effect: function (attacker) {
+        DanoSystem.registerPenalty(attacker.playerId, "esquiva", 1);
+      },
+      description: "Tiro Certeiro: +1D8 no ataque",
       conditions: [],
-      description: "Tiro Preciso: chance aumentada de acerto crítico",
     },
     Monge: {
-      dice: "D6",
+      dice: "D8",
       cost: 2,
       resource: "staminaMana",
-      effect: null,
-      modifier: null,
+      effect: function (attacker) {
+        DanoSystem.registerPenalty(attacker.playerId, "defesa", 1);
+      },
+      description: "Golpe Interior: +1D8 no ataque",
       conditions: [],
-      description: "Golpe Rápido: ataque básico de baixo custo",
     },
     Cavaleiro: {
       dice: "D8",
       cost: 3,
       resource: "staminaMana",
-      effect: null,
-      modifier: null,
+      effect: function (attacker) {
+        DanoSystem.registerPenalty(attacker.playerId, "esquiva", 1);
+      },
+      description: "Investida de Ferro: +1D8 no ataque",
       conditions: [],
-      description: "Investida: ataque com chance de atordoar",
     },
     Assassino: {
-      dice: "D12",
+      dice: "D10",
       cost: 3,
       resource: "staminaMana",
       effect: null,
-      modifier: null,
-      maxUses: 3,
-      conditions: [],
-      description: "Golpe Mortal: dano alto com usos limitados",
+      description: "Execução Silenciosa: +1D10 no ataque se tirar ≥16 no D20",
+      conditions: [
+        {
+          condicao: (char) => DadosManager.dadosRolados[char.playerId].d20 < 16,
+          mensagem: "Execução Silenciosa requer D20 ≥16!",
+        },
+      ],
     },
     Druida: {
       dice: "D8",
       cost: 3,
-      resource: "staminaMana",
-      effect: null,
-      modifier: null,
-      maxUses: 3,
-      conditions: [],
-      description: "Força da Natureza: cura após o ataque",
+      resource: "mana",
+      effect: function (attacker) {
+        attacker.vida = Math.max(1, attacker.vida - 1);
+        attacker.usesThisCombat = (attacker.usesThisCombat || 0) + 1;
+        atualizarInterfacePersonagem(
+          attacker.playerId === "player1" ? 1 : 2,
+          attacker
+        );
+      },
+      description: "Espinhos Naturais: +1D8 no ataque",
+      conditions: [
+        {
+          condicao: (char) => (char.usesThisCombat || 0) >= 2,
+          mensagem: "Espinhos Naturais só pode ser usado 2x por combate!",
+        },
+      ],
     },
     Gladiador: {
-      dice: "D6",
+      dice: "D8",
       cost: 2,
       resource: "staminaMana",
-      effect: null,
-      modifier: null,
-      conditions: [],
-      description: "Golpe Giratório: atinge múltiplos alvos",
+      effect: function (attacker) {
+        attacker.penaltyActive = true;
+        attacker.usesThisCombat = (attacker.usesThisCombat || 0) + 1;
+      },
+      description: "Força Impiedosa: +1D8 no ataque",
+      conditions: [
+        {
+          condicao: (char) => (char.usesThisCombat || 0) >= 3,
+          mensagem: "Força Impiedosa só pode ser usado 3x por combate!",
+        },
+      ],
     },
     Caçador: {
       dice: "D12",
       cost: 3,
       resource: "staminaMana",
-      effect: null,
-      modifier: null,
-      conditions: [],
-      description: "Tiro Certeiro: ignora parte da armadura",
+      effect: function (attacker) {
+        attacker.nextAvailableTurn = GerenciadorTurnos.estado.turnoAtual + 5;
+      },
+      description: "Disparo Selvagem: +1D12 no ataque",
+      conditions: [
+        {
+          condicao: (char) =>
+            char.nextAvailableTurn > GerenciadorTurnos.estado.turnoAtual,
+          mensagem: "Disparo Selvagem só pode ser usado a cada 5 turnos!",
+        },
+      ],
     },
     Mercenário: {
-      dice: "D6",
+      dice: "D10",
       cost: 2,
       resource: "staminaMana",
-      effect: null,
-      modifier: null,
-      conditions: [],
-      description: "Ataque Duplo: chance de atacar duas vezes",
+      effect: function (attacker) {
+        attacker.usesThisCombat = (attacker.usesThisCombat || 0) + 1;
+      },
+      description:
+        "Retaliação Precisa: +1D10 no ataque após esquiva bem-sucedida",
+      conditions: [
+        {
+          condicao: (char) => char.vida <= char.vidaMaxima * 0.3,
+          mensagem: "Retaliação Precisa requer vida >30%!",
+        },
+        {
+          condicao: (char) => (char.usesThisCombat || 0) >= 3,
+          mensagem: "Retaliação Precisa só pode ser usado 3x por combate!",
+        },
+      ],
     },
     Feiticeiro: {
-      dice: "D20",
+      dice: "D12",
       cost: 3,
-      resource: "staminaMana",
-      effect: null,
-      modifier: null,
-      conditions: [],
-      description: "Bola de Fogo: dano alto mas imprevisível",
+      resource: "mana",
+      effect: function (attacker) {
+        attacker.vida = Math.max(1, Math.floor(attacker.vida / 2));
+        atualizarInterfacePersonagem(
+          attacker.playerId === "player1" ? 1 : 2,
+          attacker
+        );
+      },
+      description: "Explosão Arcana: +1D12 no ataque",
+      conditions: [
+        {
+          condicao: (char) => char.vida <= 1,
+          mensagem: "Explosão Arcana não pode ser usada com 1 de vida!",
+        },
+      ],
     },
     Samurai: {
       dice: "D10",
       cost: 3,
       resource: "staminaMana",
-      effect: (attacker) => {
-        attacker.usosRestantes = (attacker.usosRestantes || 0) - 1;
+      effect: function (attacker) {
+        attacker.usedAbilityLastTurn = true;
+        attacker.usesThisCombat = (attacker.usesThisCombat || 0) + 1;
       },
-      modifier: null,
-      maxUses: 2,
+      description:
+        "Espírito Afiado: +1D10 no ataque (se não usou habilidade no turno anterior)",
       conditions: [
         {
-          condicao: (char) => (char.usosRestantes || 0) <= 0,
-          mensagem: "Foco Perfeito só pode ser usado 2 vezes por combate!",
+          condicao: (char) => char.usedAbilityLastTurn,
+          mensagem:
+            "Espírito Afiado não pode ser usado em turnos consecutivos!",
+        },
+        {
+          condicao: (char) => (char.usesThisCombat || 0) >= 2,
+          mensagem: "Espírito Afiado só pode ser usado 2x por combate!",
         },
       ],
-      description: "Foco Perfeito: ignora completamente a defesa do alvo",
     },
   },
 
-  // Penalidades ativas
-  Penalties: {
-    player1: { defesa: 0, esquiva: 0, dano: 0 },
-    player2: { defesa: 0, esquiva: 0, dano: 0 },
-  },
-
-  /**
-   * Converte dano para número
-   */
+  // Métodos auxiliares (manter os mesmos do código anterior)
   parseDanoBase: function (dano) {
     if (typeof dano === "number") return dano;
     if (typeof dano === "string") {
@@ -210,9 +244,6 @@ window.DanoSystem = {
     return 0;
   },
 
-  /**
-   * Calcula o dano total de um ataque
-   */
   calcularDano: function (jogador, tipoDado, resultado) {
     const atacante =
       jogador === 1 ? window.player1Character : window.player2Character;
@@ -226,50 +257,41 @@ window.DanoSystem = {
 
     const config = this.ClassConfig[atacante.classe] || {};
 
-    // 1. Verificar esquiva com penalidades
+    // Verificar esquiva com penalidades
     const esquivaTotal = Math.max(
       0,
       defensor.esquiva -
-        (this.Penalties[`player${jogador === 1 ? 2 : 1}`].esquiva || 0)
+        (PenalidadesAtivas[`player${jogador === 1 ? 2 : 1}`].esquiva || 0)
     );
     if (Math.random() < esquivaTotal / 100) {
       this.logAction(`${defensor.nome} esquivou do ataque!`);
       return 0;
     }
 
-    // 2. Calcular dano base
+    // Calcular dano base
     const danoBase = this.parseDanoBase(atacante.danoBase);
     const bonusDado = parseInt(resultado) || 0;
     const armadura = Math.max(
       0,
       this.parseDanoBase(defensor.armadura) -
-        (this.Penalties[`player${jogador === 1 ? 2 : 1}`].defesa || 0)
+        (PenalidadesAtivas[`player${jogador === 1 ? 2 : 1}`].defesa || 0)
     );
 
-    // 3. Cálculo inicial
     let danoTotal = Math.max(1, danoBase + bonusDado - armadura);
 
-    // 4. Verificar crítico
+    // Verificar crítico
     const faces = parseInt(tipoDado.substring(1));
     if (resultado === faces) {
       danoTotal = Math.floor(danoTotal * 1.5);
       this.logAction(`${atacante.nome} acertou um golpe crítico!`);
     }
 
-    // 5. Aplicar modificadores de classe
-    if (tipoDado === config.dice && config.modifier) {
-      danoTotal = config.modifier(danoTotal);
-    }
-
-    // 6. Aplicar penalidades de dano
-    danoTotal += this.Penalties[`player${jogador === 1 ? 2 : 1}`].dano || 0;
+    // Aplicar penalidades de dano
+    danoTotal += PenalidadesAtivas[`player${jogador === 1 ? 2 : 1}`].dano || 0;
 
     return Math.max(0, danoTotal);
   },
 
-  /**
-   * Verifica restrições especiais de habilidades
-   */
   verificarRestricoes: function (jogador, tipoDado) {
     const personagem =
       jogador === 1 ? window.player1Character : window.player2Character;
@@ -277,31 +299,18 @@ window.DanoSystem = {
 
     const config = this.ClassConfig[personagem.classe] || {};
 
-    // Verifica se é um ataque especial
     if (tipoDado === config.dice) {
-      // Verifica todas as condições
       for (const condicao of config.conditions || []) {
         if (condicao.condicao(personagem)) {
           this.showAlert(condicao.mensagem);
           return false;
         }
       }
-
-      // Verifica usos restantes
-      if (config.maxUses && (personagem.usosRestantes || 0) <= 0) {
-        this.showAlert(
-          `Habilidade já foi usada o máximo de ${config.maxUses} vezes!`
-        );
-        return false;
-      }
     }
 
     return true;
   },
 
-  /**
-   * Aplica custo de habilidade e verifica recursos
-   */
   aplicarCustoHabilidade: function (jogador, tipoDado) {
     const personagem =
       jogador === 1 ? window.player1Character : window.player2Character;
@@ -309,14 +318,12 @@ window.DanoSystem = {
 
     const config = this.ClassConfig[personagem.classe] || {};
 
-    // Verifica se é um ataque especial
     if (tipoDado === config.dice) {
       if ((personagem[config.resource] || 0) < config.cost) {
         this.showAlert("Recursos insuficientes para usar esta habilidade!");
         return false;
       }
 
-      // Deduz recursos
       personagem[config.resource] =
         (personagem[config.resource] || 0) - config.cost;
       const staminaElement = document.getElementById(`player${jogador}Stamina`);
@@ -330,9 +337,6 @@ window.DanoSystem = {
     return true;
   },
 
-  /**
-   * Aplica efeitos pós-habilidade
-   */
   aplicarEfeitosPosHabilidade: function (jogador, tipoDado) {
     const personagem =
       jogador === 1 ? window.player1Character : window.player2Character;
@@ -340,7 +344,6 @@ window.DanoSystem = {
 
     const config = this.ClassConfig[personagem.classe] || {};
 
-    // Verifica se é um ataque especial
     if (tipoDado === config.dice && config.effect) {
       try {
         config.effect(personagem);
@@ -349,40 +352,32 @@ window.DanoSystem = {
       }
     }
 
-    // Marca que foi atacado para efeitos como do Ladino
     personagem.foiAtacado = true;
   },
 
-  /**
-   * Registra uma penalidade
-   */
   registerPenalty: function (playerId, type, value) {
-    const numJogador =
-      typeof playerId === "number" ? playerId : playerId === "player1" ? 1 : 2;
+    const targetPlayer =
+      typeof playerId === "number"
+        ? playerId === 1
+          ? "player1"
+          : "player2"
+        : playerId;
 
-    if (!this.Penalties[`player${numJogador}`]) {
-      this.Penalties[`player${numJogador}`] = {
-        defesa: 0,
-        esquiva: 0,
-        dano: 0,
-      };
+    if (
+      PenalidadesAtivas[targetPlayer] &&
+      typeof PenalidadesAtivas[targetPlayer][type] === "number"
+    ) {
+      PenalidadesAtivas[targetPlayer][type] += value;
     }
 
-    if (typeof this.Penalties[`player${numJogador}`][type] === "number") {
-      this.Penalties[`player${numJogador}`][type] += value;
-    }
-
-    // Atualiza a interface
     if (window.atualizarPenalidadesInterface) {
+      const numJogador = targetPlayer === "player1" ? 1 : 2;
       atualizarPenalidadesInterface(numJogador);
     }
   },
 
-  /**
-   * Adiciona mensagem ao log de batalha
-   */
   logAction: function (message) {
-    console.log(message); // Log no console para depuração
+    console.log(message);
     const logElement = document.getElementById("logBatalha");
     if (logElement) {
       const newLog = document.createElement("p");
@@ -392,9 +387,6 @@ window.DanoSystem = {
     }
   },
 
-  /**
-   * Mostra um alerta
-   */
   showAlert: function (message) {
     console.warn(message);
     if (window.showCustomAlert) {
@@ -404,12 +396,9 @@ window.DanoSystem = {
     }
   },
 
-  /**
-   * Reseta todas as penalidades
-   */
   resetPenalties: function () {
-    this.Penalties.player1 = { defesa: 0, esquiva: 0, dano: 0 };
-    this.Penalties.player2 = { defesa: 0, esquiva: 0, dano: 0 };
+    PenalidadesAtivas.player1 = { defesa: 0, esquiva: 0, dano: 0 };
+    PenalidadesAtivas.player2 = { defesa: 0, esquiva: 0, dano: 0 };
 
     if (window.atualizarPenalidadesInterface) {
       atualizarPenalidadesInterface(1);
@@ -417,9 +406,6 @@ window.DanoSystem = {
     }
   },
 
-  /**
-   * Obtém informações da habilidade de uma classe
-   */
   getAbilityInfo: function (className) {
     const config = this.ClassConfig[className] || {};
     return {

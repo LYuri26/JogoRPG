@@ -11,20 +11,28 @@ const GerenciadorTurnos = {
   iniciarTurno: function () {
     console.log(`Iniciando turno ${this.estado.turnoAtual}`);
 
-    // Change these lines to use Personagens.aplicarPenalidades
+    // Resetar dados e estados
+    DadosManager.resetarDados();
+
+    // Determinar jogador ativo (alterna a cada turno)
+    this.estado.jogadorAtivo = this.estado.turnoAtual % 2 === 1 ? 1 : 2;
+    this.definirFase("inicial");
+
+    // Aplicar penalidades de classes
     if (window.Personagens) {
+      // Resetar penalidades antes de aplicar novas
+      PenalidadesAtivas.player1 = { defesa: 0, esquiva: 0, dano: 0 };
+      PenalidadesAtivas.player2 = { defesa: 0, esquiva: 0, dano: 0 };
+
       Personagens.aplicarPenalidades(1);
       Personagens.aplicarPenalidades(2);
     }
 
-    DadosManager.resetarDados();
-    this.estado.jogadorAtivo = this.estado.turnoAtual % 2 === 1 ? 1 : 2;
-    this.definirFase("inicial");
-    this.atualizarInterface();
-
     // Habilita apenas o D20 do jogador ativo
     this.estado.jogadorRolando = this.estado.jogadorAtivo;
     DadosManager.habilitarD20(this.estado.jogadorRolando);
+
+    this.atualizarInterface();
   },
 
   definirFase: function (fase) {
@@ -33,24 +41,29 @@ const GerenciadorTurnos = {
   },
 
   atualizarInterface: function () {
-    document.getElementById(
-      "contadorTurno"
-    ).textContent = `Turno: ${this.estado.turnoAtual}`;
-    document.getElementById(
-      "currentPhase"
-    ).textContent = `Fase: ${this.estado.fase}`;
+    // Atualiza elementos da interface
+    const elements = {
+      contadorTurno: `Turno: ${this.estado.turnoAtual}`,
+      currentPhase: `Fase: ${this.estado.fase}`,
+      resultadoTurno: this.getStatusMessage(),
+    };
 
-    if (this.estado.fase === "inicial") {
-      document.getElementById(
-        "resultadoTurno"
-      ).textContent = `Jogador ${this.estado.jogadorAtivo} começa o turno. Role o D20!`;
-    } else if (this.estado.fase === "disputa") {
-      document.getElementById("resultadoTurno").textContent =
-        "Decidindo quem ataca...";
-    } else if (this.estado.fase === "ataque") {
-      document.getElementById(
-        "resultadoTurno"
-      ).textContent = `Jogador ${this.estado.atacante} pode atacar!`;
+    for (const [id, text] of Object.entries(elements)) {
+      const element = document.getElementById(id);
+      if (element) element.textContent = text;
+    }
+  },
+
+  getStatusMessage: function () {
+    switch (this.estado.fase) {
+      case "inicial":
+        return `Jogador ${this.estado.jogadorAtivo} começa o turno. Role o D20!`;
+      case "disputa":
+        return "Decidindo quem ataca...";
+      case "ataque":
+        return `Jogador ${this.estado.atacante} pode atacar!`;
+      default:
+        return "";
     }
   },
 
@@ -97,12 +110,8 @@ const GerenciadorTurnos = {
       if (this.estado.atacante === this.estado.jogadorAtivo) {
         this.definirFase("ataque");
         DadosManager.habilitarDadosAtaque(this.estado.atacante);
-
-        if (typeof iniciarBatalha === "function") {
-          iniciarBatalha(this.estado.atacante, this.estado.defensor);
-        }
       } else {
-        // Se não for, inverte os papéis e finaliza o turno
+        // Se não for, finaliza o turno
         document.getElementById(
           "resultadoTurno"
         ).textContent = `Jogador ${this.estado.jogadorAtivo} perdeu a disputa! Turno encerrado.`;
@@ -114,24 +123,14 @@ const GerenciadorTurnos = {
   finalizarTurno: function () {
     if (this.verificarFimDeJogo()) return;
 
-    // Resetar estado de ataque
+    // Resetar estados
     this.estado.atacante = null;
     this.estado.defensor = null;
-    this.estado.fase = "inicial";
 
-    // Limpar mensagens
-    document.getElementById("mensagemBatalha").innerHTML = "";
-
-    // Incrementar turno
+    // Avança turno
     this.estado.turnoAtual++;
 
-    // Verificar limite máximo de turnos (opcional)
-    if (this.estado.turnoAtual > 100) {
-      alert("Jogo atingiu o limite máximo de turnos!");
-      window.location.reload();
-      return;
-    }
-
+    // Inicia próximo turno com pequeno delay
     setTimeout(() => this.iniciarTurno(), 1000);
   },
 

@@ -74,19 +74,22 @@ const DadosManager = {
   habilitarDadosAtaque: function (jogador) {
     this.desabilitarTodosDados();
 
-    // Habilita o D6 (ataque básico) para todos
-    this.habilitarDado(jogador, "D6");
-
-    // Habilita dados especiais baseado na classe
+    // Habilita apenas os dados de ataque (D6, D8, D10, D12)
+    const dadosAtaque = ["D6", "D8", "D10", "D12"];
     const personagem =
       jogador === 1 ? window.player1Character : window.player2Character;
+
     if (personagem) {
-      if (personagem.classe === "Guerreiro") {
-        this.habilitarDado(jogador, "D8");
-      } else if (personagem.classe === "Ladino") {
-        this.habilitarDado(jogador, "D10");
-      }
-      // Adicione outras classes conforme necessário
+      dadosAtaque.forEach((dado) => {
+        // Habilita D6 para todos como ataque básico
+        if (dado === "D6") {
+          this.habilitarDado(jogador, dado);
+        }
+        // Habilita dado especial da classe
+        if (dado === (DanoSystem.ClassConfig[personagem.classe]?.dice || "")) {
+          this.habilitarDado(jogador, dado);
+        }
+      });
     }
   },
 

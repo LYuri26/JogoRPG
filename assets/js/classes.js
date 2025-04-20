@@ -1,3 +1,11 @@
+// Adicionar no início do arquivo classes.js, antes da definição do objeto Personagens
+const PenalidadesAtivas = {
+  player1: { defesa: 0, esquiva: 0, dano: 0 },
+  player2: { defesa: 0, esquiva: 0, dano: 0 },
+};
+
+window.PenalidadesAtivas = PenalidadesAtivas; // Torna global se necessário
+
 // Objeto global para armazenar personagens
 window.Personagens = {
   // Todas as classes disponíveis
@@ -18,6 +26,24 @@ window.Personagens = {
     "Feiticeiro",
     "Samurai",
   ],
+
+  resetTurn: function (character) {
+    if (!character) return;
+
+    // Reseta penalidades ativas
+    character.penaltyActive = false;
+
+    // Atualiza flag do Samurai
+    if (character.classe === "Samurai") {
+      character.usedAbilityLastTurn = false;
+    }
+
+    // Atualiza interface
+    this.atualizarInterfacePersonagem(
+      character.playerId === "player1" ? 1 : 2,
+      character
+    );
+  },
 
   // Configurações completas para todas as classes
   configClasses: {
@@ -311,9 +337,6 @@ window.Personagens = {
     this.inicializarPersonagem(playerId, playerName);
   },
 
-  /**
-   * Atualiza a interface do personagem
-   */
   /**
    * Atualiza a interface do personagem
    */
