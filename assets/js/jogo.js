@@ -1,391 +1,311 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // Inicialização do tooltip do Bootstrap
-  const tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  );
-  tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-    new bootstrap.Tooltip(tooltipTriggerEl);
-  });
-
-  if (window.personagensCarregados) return;
-  window.personagensCarregados = true;
-
-  // Recupera e processa os dados dos jogadores
-  try {
-    const player1Data = JSON.parse(localStorage.getItem("player1Character"));
-    const player2Data = JSON.parse(localStorage.getItem("player2Character"));
-    const player1Name = localStorage.getItem("player1Name")?.trim();
-    const player2Name = localStorage.getItem("player2Name")?.trim();
-
-    if (!player1Data || !player2Data || !player1Name || !player2Name) {
-      throw new Error("Dados dos jogadores incompletos");
-    }
-
-    // Cria os objetos de personagem no formato esperado
-    window.player1Character = {
-      classe: player1Data.title,
-      nome: player1Data.name,
-      vida: player1Data.life,
-      vidaMaxima: player1Data.life,
-      danoBase: player1Data.damage,
-      armadura: player1Data.armor,
-      esquiva: player1Data.dodge,
-      staminaMana: player1Data.stamina,
-      staminaManaMax: player1Data.stamina,
-      dadoEspecial: player1Data.specialDice,
-      custoStamina: player1Data.cost,
-      penalidade: player1Data.penalty,
-      // Propriedades específicas de classes
-      usosRestantes: player1Data.title === "Ladino" ? 2 : null,
-      foiAtacado: false,
-    };
-
-    window.player2Character = {
-      classe: player2Data.title,
-      nome: player2Data.name,
-      vida: player2Data.life,
-      vidaMaxima: player2Data.life,
-      danoBase: player2Data.damage,
-      armadura: player2Data.armor,
-      esquiva: player2Data.dodge,
-      staminaMana: player2Data.stamina,
-      staminaManaMax: player2Data.stamina,
-      dadoEspecial: player2Data.specialDice,
-      custoStamina: player2Data.cost,
-      penalidade: player2Data.penalty,
-      // Propriedades específicas de classes
-      usosRestantes: player2Data.title === "Ladino" ? 2 : null,
-      foiAtacado: false,
-    };
-
-    // Atualiza a interface
-    atualizarInformacoesJogador(
-      "player1",
-      window.player1Character,
-      player1Name
-    );
-    atualizarInformacoesJogador(
-      "player2",
-      window.player2Character,
-      player2Name
-    );
-    atualizarBarraVida(
-      "player1",
-      window.player1Character.vida,
-      window.player1Character.vidaMaxima
-    );
-    atualizarBarraVida(
-      "player2",
-      window.player2Character.vida,
-      window.player2Character.vidaMaxima
-    );
-
-    // Configura eventos
-    configurarEventosJogo();
-  } catch (error) {
-    console.error("Erro ao carregar dados:", error);
-    alert("Erro ao carregar os personagens! Redirecionando...");
-    window.location.href = "../index.html";
-  }
-});
-
 /**
- * Atualiza as informações do jogador na interface
- * @param {string} playerId - ID do jogador
- * @param {Object} character - Objeto do personagem
- * @param {string} playerName - Nome do jogador
+ * Sistema Principal do Jogo
+ *
+ * Responsável por:
+ * - Inicializar o jogo
+ * - Gerenciar o fluxo de turnos
+ * - Atualizar a interface
+ * - Controlar eventos do jogo
  */
-function atualizarInformacoesJogador(playerId, character, playerName) {
-  if (!character) {
-    console.error(`Personagem ${playerId} não definido`);
-    return;
+
+class Jogo {
+  constructor() {
+    this.personagensCarregados = false;
+    this.player1Character = null;
+    this.player2Character = null;
+    this.init();
   }
 
-  console.log(`Atualizando ${playerId}:`, character);
-
-  // Elementos obrigatórios
-  const elementos = [
-    {
-      id: `${playerId}Character`,
-      value: `${playerName} - ${character.classe} - ${character.nome}`,
-    },
-    { id: `${playerId}Vida`, value: character.vida },
-    { id: `${playerId}Dano`, value: character.danoBase },
-    { id: `${playerId}Armadura`, value: character.armadura },
-    { id: `${playerId}Esquiva`, value: character.esquiva },
-    {
-      id: `${playerId}Stamina`,
-      value: `${character.staminaMana}/${character.staminaManaMax}`,
-    },
-    { id: `${playerId}DadoEspecial`, value: character.dadoEspecial },
-    { id: `${playerId}Custo`, value: character.custoStamina || "-" },
-    {
-      id: `${playerId}PenalidadeAtiva`,
-      value: character.penalidade || "Nenhuma",
-    },
-  ];
-
-  // Atualiza a interface
-  elementos.forEach((item) => {
-    const elemento = document.getElementById(item.id);
-    if (elemento) {
-      elemento.textContent = item.value;
-    } else {
-      console.warn(`Elemento ${item.id} não encontrado`);
-    }
-  });
-}
-
-function formatarPenalidade(classe) {
-  const penalidades = {
-    Guerreiro: "-1 defesa no turno seguinte",
-    Ladino: "Só pode ser usado a cada 2 turnos",
-    Mago: "-1 esquiva no turno seguinte",
-    // ... outras classes
-  };
-  return penalidades[classe] || "Nenhuma";
-}
-
-function obterCustoHabilidade(classe) {
-  const custos = {
-    Guerreiro: 2,
-    Ladino: 3,
-    Mago: 3,
-    // Adicione outras classes conforme necessário
-  };
-  return custos[classe] || "-";
-}
-
-/**
- * Configura todos os eventos do jogo
- */
-function configurarEventosJogo() {
-  // Configura eventos de ataque para todos os dados
-  const tiposDado = ["D6", "D8", "D10", "D12"];
-
-  for (let jogador of [1, 2]) {
-    tiposDado.forEach((dado) => {
-      const botao = document.getElementById(`player${jogador}${dado}Btn`);
-      if (botao) {
-        botao.addEventListener("click", () => {
-          if (typeof finalizarAtaque === "function") {
-            finalizarAtaque(jogador, dado);
-          }
-        });
-      }
+  /**
+   * Inicializa o jogo
+   */
+  init() {
+    document.addEventListener("DOMContentLoaded", () => {
+      this.inicializarTooltips();
+      this.carregarPersonagens();
+      this.configurarEventos();
     });
   }
-}
 
-/**
- * Carrega os scripts dos personagens selecionados
- * @param {string} p1Char - Personagem do jogador 1
- * @param {string} p2Char - Personagem do jogador 2
- * @param {string} p1Name - Nome do jogador 1
- * @param {string} p2Name - Nome do jogador 2
- */
-function carregarPersonagens(p1Char, p2Char, p1Name, p2Name) {
-  // Lista de classes disponíveis
-  const classesDisponiveis = ["Guerreiro", "Ladino", "Mago"];
-
-  // Verifica se os personagens selecionados são válidos
-  if (!classesDisponiveis.includes(p1Char)) {
-    console.error(`Personagem ${p1Char} não é válido`);
-    p1Char = "Guerreiro"; // Valor padrão
+  /**
+   * Inicializa os tooltips do Bootstrap
+   */
+  inicializarTooltips() {
+    const tooltipTriggerList = [
+      ...document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+    ];
+    tooltipTriggerList.forEach((tooltipTriggerEl) => {
+      new bootstrap.Tooltip(tooltipTriggerEl);
+    });
   }
 
-  if (!classesDisponiveis.includes(p2Char)) {
-    console.error(`Personagem ${p2Char} não é válido`);
-    p2Char = "Ladino"; // Valor padrão
-  }
+  /**
+   * Carrega os personagens salvos
+   */
+  carregarPersonagens() {
+    if (this.personagensCarregados) return;
 
-  // Carrega cada personagem
-  carregarPersonagem(p1Char, "player1", p1Name);
-  carregarPersonagem(p2Char, "player2", p2Name);
-}
-
-/**
- * Carrega um personagem específico
- * @param {string} nomePersonagem - Nome do personagem a ser carregado
- * @param {string} playerId - ID do jogador ('player1' ou 'player2')
- * @param {string} playerName - Nome do jogador
- */
-function carregarPersonagem(nomePersonagem, playerId, playerName) {
-  const scriptSrc = `./assets/js/personagens/${nomePersonagem.toLowerCase()}.js`;
-
-  // Verifica se o script já foi carregado
-  if (document.querySelector(`script[src="${scriptSrc}"]`)) {
-    console.log(`${nomePersonagem} já carregado`);
-    return;
-  }
-
-  // Cria e configura o script
-  const script = document.createElement("script");
-  script.src = scriptSrc;
-
-  script.onload = () => {
-    console.log(`${nomePersonagem} carregado com sucesso`);
-    const personagem = window[nomePersonagem.toLowerCase()];
-
-    if (personagem) {
-      atualizarInformacoesJogador(playerId, personagem, playerName);
-      atualizarBarraVida(
-        playerId,
-        personagem.vida,
-        personagem.vidaMaxima || personagem.vida
+    try {
+      const player1Data = this.parseCharacterData(
+        localStorage.getItem("player1Character")
       );
-    } else {
-      console.error(`Objeto do personagem ${nomePersonagem} não encontrado`);
-    }
-  };
+      const player2Data = this.parseCharacterData(
+        localStorage.getItem("player2Character")
+      );
+      const player1Name =
+        localStorage.getItem("player1Name")?.trim() || "Jogador 1";
+      const player2Name =
+        localStorage.getItem("player2Name")?.trim() || "Jogador 2";
 
-  script.onerror = () => {
-    console.error(`Falha ao carregar ${scriptSrc}`);
-    // Carrega um personagem padrão em caso de erro
-    carregarPersonagemPadrao(playerId, playerName);
-  };
+      // Garante valores numéricos válidos
+      const ensureNumber = (value, defaultValue) =>
+        isNaN(parseInt(value)) ? defaultValue : parseInt(value);
 
-  document.body.appendChild(script);
-}
+      this.player1Character = {
+        classe: player1Data?.title || "Guerreiro",
+        nome: player1Data?.name || player1Name,
+        vida: ensureNumber(player1Data?.life, 30),
+        vidaMaxima: ensureNumber(player1Data?.life, 30),
+        danoBase: ensureNumber(player1Data?.damage, 3),
+        armadura: ensureNumber(player1Data?.armor, 3),
+        esquiva: ensureNumber(player1Data?.dodge, 2),
+        stamina: ensureNumber(player1Data?.stamina, 6),
+        staminaMax: ensureNumber(player1Data?.stamina, 6),
+        dadoEspecial: player1Data?.specialDice || "D6",
+        custoHabilidade: ensureNumber(player1Data?.cost, 2),
+        playerId: "player1",
+      };
 
-/**
- * Atualiza as informações do jogador na interface
- * @param {string} playerId - ID do jogador
- * @param {Object} character - Objeto do personagem
- * @param {string} playerName - Nome do jogador
- */
-function atualizarInformacoesJogador(playerId, character, playerName) {
-  if (!character) {
-    console.error(`Personagem ${playerId} não definido`);
-    return;
-  }
+      this.player2Character = {
+        classe: player2Data?.title || "Ladino",
+        nome: player2Data?.name || player2Name,
+        vida: ensureNumber(player2Data?.life, 30),
+        vidaMaxima: ensureNumber(player2Data?.life, 30),
+        danoBase: ensureNumber(player2Data?.damage, 3),
+        armadura: ensureNumber(player2Data?.armor, 3),
+        esquiva: ensureNumber(player2Data?.dodge, 2),
+        stamina: ensureNumber(player2Data?.stamina, 6),
+        staminaMax: ensureNumber(player2Data?.stamina, 6),
+        dadoEspecial: player2Data?.specialDice || "D6",
+        custoHabilidade: ensureNumber(player2Data?.cost, 2),
+        playerId: "player2",
+      };
 
-  console.log(`Atualizando ${playerId}:`, character);
-
-  // Elementos obrigatórios
-  const elementos = [
-    {
-      id: `${playerId}Character`,
-      value: `${playerName} - ${character.classe} - ${character.nome}`,
-    },
-    { id: `${playerId}Vida`, value: character.vida },
-    { id: `${playerId}Dano`, value: character.danoBase },
-    { id: `${playerId}Armadura`, value: character.armadura },
-    { id: `${playerId}Esquiva`, value: character.esquiva },
-    {
-      id: `${playerId}Stamina`,
-      value: `${character.staminaMana}/${
-        character.staminaManaMax || character.staminaMana
-      }`,
-    },
-    { id: `${playerId}DadoEspecial`, value: character.dadoEspecial },
-    { id: `${playerId}Custo`, value: character.custoStamina || "-" },
-    { id: `${playerId}Penalidade`, value: character.penalidade || "-" },
-  ];
-
-  // Atualiza a interface
-  elementos.forEach((item) => {
-    const elemento = document.getElementById(item.id);
-    if (elemento) {
-      elemento.textContent = item.value;
-    } else {
-      console.warn(`Elemento ${item.id} não encontrado`);
-    }
-  });
-}
-
-/**
- * Atualiza a barra de vida visual do jogador
- * @param {string} playerId - ID do jogador
- * @param {number} vidaAtual - Vida atual
- * @param {number} vidaMaxima - Vida máxima
- */
-function atualizarBarraVida(playerId, vidaAtual, vidaMaxima) {
-  const porcentagem = (vidaAtual / vidaMaxima) * 100;
-  const barra = document.getElementById(`${playerId}HealthBar`);
-
-  if (barra) {
-    barra.style.width = `${porcentagem}%`;
-
-    // Altera a cor conforme a vida
-    if (porcentagem < 20) {
-      barra.classList.remove("bg-success", "bg-warning");
-      barra.classList.add("bg-danger");
-    } else if (porcentagem < 50) {
-      barra.classList.remove("bg-success", "bg-danger");
-      barra.classList.add("bg-warning");
-    } else {
-      barra.classList.remove("bg-warning", "bg-danger");
-      barra.classList.add("bg-success");
+      // Atualiza a interface imediatamente
+      this.atualizarInterface();
+      this.personagensCarregados = true;
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+      alert("Erro ao carregar os personagens! Redirecionando...");
+      window.location.href = "../index.html";
     }
   }
+
+  /**
+   * Parse dos dados do personagem
+   */
+  parseCharacterData(data) {
+    if (!data) return null;
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      console.error("Erro ao parsear dados do personagem:", e);
+      return { title: data }; // Fallback for string data
+    }
+  }
+
+  /**
+   * Cria um objeto de personagem padronizado
+   */
+  criarPersonagem(data, nome, playerId) {
+    const defaults = {
+      life: 30,
+      damage: 3,
+      armor: 3,
+      dodge: 3,
+      stamina: 6,
+      specialDice: "D6",
+      cost: 2,
+      penalty: null,
+    };
+
+    const personagem = {
+      classe: data.title || "Guerreiro",
+      nome: data.name || nome,
+      vida: data.life || defaults.life,
+      vidaMaxima: data.life || defaults.life,
+      danoBase: data.damage || defaults.damage,
+      armadura: data.armor || defaults.armor,
+      esquiva: data.dodge || defaults.dodge,
+      stamina: data.stamina || defaults.stamina,
+      staminaMax: data.stamina || defaults.stamina,
+      dadoEspecial: data.specialDice || defaults.specialDice,
+      custoHabilidade: data.cost || defaults.cost,
+      penalidade: data.penalty || defaults.penalty,
+      playerId: playerId,
+      foiAtacado: false,
+    };
+
+    // Propriedades específicas por classe
+    if (personagem.classe === "Ladino") {
+      personagem.usosHabilidade = 2;
+    }
+
+    return personagem;
+  }
+
+  /**
+   * Configura os eventos do jogo
+   */
+  configurarEventos() {
+    const tiposDado = ["D6", "D8", "D10", "D12"];
+
+    for (let jogador of [1, 2]) {
+      tiposDado.forEach((dado) => {
+        const botao = document.getElementById(`player${jogador}${dado}Btn`);
+        if (botao) {
+          botao.addEventListener("click", () =>
+            this.finalizarAtaque(jogador, dado)
+          );
+        }
+      });
+    }
+  }
+
+  /**
+   * Finaliza um ataque
+   */
+  finalizarAtaque(jogador, dado) {
+    const personagem =
+      jogador === 1 ? this.player1Character : this.player2Character;
+    if (!personagem) return;
+
+    const resultado = DadosManager.rolarDado(dado, jogador);
+    const dano = DanoSystem.calcularDano(jogador, dado, resultado);
+    this.processarDano(jogador === 1 ? 2 : 1, dano);
+
+    this.atualizarInterface();
+
+    // Adicionar esta linha para finalizar o turno após o ataque
+    GerenciadorTurnos.finalizarTurno();
+  }
+
+  /**
+   * Processa o dano recebido
+   */
+  processarDano(jogador, dano) {
+    const personagem =
+      jogador === 1 ? this.player1Character : this.player2Character;
+    if (!personagem) return;
+
+    personagem.vida = Math.max(0, personagem.vida - dano);
+    personagem.foiAtacado = true;
+
+    if (personagem.vida <= 0) {
+      this.finalizarJogo(jogador);
+    }
+  }
+
+  /**
+   * Atualiza toda a interface
+   */
+  atualizarInterface() {
+    this.atualizarPersonagem("player1", this.player1Character);
+    this.atualizarPersonagem("player2", this.player2Character);
+  }
+
+  /**
+   * Atualiza a interface de um personagem específico
+   */
+  atualizarPersonagem(playerId, personagem) {
+    if (!personagem) return;
+
+    const safeUpdate = (idSuffix, value) => {
+      const element = document.getElementById(`${playerId}-${idSuffix}`);
+      if (element) element.textContent = value;
+    };
+
+    safeUpdate("nome", personagem.nome);
+    safeUpdate("vida", personagem.vida);
+    safeUpdate("stamina", `${personagem.stamina}/${personagem.staminaMax}`);
+
+    // Atualiza barra de vida
+    this.atualizarBarraVida(playerId, personagem.vida, personagem.vidaMaxima);
+
+    // Atualiza botões de habilidade
+    if (window.ResourceManager) {
+      ResourceManager.updateAbilityButtons(personagem);
+    }
+  }
+
+  /**
+   * Atualiza a barra de vida visual
+   */
+  atualizarBarraVida(playerId, vidaAtual, vidaMaxima) {
+    const porcentagem = (vidaAtual / vidaMaxima) * 100;
+    const barra = document.getElementById(`${playerId}-health-bar`);
+
+    if (barra) {
+      barra.style.width = `${porcentagem}%`;
+      barra.className = `health-bar ${this.getHealthBarClass(porcentagem)}`;
+    }
+  }
+
+  /**
+   * Retorna a classe CSS baseada na porcentagem de vida
+   */
+  getHealthBarClass(porcentagem) {
+    if (porcentagem < 20) return "critical";
+    if (porcentagem < 50) return "warning";
+    return "healthy";
+  }
+
+  /**
+   * Finaliza o jogo
+   */
+  finalizarJogo(jogadorPerdedor) {
+    const vencedor =
+      jogadorPerdedor === 1 ? this.player2Character : this.player1Character;
+    const mensagem = vencedor
+      ? `Fim de jogo! ${vencedor.nome} venceu!`
+      : "Fim de jogo!";
+
+    alert(mensagem);
+    window.location.reload();
+  }
+
+  /**
+   * Avança para o próximo turno
+   */
+  proximoTurno() {
+    if (!this.player1Character || !this.player2Character) return;
+
+    // Atualiza estados dos personagens
+    [this.player1Character, this.player2Character].forEach((char) => {
+      if (char.foiAtacado) char.foiAtacado = false;
+
+      // Recupera stamina
+      if (char.playerId === `player${ConfigJogo.jogadorAtivo}`) {
+        char.stamina = Math.min(char.stamina + 2, char.staminaMax);
+      }
+    });
+
+    // Aplica penalidades
+    if (window.PenaltySystem) {
+      PenaltySystem.applyPenalties();
+    }
+
+    // Avança turno
+    if (window.ConfigJogo) {
+      ConfigJogo.proximoTurno();
+    }
+    if (window.DadosManager) {
+      DadosManager.resetarDados();
+    }
+
+    this.atualizarInterface();
+  }
 }
 
-/**
- * Carrega um personagem padrão em caso de erro
- * @param {string} playerId - ID do jogador
- * @param {string} playerName - Nome do jogador
- */
-function carregarPersonagemPadrao(playerId, playerName) {
-  const personagemPadrao = {
-    classe: playerId === "player1" ? "Guerreiro" : "Ladino",
-    nome: playerId === "player1" ? "Conan" : "Loki",
-    vida: 30,
-    danoBase: 3,
-    armadura: 5,
-    esquiva: 2,
-    staminaMana: 6,
-    dadoEspecial: playerId === "player1" ? "D8" : "D10",
-  };
-
-  atualizarInformacoesJogador(playerId, personagemPadrao, playerName);
-}
-/**
- * Função auxiliar para formatar a descrição da penalidade
- */
-function formatarPenalidade(classe) {
-  const penalidades = {
-    Guerreiro: "-1 defesa no turno seguinte",
-    Ladino: "Só pode ser usado a cada 2 turnos",
-    Mago: "-1 esquiva no turno seguinte",
-    Paladino: "-2 no próximo ataque",
-    Bárbaro: "Só pode ser usado uma vez por combate",
-    Arqueiro: "-1 esquiva no turno seguinte",
-    Monge: "-1 dano no próximo ataque",
-    Cavaleiro: "Não pode atacar no turno seguinte",
-    Assassino: "Custa 2 Stamina adicionais se falhar",
-    Druida: "Só pode ser usado 3 vezes por combate",
-    Gladiador: "Não pode usar outra habilidade no próximo turno",
-    Caçador: "Só pode ser usado a cada 3 turnos",
-    Mercenário: "-1 esquiva no turno seguinte",
-    Feiticeiro: "Reduz 2 de vida ao usar",
-    Samurai: "Só pode ser usado 2 vezes por combate",
-  };
-
-  return penalidades[classe] || "-";
-}
-
-/**
- * Função auxiliar para obter o custo da habilidade por classe
- */
-function obterCustoHabilidade(classe) {
-  const custos = {
-    Guerreiro: 2,
-    Ladino: 3,
-    Mago: 3,
-    Paladino: 2,
-    Bárbaro: 3,
-    Arqueiro: 2,
-    Monge: 2,
-    Cavaleiro: 3,
-    Assassino: 3,
-    Druida: 3,
-    Gladiador: 2,
-    Caçador: 3,
-    Mercenário: 2,
-    Feiticeiro: 3,
-    Samurai: 3,
-  };
-
-  return custos[classe] || "-";
-}
+// Inicializa o jogo quando o arquivo é carregado
+window.jogo = new Jogo();

@@ -26,10 +26,17 @@ window.ConfigJogo = {
       this.player2Character = this.parsePersonagem(
         localStorage.getItem("player2Character")
       );
-      this.player1Name = localStorage.getItem("player1Name");
-      this.player2Name = localStorage.getItem("player2Name");
+      this.player1Name = localStorage.getItem("player1Name") || "Jogador 1";
+      this.player2Name = localStorage.getItem("player2Name") || "Jogador 2";
+
+      if (!this.player1Character || !this.player2Character) {
+        throw new Error("Personagens não encontrados no localStorage");
+      }
     } catch (e) {
       console.error("Erro ao carregar configurações:", e);
+      // Set default characters if loading fails
+      this.player1Character = { classe: "Guerreiro" };
+      this.player2Character = { classe: "Ladino" };
     }
   },
 

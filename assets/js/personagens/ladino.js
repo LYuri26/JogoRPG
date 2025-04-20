@@ -1,145 +1,132 @@
-// Objeto Ladino completo
 window.ladino = {
-  classe: "Ladino",
-  nome: "Mulher Gato",
-  vida: 25,
-  danoBase: 2,
-  armadura: 2,
-  esquiva: 5,
-  peso: 1,
-  staminaMana: 6,
-  dadoEspecial: "D10 extra no ataque (se não foi atacado)",
-  custoStamina: 3,
-  penalidade: 2,
-  usosRestantes: 2,
-  foiAtacado: false,
+  title: "Ladino",
+  name: "Mulher Gato",
+  life: 25,
+  lifeMax: 25,
+  damage: 2,
+  armor: 2,
+  dodge: 5,
+  weight: 1,
+  stamina: 6,
+  staminaMax: 6,
+  specialDice: "D10",
+  specialAbility: "Ataque Furtivo",
+  cost: 3,
+  costType: "Stamina",
+  condition: "Não foi atacado",
+  penalty: { type: "uses", value: 1, max: 2 },
+  usedThisCombat: 0,
+  wasAttacked: false,
+  playerId: null,
 
-  // Ataque especial do ladino
-  ataqueEspecial: function () {
-    if (this.usosRestantes <= 0) {
-      console.log("Usos do ataque especial esgotados!");
-      return 0;
-    }
+  useSpecial: function () {
+    if (this.wasAttacked) return { error: "Não pode usar após ser atacado!" };
+    if (this.usedThisCombat >= this.penalty.max)
+      return { error: "Usos esgotados neste combate!" };
+    if (this.stamina < this.cost) return { error: "Stamina insuficiente!" };
 
-    if (this.foiAtacado) {
-      console.log("Não pode usar ataque especial após ser atacado!");
-      return 0;
-    }
+    this.stamina -= this.cost;
+    this.usedThisCombat++;
 
-    if (this.staminaMana < this.custoStamina) {
-      console.log("Stamina insuficiente para ataque especial!");
-      return 0;
-    }
-
-    const dano = this.danoBase + Math.floor(Math.random() * 10) + 1;
-    this.staminaMana -= this.custoStamina;
-    this.usosRestantes--;
-
-    return dano;
+    return {
+      bonus: Math.floor(Math.random() * 10) + 1,
+      message: "Ataque Furtivo realizado!",
+    };
   },
 
-  // Reseta estado após turno
-  resetarTurno: function () {
-    this.foiAtacado = false;
+  resetCombat: function () {
+    this.usedThisCombat = 0;
   },
 
-  // Restaura stamina
-  restaurarStamina: function () {
-    this.staminaMana = 6;
-    console.log("Stamina do Ladino restaurada!");
+  resetTurn: function () {
+    this.wasAttacked = false;
   },
 
-  // Inicializa interface do jogador
-  inicializar: function (playerId) {
-    if (!playerId) {
-      console.error("ID do jogador não fornecido!");
+  initialize: function (playerId) {
+    this.playerId = playerId;
+    this.createDiceButtons();
+    this.updateInterface();
+  },
+
+  createDiceButtons: function () {
+    const container = document.getElementById(
+      `${this.playerId}-dice-container`
+    );
+    if (!container) {
+      console.error(`Dice container not found for ${this.playerId}`);
       return;
     }
 
-    const playerSection = document.getElementById(playerId);
-    if (!playerSection) {
-      console.error(`Seção do jogador ${playerId} não encontrada!`);
-      return;
-    }
+    container.innerHTML = "";
 
-    this.criarBotoesDados(playerId);
-    this.atualizarStatus(playerId);
-    console.log(`Ladino inicializado para ${playerId}`);
+    const basicBtn = this.createDiceButton("D6", 6);
+    const specialBtn = this.createDiceButton("D10", 10, true);
+
+    container.append(basicBtn, specialBtn);
   },
 
-  // Cria botões de dados na interface
-  criarBotoesDados: function (playerId) {
-    const containerId = `${playerId}-dados-container`;
-    let container = document.getElementById(containerId);
+  createDiceButton: function (diceType, faces, isSpecial = false) {
+    const button = document.createElement("button");
+    button.textContent = diceType;
+    button.className = `dice-button ${isSpecial ? "special" : ""}`;
 
-    if (container) {
-      container.innerHTML = "";
-    } else {
-      container = document.createElement("div");
-      container.id = containerId;
-      container.className = "dice-container";
-      document.getElementById(playerId).appendChild(container);
-    }
-
-    // Botão D6 (ataque básico)
-    const btnD6 = this.criarBotaoDado(playerId, "D6", 6);
-
-    // Botão D10 (ataque especial)
-    const btnD10 = this.criarBotaoDado(playerId, "D10", 10, true);
-
-    container.append(btnD6, btnD10);
-  },
-
-  // Cria um botão de dado genérico
-  criarBotaoDado: function (playerId, tipoDado, faces, isEspecial = false) {
-    const botao = document.createElement("button");
-    botao.textContent = tipoDado;
-    botao.className = `dice-button ${isEspecial ? "special" : ""}`;
-    botao.dataset.faces = faces;
-
-    botao.onclick = () => {
-      const resultado = Math.floor(Math.random() * faces) + 1;
-      console.log(`${playerId} rolou ${tipoDado}: ${resultado}`);
-
-      if (isEspecial) {
-        return this.ataqueEspecial();
+    button.onclick = () => {
+      if (isSpecial) {
+        const result = this.useSpecial();
+        if (result.error) {
+          console.log(result.error);
+          return 0;
+        }
+        return result.bonus + this.damage;
       }
-      return resultado;
+      return Math.floor(Math.random() * faces) + 1 + this.damage;
     };
 
-    return botao;
+    return button;
   },
 
-  // Atualiza status na interface
-  atualizarStatus: function (playerId) {
-    const elementos = {
-      vida: `${playerId}Vida`,
-      stamina: `${playerId}Stamina`,
-      nome: `${playerId}Character`,
+  updateInterface: function () {
+    if (!this.playerId) return;
+
+    const updateElement = (idSuffix, value) => {
+      const element = document.getElementById(`${this.playerId}-${idSuffix}`);
+      if (element) element.textContent = value;
     };
 
-    for (const [prop, id] of Object.entries(elementos)) {
-      const elemento = document.getElementById(id);
-      if (elemento) {
-        elemento.textContent =
-          prop === "nome" ? `Ladino - ${this.nome}` : this[prop];
-      }
+    updateElement("nome", this.name);
+    updateElement("vida", this.life);
+    updateElement("stamina", `${this.stamina}/${this.staminaMax}`);
+
+    if (window.ResourceManager) {
+      ResourceManager.updateAbilityButtons(this);
+    }
+
+    if (window.jogo && jogo.atualizarBarraVida) {
+      jogo.atualizarBarraVida(this.playerId, this.life, this.lifeMax);
     }
   },
 };
 
-// Inicialização automática se necessário
+// Auto-initialization when DOM is ready
 document.addEventListener("DOMContentLoaded", function () {
   try {
-    const p1Char = ConfigJogo.player1Character;
-    const p2Char = ConfigJogo.player2Character;
+    // Check if ConfigJogo exists and has character data
+    if (window.ConfigJogo) {
+      const p1Char = ConfigJogo.player1Character;
+      const p2Char = ConfigJogo.player2Character;
 
-    if (p1Char && p1Char.classe === "Ladino") {
-      window.ladino.inicializar("player1");
+      // Initialize if this class is selected for either player
+      if (p1Char && p1Char.classe === "Ladino") {
+        window.ladino.initialize("player1");
+      }
+      if (p2Char && p2Char.classe === "Ladino") {
+        window.ladino.initialize("player2");
+      }
     }
 
-    if (p2Char && p2Char.classe === "Ladino") {
-      window.ladino.inicializar("player2");
+    // Register with CharacterClasses if available
+    if (window.CharacterClasses) {
+      window.CharacterClasses.Ladino = window.ladino;
     }
   } catch (e) {
     console.error("Erro ao inicializar ladino:", e);

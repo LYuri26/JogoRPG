@@ -1,6 +1,8 @@
 let currentPlayer = 1;
 let player1Character = null;
 let player2Character = null;
+let previousPlayer1Character = null;
+let previousPlayer2Character = null;
 
 // Função para selecionar o personagem
 function selectCharacter() {
@@ -9,9 +11,11 @@ function selectCharacter() {
 
   // Se o jogador já tiver escolhido um personagem antes, restaura o anterior
   if (currentPlayer === 1 && player1Character) {
-    resetCharacter(player1Character);
+    previousPlayer1Character = player1Character;
+    resetCharacter(previousPlayer1Character);
   } else if (currentPlayer === 2 && player2Character) {
-    resetCharacter(player2Character);
+    previousPlayer2Character = player2Character;
+    resetCharacter(previousPlayer2Character);
   }
 
   // Armazena o novo personagem selecionado pelo jogador atual
@@ -55,10 +59,16 @@ function selectCharacter() {
 // Funções auxiliares
 function resetCharacter(character) {
   const card = document.getElementById(character + "Card");
-  if (card) card.style.opacity = 1;
+  if (card) {
+    card.classList.remove("selected-character");
+    card.style.opacity = 1;
+  }
 
   const button = document.getElementById(character + "Btn");
-  if (button) button.style.display = "block";
+  if (button) {
+    button.style.display = "block";
+    button.disabled = false;
+  }
 }
 
 function updateCardSelection(character) {
@@ -71,13 +81,12 @@ function updateCardSelection(character) {
   const button = document.getElementById(character + "Btn");
   if (button) {
     button.style.display = "none";
-    button.disabled = true;
   }
 }
 
 function loadCharacterScript(character) {
   const script = document.createElement("script");
-  script.src = `/js/personagens/${character.toLowerCase()}.js`;
+  script.src = `./assets/js/personagens/${character.toLowerCase()}.js`;
   script.type = "module";
   document.head.appendChild(script);
 }

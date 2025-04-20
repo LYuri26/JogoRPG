@@ -11,8 +11,11 @@ const GerenciadorTurnos = {
   iniciarTurno: function () {
     console.log(`Iniciando turno ${this.estado.turnoAtual}`);
 
-    aplicarPenalidades(1);
-    aplicarPenalidades(2);
+    // Change these lines to use Personagens.aplicarPenalidades
+    if (window.Personagens) {
+      Personagens.aplicarPenalidades(1);
+      Personagens.aplicarPenalidades(2);
+    }
 
     DadosManager.resetarDados();
     this.estado.jogadorAtivo = this.estado.turnoAtual % 2 === 1 ? 1 : 2;
@@ -111,7 +114,24 @@ const GerenciadorTurnos = {
   finalizarTurno: function () {
     if (this.verificarFimDeJogo()) return;
 
+    // Resetar estado de ataque
+    this.estado.atacante = null;
+    this.estado.defensor = null;
+    this.estado.fase = "inicial";
+
+    // Limpar mensagens
+    document.getElementById("mensagemBatalha").innerHTML = "";
+
+    // Incrementar turno
     this.estado.turnoAtual++;
+
+    // Verificar limite máximo de turnos (opcional)
+    if (this.estado.turnoAtual > 100) {
+      alert("Jogo atingiu o limite máximo de turnos!");
+      window.location.reload();
+      return;
+    }
+
     setTimeout(() => this.iniciarTurno(), 1000);
   },
 

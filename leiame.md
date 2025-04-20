@@ -1,102 +1,110 @@
-# 📜 Desafio: Sistema de Combate Baseado em Turnos
+# 🛡️ Sistema de Combate Tático por Turnos
+
+Projeto de jogo de combate baseado em turnos, com 15 classes jogáveis, cada uma com atributos únicos, habilidades especiais, consumo de recursos (Stamina/Mana) e penalidades estratégicas. Ideal para duelos entre jogadores ou implementação em sistemas de RPG mais amplos.
+
+---
 
 ## 🎯 Objetivo
 
-Criar um jogo de combate tático onde dois jogadores escolhem classes distintas e batalham por turnos usando rolagens de dados e habilidades especiais.
+Permitir combates entre dois jogadores que escolhem classes distintas, usando rolagens de dados, ações táticas e habilidades com custos e restrições.
 
 ---
 
-## 📌 Regras do Jogo
+## 🧠 Mecânica Geral
 
 ### 🎲 Fluxo do Turno
-1️⃣ **Jogador Atacante** escolhe se vai usar uma Habilidade Especial (gasta Stamina/Mana antes de rolar o D20).  
-2️⃣ **Jogador Defensor** escolhe se vai usar uma Habilidade Especial (gasta Stamina/Mana antes de rolar o D20 de esquiva).  
-3️⃣ **Atacante** rola um D20 para determinar a força do ataque.  
-4️⃣ **Defensor** rola um D20 para tentar esquivar.  
-5️⃣ **Comparação das rolagens:**
-- Se o defensor obtiver um número maior ou igual ao atacante, esquiva com sucesso.
-- Se o atacante vencer, o dano é rolado com um D6 e somado ao bônus da classe. O dano final é reduzido pelo valor da esquiva e armadura do defensor.
-6️⃣ Registrar os danos e continuar o combate até que um jogador fique sem vida.
+
+1. **Atacante** decide se usará uma habilidade especial (gasta Stamina/Mana).
+2. **Defensor** decide se usará uma habilidade especial (também gasta recurso).
+3. **Atacante** rola um dado de 20 lados (D20).
+4. **Defensor** rola um D20 para tentar esquivar.
+5. **Compara-se os resultados:**
+   - Se o defensor empatar ou superar o resultado do atacante, esquiva com sucesso.
+   - Se o atacante vencer, rola um dado de 6 lados (D6), soma o **Dano Base** e aplica **reduções** de Armadura e Esquiva do defensor.
+6. **Registra-se o dano** e o combate continua até alguém zerar a Vida.
 
 ---
 
-### 📢 Regras das Habilidades
+### 📌 Regras das Habilidades
 
-✅ **As habilidades só podem ser ativadas antes da rolagem de dados!**  
-✅ Se uma habilidade for de **ataque**, deve ser usada antes de rolar o D20 de ataque.  
-✅ Se for de **defesa**, deve ser usada antes de rolar o D20 de esquiva.  
-✅ O gasto de **Stamina/Mana** ocorre imediatamente ao declarar a habilidade.  
-✅ **Habilidades com limite por combate** continuam com as mesmas restrições.
-
----
-
-## 🛡️ Tabela de Classes e Atributos
-
-| **Classe**     | **Vida** | **Dano Base** | **Armadura** | **Esquiva** | **Peso** | **Stamina/Mana** | **Habilidade Especial**           | **Custo** | **Penalidade**                          |
-|----------------|----------|---------------|--------------|-------------|----------|------------------|------------------------------------|-----------|-----------------------------------------|
-| Guerreiro      | 30       | 3             | 5            | 2           | 4        | 6                | Força Brutal: Rola um D8 extra no ataque. | 2 Stamina | -1 defesa no turno seguinte.            |
-| Ladino         | 25       | 2             | 2            | 5           | 1        | 6                | Ataque Sorrateiro: Se não foi atacado no turno anterior, rola um D10 extra. | 3 Stamina | Só pode ser usado a cada 2 turnos.      |
-| Mago           | 20       | 4             | 1            | 3           | 2        | 9                | Bola de Fogo: Pode rolar um D12 no ataque. | 3 Mana    | -1 esquiva no turno seguinte.           |
-| Paladino       | 35       | 3             | 4            | 3           | 3        | 6                | Proteção Divina: Rola um D8 extra na defesa. | 2 Stamina | -2 no próximo ataque.                   |
-| Bárbaro        | 35       | 4             | 3            | 3           | 3        | 6                | Fúria: Quando a vida cair abaixo de 15, rola um D10 extra no ataque. | 3 Stamina | Só pode ser usado uma vez por combate.  |
-| Arqueiro       | 25       | 3             | 2            | 4           | 1        | 6                | Tiro Preciso: Rola um D8 extra no ataque. | 2 Stamina | -1 esquiva no turno seguinte.           |
-| Monge          | 30       | 2             | 3            | 5           | 0        | 6                | Reflexos Aguçados: Rola um D6 extra ao esquivar. | 2 Stamina | -1 dano no próximo ataque.              |
-| Cavaleiro      | 35       | 3             | 5            | 2           | 4        | 6                | Defesa Absoluta: Ignora um ataque fraco ou médio. | 3 Stamina | Não pode atacar no turno seguinte.      |
-| Assassino      | 25       | 4             | 2            | 4           | 1        | 6                | Golpe Mortal: Se tirar 20 no D20 de ataque, rola um D12 extra. | 3 Stamina | Custa 2 Stamina adicionais se falhar.   |
-| Druida         | 30       | 3             | 3            | 3           | 2        | 9                | Cura Natural: Rola um D8 e recupera vida. | 3 Mana    | Só pode ser usado 3 vezes por combate.  |
-| Gladiador      | 35       | 4             | 4            | 2           | 3        | 6                | Resistência Extrema: Rola um D6 extra para reduzir dano recebido. | 2 Stamina | Não pode usar outra habilidade no próximo turno. |
-| Caçador        | 25       | 3             | 3            | 4           | 2        | 6                | Armadilha Oculta: O inimigo rola um D12 em vez do D20 para esquiva. | 3 Stamina | Só pode ser usado a cada 3 turnos.      |
-| Mercenário     | 30       | 3             | 4            | 3           | 3        | 6                | Golpe Oportunista: Se esquivar, pode contra-atacar com um D6 extra. | 2 Stamina | -1 esquiva no turno seguinte.           |
-| Feiticeiro     | 20       | 4             | 1            | 3           | 2        | 9                | Explosão Arcana: Rola um D20 para ataque. | 3 Mana    | Reduz 2 de vida ao usar.                |
-| Samurai        | 30       | 4             | 4            | 3           | 3        | 6                | Foco Perfeito: Se não usou habilidade no turno anterior, rola um D10 extra. | 3 Stamina | Só pode ser usado 2 vezes por combate.  |
+- Habilidades devem ser declaradas **antes da rolagem**.
+- O custo de Stamina ou Mana é **pago na hora**.
+- Algumas têm **limites por combate** ou **condições específicas**.
+- Penalidades entram em vigor **após o uso**, mesmo que o efeito não seja bem-sucedido.
 
 ---
 
-## 🌳 Nova Árvore de Diretórios
+## 🛡️ Tabela Atualizada de Classes e Atributos
+
+Cada classe possui um conjunto fixo de atributos e uma habilidade especial que pode virar o jogo. Use com estratégia — o custo sempre cobra a fatura!
+
+| **Classe**     | **Vida** | **Dano** | **Armadura** | **Esquiva** | **Peso** | **Recursos** | **Habilidade Especial**              | **Custo**     | **Condição / Penalidade**                            |
+|----------------|----------|----------|--------------|-------------|----------|--------------|--------------------------------------|---------------|-------------------------------------------------------|
+| **Guerreiro**  | 32       | 3        | 4            | 2           | 4        | 6 Stamina    | **Golpe Brutal**: +1D8 no ataque     | 2 Stamina     | -1 Armadura no próximo turno                        |
+| **Ladino**     | 26       | 2        | 2            | 5           | 1        | 6 Stamina    | **Ataque Furtivo**: +1D10 no ataque  | 3 Stamina     | Só pode usar a cada 2 turnos                         |
+| **Mago**       | 20       | 4        | 1            | 4           | 2        | 6 Mana       | **Bola de Fogo**: +1D12 no ataque    | 3 Mana        | -2 Esquiva no próximo turno                          |
+| **Paladino**   | 36       | 3        | 4            | 2           | 3        | 6 Stamina    | **Ira Sagrada**: +1D8 no ataque      | 2 Stamina     | Sofre 2 de dano direto após o uso                    |
+| **Bárbaro**    | 34       | 4        | 3            | 2           | 3        | 6 Stamina    | **Fúria Primordial**: +1D12 no ataque| 6 Stamina     | Só se tiver ≤15 Vida. Usável 1x por combate          |
+| **Arqueiro**   | 26       | 3        | 2            | 4           | 1        | 6 Stamina    | **Tiro Certeiro**: +1D8 no ataque    | 2 Stamina     | -1 Esquiva no próximo turno                          |
+| **Monge**      | 30       | 3        | 3            | 5           | 0        | 6 Stamina    | **Golpe Interior**: +1D8 no ataque   | 2 Stamina     | -1 Armadura após o uso                               |
+| **Cavaleiro**  | 35       | 3        | 5            | 2           | 4        | 6 Stamina    | **Investida de Ferro**: +1D8 ataque  | 3 Stamina     | -1 Esquiva no próximo turno                          |
+| **Assassino**  | 25       | 4        | 2            | 4           | 1        | 6 Stamina    | **Execução Silenciosa**: +1D10 no ataque se tirar ≥16 no D20 | 3 Stamina | Só ativa com D20 ≥16                                |
+| **Druida**     | 30       | 3        | 3            | 3           | 2        | 6 Mana       | **Espinhos Naturais**: +1D8 no ataque| 3 Mana        | Máx. 2 usos por combate. Causa 1 de dano ao usuário  |
+| **Gladiador**  | 34       | 4        | 4            | 2           | 3        | 6 Stamina    | **Força Impiedosa**: +1D8 no ataque  | 2 Stamina     | Máx. 3 vezes por combate. Fica indisponível no próximo turno |
+| **Caçador**    | 27       | 3        | 3            | 4           | 2        | 6 Stamina    | **Disparo Selvagem**: +1D12 ataque   | 3 Stamina     | Só pode usar a cada 5 turnos                         |
+| **Mercenário** | 30       | 3        | 4            | 3           | 3        | 6 Stamina    | **Retaliação Precisa**: +1D10 no ataque após esquiva bem-sucedida | 2 Stamina | Só se tiver >30% da Vida. Máx. 3 usos por combate   |
+| **Feiticeiro** | 20       | 4        | 1            | 3           | 2        | 6 Mana       | **Explosão Arcana**: +1D12 ataque    | 3 Mana        | Perde 50% da Vida atual. Não pode usar com 1 de Vida |
+| **Samurai**    | 30       | 4        | 4            | 3           | 3        | 6 Stamina    | **Espírito Afiado**: +1D10 ataque    | 3 Stamina     | Só se não usou habilidade no turno anterior. Máx. 2 vezes por combate |
+
+---
+
+## 🔍 Como Interpretar os Atributos
+
+- **Vida**: HP bruto. Quando zera, é tchau e bença.
+- **Dano Base**: Soma no ataque padrão (D6 + Dano).
+- **Armadura**: Reduz o dano recebido.
+- **Esquiva**: Chance de evitar totalmente o golpe (comparado com D20 do atacante).
+- **Peso**: Pode influenciar na velocidade em sistemas futuros.
+- **Recursos**: Stamina ou Mana — combustível das habilidades.
+- **Habilidade Especial**: Ativada antes da rolagem, muda o rumo do combate.
+
+
+## 📂 Estrutura de Diretórios
 
 ```
-/rpg-combat-system
+/sistema-combate-rpg
 │
-├── /assets
-│   ├── /images         # Imagens do projeto (se necessário)
-│   ├── /fonts          # Fontes personalizadas, se necessário
-│   ├── /css
-│   ├── style.css       # Arquivo principal de estilo CSS
-│   ├── /classes
-│   │   ├── guerreiro.css
-│   │   ├── ladino.css
-│   │   ├── mago.css
-│   │   ├── paladino.css
-│   │   ├── barbaro.css
-│   │   ├── arqueiro.css
-│   │   ├── monge.css
-│   │   ├── cavaleiro.css
-│   │   ├── assassino.css
-│   │   ├── druida.css
-│   │   ├── gladiador.css
-│   │   ├── caçador.css
-│   │   ├── mercenario.css
-│   │   ├── feiticeiro.css
-│   │   └── samurai.css
-│   ├── modal.css       # Estilos para o modal de cada personagem
-│   ├── /js
-│   ├── data.js         # Lógica de dados e cálculos (rolagens, habilidades, etc)
-│   ├── guerreiro.js    # Funções específicas do Guerreiro
-│   ├── ladino.js       # Funções específicas do Ladino
-│   ├── mago.js         # Funções específicas do Mago
-│   ├── paladino.js     # Funções específicas do Paladino
-│   ├── barbaro.js      # Funções específicas do Bárbaro
-│   ├── arqueiro.js     # Funções específicas do Arqueiro
-│   ├── monge.js        # Funções específicas do Monge
-│   ├── cavaleiro.js    # Funções específicas do Cavaleiro
-│   ├── assassino.js    # Funções específicas do Assassino
-│   ├── druida.js       # Funções específicas do Druida
-│   ├── gladiador.js    # Funções específicas do Gladiador
-│   ├── cacador.js      # Funções específicas do Caçador
-│   ├── mercenario.js   # Funções específicas do Mercenário
-│   ├── feiticeiro.js   # Funções específicas do Feiticeiro
-│   └── samurai.js      # Funções específicas do Samurai
+├── /recursos
+│   ├── /imagens            # Imagens do projeto (opcional)
+│   ├── /fontes             # Fontes personalizadas
+│   ├── /estilos
+│   │   ├── estilo.css      # Estilo principal
+│   │   └── classes/*.css   # Arquivos CSS por classe
+│   ├── /scripts
+│       ├── dados.js        # Lógica de rolagens e combate
+│       └── classes/*.js    # Funções por classe (guerreiro.js, mago.js etc)
 │
-├── /index.html         # Arquivo principal HTML
-└── /README.md          # Documentação do projeto
+├── index.html              # Página principal
+└── README.md               # Este arquivo
 ```
+
+---
+
+## 🚧 Funcionalidades Futuras
+
+- Sistema de iniciativa por velocidade/peso  
+- Sistema de status (sangramento, queimadura etc.)  
+- Modo de campanha ou torneio  
+- Interface gráfica com animações simples  
+
+---
+
+## 🤝 Contribuição
+
+Sugestões, correções e melhorias são bem-vindas. Mande aquele **commit limpo** ou abra um tópico.
+
+---
+
+## 📜 Licença
+
+Projeto livre para uso e modificação.

@@ -10,11 +10,15 @@ const DadosManager = {
     const faces = parseInt(tipoDado.replace("D", ""));
     const resultado = Math.floor(Math.random() * faces) + 1;
 
-    // Armazena o resultado
-    this.dadosRolados[`player${jogador}`][tipoDado.toLowerCase()] = resultado;
+    // Garante que o resultado seja um número válido
+    this.dadosRolados[`player${jogador}`][tipoDado.toLowerCase()] =
+      resultado || 0;
 
     // Atualiza a interface
-    this.atualizarInterfaceDados(jogador, tipoDado, resultado);
+    const elemento = document.getElementById(`player${jogador}${tipoDado}`);
+    if (elemento) {
+      elemento.textContent = resultado;
+    }
 
     return resultado;
   },

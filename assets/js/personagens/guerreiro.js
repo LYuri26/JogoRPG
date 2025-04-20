@@ -1,139 +1,134 @@
-// Objeto Guerreiro completo
 window.guerreiro = {
-  classe: "Guerreiro",
-  nome: "Vegeta",
-  vida: 30,
-  danoBase: 3,
-  armadura: 5,
-  esquiva: 2,
-  peso: 4,
-  staminaMana: 6,
-  dadoEspecial: "D8 extra no ataque",
-  custoStamina: 2,
-  penalidade: "-1 defesa no turno seguinte",
-  foiAtacado: false,
+  title: "Guerreiro",
+  name: "Vegeta",
+  life: 32,
+  lifeMax: 32,
+  damage: 3,
+  armor: 4,
+  dodge: 2,
+  weight: 4,
+  stamina: 6,
+  staminaMax: 6,
+  specialDice: "D8",
+  specialAbility: "Golpe Brutal",
+  cost: 2,
+  costType: "Stamina",
+  condition: null,
+  penalty: { type: "armor", value: -1, duration: 1 },
+  activePenalty: null,
+  playerId: null,
 
-  // Ataque especial do guerreiro
-  ataqueEspecial: function () {
-    if (this.staminaMana < this.custoStamina) {
-      console.log("Stamina insuficiente para ataque especial!");
-      return 0;
+  useSpecial: function () {
+    if (this.stamina < this.cost) return { error: "Stamina insuficiente!" };
+
+    this.stamina -= this.cost;
+    this.activePenalty = { ...this.penalty };
+
+    return {
+      bonus: Math.floor(Math.random() * 8) + 1,
+      message: `${this.name} usou Golpe Brutal!`,
+    };
+  },
+
+  updateTurn: function () {
+    if (this.activePenalty) {
+      this.activePenalty.duration--;
+      if (this.activePenalty.duration <= 0) {
+        this.activePenalty = null;
+      }
     }
 
-    const dano = this.danoBase + Math.floor(Math.random() * 8) + 1;
-    this.staminaMana -= this.custoStamina;
-
-    // Aplica penalidade
-    if (typeof registrarPenalidade === "function") {
-      registrarPenalidade(this.playerId === "player1" ? 1 : 2, "defesa", 1);
+    if (
+      window.ConfigJogo &&
+      ConfigJogo.turnoAtual % 2 === (this.playerId === "player1" ? 1 : 0)
+    ) {
+      this.stamina = Math.min(this.stamina + 2, this.staminaMax);
     }
 
-    return dano;
+    this.updateInterface();
   },
 
-  // Aplica penalidade após ataque especial
-  aplicarPenalidade: function () {
-    console.log("Penalidade aplicada: " + this.penalidade);
-    // Implemente a lógica de penalidade aqui
+  initialize: function (playerId) {
+    this.playerId = playerId;
+    this.setupInterface();
+    this.updateInterface();
   },
 
-  // Restaura stamina
-  restaurarStamina: function () {
-    this.staminaMana = 6;
-    console.log("Stamina restaurada!");
-  },
-
-  // Inicializa interface do jogador
-  inicializar: function (playerId) {
-    if (!playerId) {
-      console.error("ID do jogador não fornecido!");
+  setupInterface: function () {
+    const container = document.getElementById(`${this.playerId}-abilities`);
+    if (!container) {
+      console.error(`Container not found for ${this.playerId}`);
       return;
     }
 
-    const playerSection = document.getElementById(playerId);
-    if (!playerSection) {
-      console.error(`Seção do jogador ${playerId} não encontrada!`);
-      return;
-    }
-
-    this.criarBotoesDados(playerId);
-    this.atualizarStatus(playerId);
-    console.log(`Guerreiro inicializado para ${playerId}`);
-  },
-
-  // Cria botões de dados na interface
-  criarBotoesDados: function (playerId) {
-    const containerId = `${playerId}-dados-container`;
-    let container = document.getElementById(containerId);
-
-    if (container) {
-      container.innerHTML = "";
-    } else {
-      container = document.createElement("div");
-      container.id = containerId;
-      container.className = "dice-container";
-      document.getElementById(playerId).appendChild(container);
-    }
-
-    // Botão D6 (ataque básico)
-    const btnD6 = this.criarBotaoDado(playerId, "D6", 6);
-
-    // Botão D8 (ataque especial)
-    const btnD8 = this.criarBotaoDado(playerId, "D8", 8, true);
-
-    container.append(btnD6, btnD8);
-  },
-
-  // Cria um botão de dado genérico
-  criarBotaoDado: function (playerId, tipoDado, faces, isEspecial = false) {
-    const botao = document.createElement("button");
-    botao.textContent = tipoDado;
-    botao.className = `dice-button ${isEspecial ? "special" : ""}`;
-    botao.dataset.faces = faces;
-
-    botao.onclick = () => {
-      const resultado = Math.floor(Math.random() * faces) + 1;
-      console.log(`${playerId} rolou ${tipoDado}: ${resultado}`);
-
-      if (isEspecial) {
-        return this.ataqueEspecial();
+    const btn = document.createElement("button");
+    btn.className = "ability-button";
+    btn.textContent = this.specialAbility;
+    btn.onclick = () => {
+      const result = this.useSpecial();
+      if (result && !result.error) {
+        if (window.GerenciadorCombate) {
+          GerenciadorCombate.registrarAtaque(
+            this.playerId,
+            this.specialDice,
+            result.bonus
+          );
+        }
+      } else if (result.error) {
+        console.log(result.error);
       }
-      return resultado;
     };
 
-    return botao;
+    container.appendChild(btn);
   },
 
-  // Atualiza status na interface
-  atualizarStatus: function (playerId) {
-    const elementos = {
-      vida: `${playerId}Vida`,
-      stamina: `${playerId}Stamina`,
-      nome: `${playerId}Character`,
+  updateInterface: function () {
+    if (!this.playerId) return;
+
+    const updateElement = (idSuffix, value) => {
+      const element = document.getElementById(`${this.playerId}-${idSuffix}`);
+      if (element) element.textContent = value;
     };
 
-    for (const [prop, id] of Object.entries(elementos)) {
-      const elemento = document.getElementById(id);
-      if (elemento) {
-        elemento.textContent =
-          prop === "nome" ? `Guerreiro - ${this.nome}` : this[prop];
-      }
+    updateElement("nome", this.name);
+    updateElement("vida", this.life);
+    updateElement("stamina", `${this.stamina}/${this.staminaMax}`);
+
+    const btn = document.querySelector(`#${this.playerId}-abilities button`);
+    if (btn) {
+      btn.disabled = this.stamina < this.cost;
+    }
+
+    if (window.ResourceManager) {
+      ResourceManager.updateAbilityButtons(this);
+    }
+
+    if (window.jogo && jogo.atualizarBarraVida) {
+      jogo.atualizarBarraVida(this.playerId, this.life, this.lifeMax);
     }
   },
 };
 
-// Inicialização automática se necessário
+// Auto-initialization when DOM is ready
 document.addEventListener("DOMContentLoaded", function () {
   try {
-    const p1Char = ConfigJogo.player1Character;
-    const p2Char = ConfigJogo.player2Character;
+    // Check if ConfigJogo exists and has character data
+    if (window.ConfigJogo) {
+      const p1Char = ConfigJogo.player1Character;
+      const p2Char = ConfigJogo.player2Character;
 
-    if (p1Char && p1Char.classe === "Guerreiro") {
-      window.guerreiro.inicializar("player1");
+      // Initialize if this class is selected for either player
+      if (p1Char && p1Char.classe === "Guerreiro") {
+        window.guerreiro.initialize("player1");
+      }
+      if (p2Char && p2Char.classe === "Guerreiro") {
+        window.guerreiro.initialize("player2");
+      }
     }
 
-    if (p2Char && p2Char.classe === "Guerreiro") {
-      window.guerreiro.inicializar("player2");
+    // Register with CharacterClasses if available
+    if (window.CharacterClasses) {
+      window.CharacterClasses.Guerreiro = window.guerreiro;
     }
   } catch (e) {
     console.error("Erro ao inicializar guerreiro:", e);

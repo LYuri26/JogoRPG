@@ -1,30 +1,30 @@
-// Dados dos personagens com base na tabela
+// Dados completos dos personagens atualizados conforme a tabela
 const characterData = {
   Guerreiro: {
     title: "Guerreiro",
     name: "Vegeta",
-    life: 30,
+    life: 32,
     damage: 3,
-    armor: 5,
+    armor: 4,
     dodge: 2,
     weight: 4,
     stamina: 6,
-    specialDice: "D8 extra no ataque",
+    specialDice: "Golpe Brutal: +1D8 no ataque",
     cost: "2 Stamina",
-    penalty: "-1 defesa no turno seguinte",
+    penalty: "-1 Armadura no próximo turno",
   },
   Ladino: {
     title: "Ladino",
     name: "Mulher Gato",
-    life: 25,
+    life: 26,
     damage: 2,
     armor: 2,
     dodge: 5,
     weight: 1,
     stamina: 6,
-    specialDice: "D10 extra no ataque (se não foi atacado)",
+    specialDice: "Ataque Furtivo: +1D10 no ataque",
     cost: "3 Stamina",
-    penalty: "Só pode ser usado 2 vezes no jogo",
+    penalty: "Só pode usar a cada 2 turnos",
   },
   Mago: {
     title: "Mago",
@@ -32,64 +32,64 @@ const characterData = {
     life: 20,
     damage: 4,
     armor: 1,
-    dodge: 3,
+    dodge: 4,
     weight: 2,
-    stamina: 9,
-    specialDice: "D12 extra no ataque",
+    stamina: 6,
+    specialDice: "Bola de Fogo: +1D12 no ataque",
     cost: "3 Mana",
-    penalty: "-1 esquiva no turno seguinte",
+    penalty: "-2 Esquiva no próximo turno",
   },
   Paladino: {
     title: "Paladino",
     name: "Garen",
-    life: 35,
+    life: 36,
     damage: 3,
     armor: 4,
-    dodge: 3,
+    dodge: 2,
     weight: 3,
     stamina: 6,
-    specialDice: "D8 extra na defesa",
+    specialDice: "Ira Sagrada: +1D8 no ataque",
     cost: "2 Stamina",
-    penalty: "-2 no próximo ataque",
+    penalty: "Sofre 2 de dano direto após o uso",
   },
   Barbaro: {
-    title: "Barbaro",
+    title: "Bárbaro",
     name: "Konan",
-    life: 35,
+    life: 34,
     damage: 4,
     armor: 3,
-    dodge: 3,
+    dodge: 2,
     weight: 3,
     stamina: 6,
-    specialDice: "D10 extra no ataque (se vida < 15)",
+    specialDice: "Fúria Primordial: +1D12 no ataque (se vida ≤15)",
     cost: "6 Stamina",
-    penalty: "Só pode ser usado uma vez por combate",
+    penalty: "Só pode usar uma vez por combate",
   },
   Arqueiro: {
     title: "Arqueiro",
     name: "Legolas",
-    life: 25,
+    life: 26,
     damage: 3,
     armor: 2,
     dodge: 4,
     weight: 1,
     stamina: 6,
-    specialDice: "D8 extra no ataque",
+    specialDice: "Tiro Certeiro: +1D8 no ataque",
     cost: "2 Stamina",
-    penalty: "-1 esquiva no turno seguinte",
+    penalty: "-1 Esquiva no próximo turno",
   },
   Monge: {
     title: "Monge",
     name: "Liu Kang",
     life: 30,
-    damage: 2,
+    damage: 3,
     armor: 3,
     dodge: 5,
     weight: 0,
     stamina: 6,
-    specialDice: "D6 extra ao esquivar",
+    specialDice: "Golpe Interior: +1D8 no ataque",
     cost: "2 Stamina",
-    penalty: "-1 dano no próximo ataque",
+    penalty: "-1 Armadura após o uso",
   },
   Cavaleiro: {
     title: "Cavaleiro",
@@ -100,91 +100,92 @@ const characterData = {
     dodge: 2,
     weight: 4,
     stamina: 6,
-    specialDice: "Ignora um ataque fraco/médio",
+    specialDice: "Investida de Ferro: +1D8 no ataque",
     cost: "3 Stamina",
-    penalty: "Não pode atacar no turno seguinte",
+    penalty: "-1 Esquiva no próximo turno",
   },
   Assassino: {
     title: "Assassino",
-    name: "Vetor",
+    name: "Ezio",
     life: 25,
     damage: 4,
     armor: 2,
     dodge: 4,
     weight: 1,
     stamina: 6,
-    specialDice: "D12 extra no ataque (se D20 for 20)",
+    specialDice: "Execução Silenciosa: +1D10 no ataque (se D20 ≥16)",
     cost: "3 Stamina",
-    penalty: "Custa 3 Stamina adicionais se falhar",
+    penalty: "Só ativa com D20 ≥16",
   },
   Druida: {
     title: "Druida",
-    name: "Branca de Neve",
+    name: "Malfurion",
     life: 30,
     damage: 3,
     armor: 3,
     dodge: 3,
     weight: 2,
-    stamina: 9,
-    specialDice: "D8 extra para recuperar vida",
+    stamina: 6,
+    specialDice: "Espinhos Naturais: +1D8 no ataque",
     cost: "3 Mana",
-    penalty: "Só pode ser usado 3 vezes por combate",
+    penalty: "Máx. 2 usos por combate. Causa 1 de dano ao usuário",
   },
   Gladiador: {
     title: "Gladiador",
     name: "Maximus",
-    life: 35,
+    life: 34,
     damage: 4,
     armor: 4,
     dodge: 2,
     weight: 3,
     stamina: 6,
-    specialDice: "D6 extra para reduzir dano recebido",
+    specialDice: "Força Impiedosa: +1D8 no ataque",
     cost: "2 Stamina",
-    penalty: "Não pode usar outra habilidade no próximo turno",
+    penalty: "Máx. 3 vezes por combate. Fica indisponível no próximo turno",
   },
   Cacador: {
-    title: "Cacador",
+    title: "Caçador",
     name: "Hisoka",
-    life: 25,
+    life: 27,
     damage: 3,
     armor: 3,
     dodge: 4,
     weight: 2,
     stamina: 6,
-    specialDice: "Oponente rola D12 em vez de D20 para esquiva",
+    specialDice: "Disparo Selvagem: +1D12 no ataque",
     cost: "3 Stamina",
-    penalty: "Só pode ser usado a cada 3 turnos",
+    penalty: "Só pode usar a cada 5 turnos",
   },
   Mercenario: {
-    title: "Mercenario",
-    name: "Lady Deadpool",
+    title: "Mercenário",
+    name: "Deadpool",
     life: 30,
     damage: 3,
     armor: 4,
     dodge: 3,
     weight: 3,
     stamina: 6,
-    specialDice: "D6 extra no contra-ataque (se esquivar)",
+    specialDice:
+      "Retaliação Precisa: +1D10 no ataque após esquiva bem-sucedida",
     cost: "2 Stamina",
-    penalty: "-1 esquiva no turno seguinte",
+    penalty: "Só se tiver >30% da Vida. Máx. 3 usos por combate",
   },
   Feiticeiro: {
     title: "Feiticeiro",
-    name: "Harry Potter",
+    name: "Dr. Estranho",
     life: 20,
     damage: 4,
     armor: 1,
     dodge: 3,
     weight: 2,
-    stamina: 9,
-    specialDice: "D20 extra no ataque",
+    stamina: 6,
+    specialDice: "Explosão Arcana: +1D12 no ataque",
     cost: "3 Mana",
-    penalty: "Reduz 2 de vida ao usar",
+    penalty: "Perde 50% da Vida atual. Não pode usar com 1 de Vida",
   },
   Samurai: {
     title: "Samurai",
-    name: "Kenshin Himura",
+    name: "Kenshin",
     life: 30,
     damage: 4,
     armor: 4,
@@ -192,9 +193,9 @@ const characterData = {
     weight: 3,
     stamina: 6,
     specialDice:
-      "D10 extra no ataque (se não usou habilidade no turno anterior)",
+      "Espírito Afiado: +1D10 no ataque (se não usou habilidade no turno anterior)",
     cost: "3 Stamina",
-    penalty: "Só pode ser usado 2 vezes por combate",
+    penalty: "Só pode usar 2 vezes por combate",
   },
 };
 
@@ -203,63 +204,32 @@ function openModal(character) {
   document.getElementById(
     "characterImage"
   ).src = `./assets/images/${character.toLowerCase()}.jpeg`;
-  // Verificar se o personagem existe na lista de dados
-  if (characterData[character]) {
-    // Atualiza as informações do modal com os dados do personagem selecionado
-    document.getElementById("characterTitle").textContent =
-      characterData[character].title; // Nome do personagem
-    document.getElementById("characterLife").textContent =
-      characterData[character].life; // Vida do personagem
-    document.getElementById("characterDamage").textContent =
-      characterData[character].damage; // Dano causado pelo personagem
-    document.getElementById("characterArmor").textContent =
-      characterData[character].armor; // Armadura do personagem
-    document.getElementById("characterDodge").textContent =
-      characterData[character].dodge; // Habilidade de esquiva do personagem
-    document.getElementById("characterWeight").textContent =
-      characterData[character].weight; // Peso do personagem
-    document.getElementById("characterStamina").textContent =
-      characterData[character].stamina; // Stamina do personagem
-    document.getElementById("characterSkill").textContent =
-      characterData[character].specialDice; // Habilidade especial do personagem (corrigido para specialDice)
-    document.getElementById("characterCost").textContent =
-      characterData[character].cost; // Custo da habilidade especial
-    document.getElementById("characterPenalty").textContent =
-      characterData[character].penalty; // Penalidade por usar a habilidade
 
-    // Exibe o modal utilizando o método show() do Bootstrap
+  if (characterData[character]) {
+    const char = characterData[character];
+
+    document.getElementById("characterTitle").textContent = char.title;
+    document.getElementById("characterLife").textContent = char.life;
+    document.getElementById("characterDamage").textContent = char.damage;
+    document.getElementById("characterArmor").textContent = char.armor;
+    document.getElementById("characterDodge").textContent = char.dodge;
+    document.getElementById("characterWeight").textContent = char.weight;
+    document.getElementById("characterStamina").textContent = char.stamina;
+    document.getElementById("characterSkill").textContent = char.specialDice;
+    document.getElementById("characterCost").textContent = char.cost;
+    document.getElementById("characterPenalty").textContent = char.penalty;
+
     var modal = new bootstrap.Modal(document.getElementById("characterModal"));
     modal.show();
   } else {
-    // Se o personagem não existir, exibe um erro no console
     console.error("Personagem não encontrado: " + character);
   }
 }
 
 // Função para fechar o modal
 function closeModal() {
-  // Obtém a instância do modal do Bootstrap
   var modal = bootstrap.Modal.getInstance(
     document.getElementById("characterModal")
   );
-  // Fecha o modal
   modal.hide();
-
-  // Exemplo de como obter os personagens selecionados
-  const urlParams = new URLSearchParams(window.location.search);
-  const player1Character = urlParams.get("player1Character");
-  const player2Character = urlParams.get("player2Character");
-
-  // Carregar os arquivos JS dos personagens
-  if (player1Character) {
-    const script1 = document.createElement("script");
-    script1.src = `./js/${player1Character}.js`;
-    document.head.appendChild(script1);
-  }
-
-  if (player2Character) {
-    const script2 = document.createElement("script");
-    script2.src = `./js/${player2Character}.js`;
-    document.head.appendChild(script2);
-  }
 }

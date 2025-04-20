@@ -29,98 +29,73 @@
     </div>
 
     <div class="row">
-      <!-- Player 1 Section -->
+      <!-- Player 1 -->
       <div class="col-lg-6 mb-4">
         <div class="player-card" id="player1">
           <div class="player-header">
             <h2 class="character-name mb-0" id="player1Character">Jogador 1</h2>
           </div>
           <div class="player-body">
-            <!-- Health Bar -->
+            <!-- Barra de Vida -->
             <div class="health-bar progress">
               <div class="progress-bar" id="player1HealthBar" role="progressbar" style="width: 100%"></div>
             </div>
 
-            <!-- Stats Grid -->
+            <!-- Atributos -->
             <div class="row">
               <div class="col-md-6">
-                <div class="stat-item">
-                  <span class="stat-label">Vida:</span>
-                  <span class="stat-value float-end" id="player1Vida">30</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Dano Base:</span>
-                  <span class="stat-value float-end" id="player1Dano">3</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Armadura:</span>
-                  <span class="stat-value float-end" id="player1Armadura">5</span>
-                  <small class="text-danger" id="player1ArmaduraPenalidade"></small>
+                <div class="stat-item"><span class="stat-label">Vida:</span><span class="stat-value float-end"
+                    id="player1Vida">30</span></div>
+                <div class="stat-item"><span class="stat-label">Dano Base:</span><span class="stat-value float-end"
+                    id="player1Dano">3</span></div>
+                <div class="stat-item"><span class="stat-label">Armadura:</span><span class="stat-value float-end"
+                    id="player1Armadura">5</span><small class="text-danger" id="player1ArmaduraPenalidade"></small>
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="stat-item">
-                  <span class="stat-label">Esquiva:</span>
-                  <span class="stat-value float-end" id="player1Esquiva">2</span>
-                  <small class="text-danger" id="player1EsquivaPenalidade"></small>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Stamina:</span>
-                  <span class="stat-value float-end" id="player1Stamina">6/6</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Habilidade:</span>
-                  <span class="stat-value float-end" id="player1DadoEspecial">D8</span>
-                </div>
+                <div class="stat-item"><span class="stat-label">Esquiva:</span><span class="stat-value float-end"
+                    id="player1Esquiva">2</span><small class="text-danger" id="player1EsquivaPenalidade"></small></div>
+                <div class="stat-item"><span class="stat-label">Stamina:</span><span class="stat-value float-end"
+                    id="player1Stamina">6/6</span></div>
+                <div class="stat-item"><span class="stat-label">Habilidade:</span><span class="stat-value float-end"
+                    id="player1DadoEspecial">D8</span></div>
               </div>
               <div class="col-12">
-                <div class="stat-item">
-                  <span class="stat-label">Custo Habilidade:</span>
-                  <span class="stat-value float-end" id="player1Custo">2 Stamina</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Penalidade Ativa:</span>
-                  <span class="stat-value float-end text-danger" id="player1PenalidadeAtiva">Nenhuma</span>
-                </div>
+                <div class="stat-item"><span class="stat-label">Custo Habilidade:</span><span
+                    class="stat-value float-end" id="player1Custo">2 Stamina</span></div>
+                <div class="stat-item"><span class="stat-label">Penalidade Ativa:</span><span
+                    class="stat-value float-end text-danger" id="player1PenalidadeAtiva">Nenhuma</span></div>
               </div>
             </div>
 
-            <!-- Dice Section -->
+            <!-- Dados -->
             <div class="dice-section">
               <h3><i class="fas fa-dice me-2"></i>Rolagem de Dados</h3>
-
+              <!-- D20 -->
               <div class="dice-row mb-2">
-                <button id="player1D20Btn" class="btn btn-danger btn-sm dice-button" data-dado="D20">
-                  <i class="fas fa-dice-d20 me-1"></i> D20
-                </button>
+                <button id="player1D20Btn" class="btn btn-danger btn-sm dice-button" data-dado="D20"><i
+                    class="fas fa-dice-d20 me-1"></i> D20</button>
                 <span class="badge bg-dark ms-2" id="player1D20">0</span>
               </div>
-
+              <!-- Dados Especiais -->
               <div class="dice-row mb-2">
-                <button id="player1D6Btn" class="btn btn-secondary btn-sm dice-button" data-dado="D6" disabled>
-                  <i class="fas fa-dice-six me-1"></i> D6
-                </button>
+                <button id="player1D6Btn" class="btn btn-secondary btn-sm dice-button" data-dado="D6" disabled><i
+                    class="fas fa-dice-six me-1"></i> D6</button>
                 <span class="badge bg-dark ms-2" id="player1D6">0</span>
               </div>
-
               <div class="dice-row mb-2">
-                <button id="player1D8Btn" class="btn btn-info btn-sm dice-button" data-dado="D8" disabled>
-                  <i class="fas fa-dice-eight me-1"></i> D8
-                </button>
+                <button id="player1D8Btn" class="btn btn-info btn-sm dice-button" data-dado="D8" disabled><i
+                    class="fas fa-dice-eight me-1"></i> D8</button>
                 <span class="badge bg-dark ms-2" id="player1D8">0</span>
               </div>
-
               <div class="dice-row mb-2">
-                <button id="player1D10Btn" class="btn btn-success btn-sm dice-button" data-dado="D10" disabled>
-                  <i class="fas fa-dice-ten me-1"></i> D10
-                </button>
+                <button id="player1D10Btn" class="btn btn-success btn-sm dice-button" data-dado="D10" disabled><i
+                    class="fas fa-dice-ten me-1"></i> D10</button>
                 <span class="badge bg-dark ms-2" id="player1D10">0</span>
               </div>
-
               <div class="dice-row">
-                <button id="player1D12Btn" class="btn btn-warning btn-sm dice-button" data-dado="D12" disabled>
-                  <i class="fas fa-dice-twelve me-1"></i> D12
-                </button>
+                <button id="player1D12Btn" class="btn btn-warning btn-sm dice-button" data-dado="D12" disabled><i
+                    class="fas fa-dice-twelve me-1"></i> D12</button>
                 <span class="badge bg-dark ms-2" id="player1D12">0</span>
               </div>
             </div>
@@ -128,98 +103,71 @@
         </div>
       </div>
 
-      <!-- Player 2 Section -->
+      <!-- Player 2 -->
       <div class="col-lg-6 mb-4">
         <div class="player-card" id="player2">
           <div class="player-header">
             <h2 class="character-name mb-0" id="player2Character">Jogador 2</h2>
           </div>
           <div class="player-body">
-            <!-- Health Bar -->
+            <!-- Barra de Vida -->
             <div class="health-bar progress">
               <div class="progress-bar" id="player2HealthBar" role="progressbar" style="width: 100%"></div>
             </div>
 
-            <!-- Stats Grid -->
-            <!-- No player-card, dentro da seção de stats, substitua a parte dos stats por: -->
+            <!-- Atributos -->
             <div class="row">
               <div class="col-md-6">
-                <div class="stat-item">
-                  <span class="stat-label">Vida:</span>
-                  <span class="stat-value float-end" id="player2Vida">30</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Dano Base:</span>
-                  <span class="stat-value float-end" id="player2Dano">3</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Armadura:</span>
-                  <span class="stat-value float-end" id="player2Armadura">5</span>
-                  <small class="text-danger" id="player2ArmaduraPenalidade"></small>
+                <div class="stat-item"><span class="stat-label">Vida:</span><span class="stat-value float-end"
+                    id="player2Vida">30</span></div>
+                <div class="stat-item"><span class="stat-label">Dano Base:</span><span class="stat-value float-end"
+                    id="player2Dano">3</span></div>
+                <div class="stat-item"><span class="stat-label">Armadura:</span><span class="stat-value float-end"
+                    id="player2Armadura">5</span><small class="text-danger" id="player2ArmaduraPenalidade"></small>
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="stat-item">
-                  <span class="stat-label">Esquiva:</span>
-                  <span class="stat-value float-end" id="player2Esquiva">2</span>
-                  <small class="text-danger" id="player2EsquivaPenalidade"></small>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Stamina:</span>
-                  <span class="stat-value float-end" id="player2Stamina">6/6</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Habilidade:</span>
-                  <span class="stat-value float-end" id="player2DadoEspecial">D8</span>
-                </div>
+                <div class="stat-item"><span class="stat-label">Esquiva:</span><span class="stat-value float-end"
+                    id="player2Esquiva">2</span><small class="text-danger" id="player2EsquivaPenalidade"></small></div>
+                <div class="stat-item"><span class="stat-label">Stamina:</span><span class="stat-value float-end"
+                    id="player2Stamina">6/6</span></div>
+                <div class="stat-item"><span class="stat-label">Habilidade:</span><span class="stat-value float-end"
+                    id="player2DadoEspecial">D8</span></div>
               </div>
               <div class="col-12">
-                <div class="stat-item">
-                  <span class="stat-label">Custo Habilidade:</span>
-                  <span class="stat-value float-end" id="player2Custo">2 Stamina</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Penalidade Ativa:</span>
-                  <span class="stat-value float-end text-danger" id="player2PenalidadeAtiva">Nenhuma</span>
-                </div>
+                <div class="stat-item"><span class="stat-label">Custo Habilidade:</span><span
+                    class="stat-value float-end" id="player2Custo">2 Stamina</span></div>
+                <div class="stat-item"><span class="stat-label">Penalidade Ativa:</span><span
+                    class="stat-value float-end text-danger" id="player2PenalidadeAtiva">Nenhuma</span></div>
               </div>
             </div>
-            <!-- Dice Section -->
+
+            <!-- Dados -->
             <div class="dice-section">
               <h3><i class="fas fa-dice me-2"></i>Rolagem de Dados</h3>
-
               <div class="dice-row mb-2">
-                <button id="player2D20Btn" class="btn btn-danger btn-sm dice-button" data-dado="D20">
-                  <i class="fas fa-dice-d20 me-1"></i> D20
-                </button>
+                <button id="player2D20Btn" class="btn btn-danger btn-sm dice-button" data-dado="D20"><i
+                    class="fas fa-dice-d20 me-1"></i> D20</button>
                 <span class="badge bg-dark ms-2" id="player2D20">0</span>
               </div>
-
               <div class="dice-row mb-2">
-                <button id="player2D6Btn" class="btn btn-secondary btn-sm dice-button" data-dado="D6" disabled>
-                  <i class="fas fa-dice-six me-1"></i> D6
-                </button>
+                <button id="player2D6Btn" class="btn btn-secondary btn-sm dice-button" data-dado="D6" disabled><i
+                    class="fas fa-dice-six me-1"></i> D6</button>
                 <span class="badge bg-dark ms-2" id="player2D6">0</span>
               </div>
-
               <div class="dice-row mb-2">
-                <button id="player2D8Btn" class="btn btn-info btn-sm dice-button" data-dado="D8" disabled>
-                  <i class="fas fa-dice-eight me-1"></i> D8
-                </button>
+                <button id="player2D8Btn" class="btn btn-info btn-sm dice-button" data-dado="D8" disabled><i
+                    class="fas fa-dice-eight me-1"></i> D8</button>
                 <span class="badge bg-dark ms-2" id="player2D8">0</span>
               </div>
-
               <div class="dice-row mb-2">
-                <button id="player2D10Btn" class="btn btn-success btn-sm dice-button" data-dado="D10" disabled>
-                  <i class="fas fa-dice-ten me-1"></i> D10
-                </button>
+                <button id="player2D10Btn" class="btn btn-success btn-sm dice-button" data-dado="D10" disabled><i
+                    class="fas fa-dice-ten me-1"></i> D10</button>
                 <span class="badge bg-dark ms-2" id="player2D10">0</span>
               </div>
-
               <div class="dice-row">
-                <button id="player2D12Btn" class="btn btn-warning btn-sm dice-button" data-dado="D12" disabled>
-                  <i class="fas fa-dice-twelve me-1"></i> D12
-                </button>
+                <button id="player2D12Btn" class="btn btn-warning btn-sm dice-button" data-dado="D12" disabled><i
+                    class="fas fa-dice-twelve me-1"></i> D12</button>
                 <span class="badge bg-dark ms-2" id="player2D12">0</span>
               </div>
             </div>
@@ -228,7 +176,7 @@
       </div>
     </div>
 
-    <!-- Game Info Section -->
+    <!-- Info de Jogo -->
     <div class="row">
       <div class="col-lg-8 mx-auto">
         <div class="turn-info">
@@ -239,6 +187,7 @@
           <p class="mb-0 mt-2" id="resultadoTurno">Jogador 1 começa o turno</p>
         </div>
 
+        <!-- Log de Batalha -->
         <div class="battle-log mt-4">
           <div class="battle-message mt-3 text-center" id="mensagemBatalha"></div>
           <h4 class="text-center mb-3"><i class="fas fa-scroll me-2"></i>Registro de Batalha</h4>
@@ -251,19 +200,19 @@
     </div>
   </div>
 
-  <!-- Bootstrap 5.3 JS Bundle with Popper -->
+  <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Custom JS -->
   <script src="./assets/js/config.js"></script>
+  <script src="./assets/js/recursos.js"></script>
+  <script src="./assets/js/personagens/barbaro.js"></script>
   <script src="./assets/js/personagens/guerreiro.js"></script>
   <script src="./assets/js/personagens/ladino.js"></script>
+  <script src="./assets/js/classes.js"></script>
   <script src="./assets/js/dados.js"></script>
-  <script src="./assets/js/turnos.js"></script>
-  <script src="./assets/js/jogo.js"></script>
   <script src="./assets/js/dano.js"></script>
+  <script src="./assets/js/turnos.js"></script>
   <script src="./assets/js/batalha.js"></script>
-
-
+  <script src="./assets/js/jogo.js"></script>
 </body>
 
 </html>

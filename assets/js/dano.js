@@ -1,270 +1,439 @@
-// dano.js - Complete corrected version with accurate damage and dodge calculations
+/**
+ * DANO.JS - Sistema completo de cálculo de dano e habilidades
+ * Versão corrigida e aprimorada
+ */
 
-// Helper function to parse damage values
-function parseDanoBase(dano) {
-  if (typeof dano === "number") return dano;
-  if (typeof dano === "string") return parseInt(dano.replace(/\D/g, "")) || 0;
-  return 0;
-}
+window.DanoSystem = {
+  // Configurações completas de todas as classes
+  ClassConfig: {
+    Guerreiro: {
+      dice: "D8",
+      cost: 2,
+      resource: "staminaMana",
+      effect: function (attacker) {
+        DanoSystem.registerPenalty(
+          attacker.playerId || (attacker === window.player1Character ? 1 : 2),
+          "defesa",
+          1
+        );
+      },
+      modifier: null,
+      conditions: [],
+      description: "Golpe Poderoso: reduz a defesa do alvo em 1 ponto",
+    },
+    Ladino: {
+      dice: "D10",
+      cost: 3,
+      resource: "staminaMana",
+      condition: (char) => !char.foiAtacado,
+      effect: (attacker) => {
+        attacker.usosRestantes = (attacker.usosRestantes || 0) - 1;
+      },
+      modifier: (damage) => damage * 2,
+      maxUses: 2,
+      conditions: [
+        {
+          condicao: (char) => char.foiAtacado,
+          mensagem: "Ladino não pode usar Ataque Sorrateiro após ser atacado!",
+        },
+        {
+          condicao: (char) => (char.usosRestantes || 0) <= 0,
+          mensagem: "Ataque Sorrateiro só pode ser usado a cada 2 turnos!",
+        },
+      ],
+      description: "Ataque Sorrateiro: causa dano dobrado se não foi atacado",
+    },
+    Bárbaro: {
+      dice: "D10",
+      cost: 3,
+      resource: "staminaMana",
+      condition: (char) => char.vida < 15,
+      effect: (attacker) => {
+        attacker.usosRestantes = (attacker.usosRestantes || 0) - 1;
+      },
+      modifier: (damage) => Math.floor(damage * 1.5),
+      maxUses: 1,
+      conditions: [
+        {
+          condicao: (char) => char.vida >= 15,
+          mensagem:
+            "Bárbaro só pode usar Fúria quando a vida está abaixo de 15!",
+        },
+        {
+          condicao: (char) => (char.usosRestantes || 0) <= 0,
+          mensagem: "Fúria só pode ser usada uma vez por combate!",
+        },
+      ],
+      description: "Fúria: aumenta dano em 50% quando com vida baixa",
+    },
+    Mago: {
+      dice: "D12",
+      cost: 3,
+      resource: "staminaMana",
+      effect: function (attacker) {
+        DanoSystem.registerPenalty(
+          attacker.playerId || (attacker === window.player1Character ? 1 : 2),
+          "esquiva",
+          1
+        );
+      },
+      modifier: null,
+      conditions: [],
+      description: "Feitiço Arcano: reduz esquiva do alvo em 1 ponto",
+    },
+    Paladino: {
+      dice: "D8",
+      cost: 2,
+      resource: "staminaMana",
+      effect: null,
+      modifier: null,
+      conditions: [],
+      description: "Golpe Divino: ataque básico com custo reduzido",
+    },
+    Arqueiro: {
+      dice: "D8",
+      cost: 2,
+      resource: "staminaMana",
+      effect: null,
+      modifier: null,
+      conditions: [],
+      description: "Tiro Preciso: chance aumentada de acerto crítico",
+    },
+    Monge: {
+      dice: "D6",
+      cost: 2,
+      resource: "staminaMana",
+      effect: null,
+      modifier: null,
+      conditions: [],
+      description: "Golpe Rápido: ataque básico de baixo custo",
+    },
+    Cavaleiro: {
+      dice: "D8",
+      cost: 3,
+      resource: "staminaMana",
+      effect: null,
+      modifier: null,
+      conditions: [],
+      description: "Investida: ataque com chance de atordoar",
+    },
+    Assassino: {
+      dice: "D12",
+      cost: 3,
+      resource: "staminaMana",
+      effect: null,
+      modifier: null,
+      maxUses: 3,
+      conditions: [],
+      description: "Golpe Mortal: dano alto com usos limitados",
+    },
+    Druida: {
+      dice: "D8",
+      cost: 3,
+      resource: "staminaMana",
+      effect: null,
+      modifier: null,
+      maxUses: 3,
+      conditions: [],
+      description: "Força da Natureza: cura após o ataque",
+    },
+    Gladiador: {
+      dice: "D6",
+      cost: 2,
+      resource: "staminaMana",
+      effect: null,
+      modifier: null,
+      conditions: [],
+      description: "Golpe Giratório: atinge múltiplos alvos",
+    },
+    Caçador: {
+      dice: "D12",
+      cost: 3,
+      resource: "staminaMana",
+      effect: null,
+      modifier: null,
+      conditions: [],
+      description: "Tiro Certeiro: ignora parte da armadura",
+    },
+    Mercenário: {
+      dice: "D6",
+      cost: 2,
+      resource: "staminaMana",
+      effect: null,
+      modifier: null,
+      conditions: [],
+      description: "Ataque Duplo: chance de atacar duas vezes",
+    },
+    Feiticeiro: {
+      dice: "D20",
+      cost: 3,
+      resource: "staminaMana",
+      effect: null,
+      modifier: null,
+      conditions: [],
+      description: "Bola de Fogo: dano alto mas imprevisível",
+    },
+    Samurai: {
+      dice: "D10",
+      cost: 3,
+      resource: "staminaMana",
+      effect: (attacker) => {
+        attacker.usosRestantes = (attacker.usosRestantes || 0) - 1;
+      },
+      modifier: null,
+      maxUses: 2,
+      conditions: [
+        {
+          condicao: (char) => (char.usosRestantes || 0) <= 0,
+          mensagem: "Foco Perfeito só pode ser usado 2 vezes por combate!",
+        },
+      ],
+      description: "Foco Perfeito: ignora completamente a defesa do alvo",
+    },
+  },
 
-// Function to register penalties
-function registrarPenalidade(jogador, tipo, valor) {
-  if (!window.PenalidadesAtivas) {
-    window.PenalidadesAtivas = {
-      player1: { defesa: 0, esquiva: 0, dano: 0 },
-      player2: { defesa: 0, esquiva: 0, dano: 0 },
-    };
-  }
-  window.PenalidadesAtivas[`player${jogador}`][tipo] += valor;
-}
+  // Penalidades ativas
+  Penalties: {
+    player1: { defesa: 0, esquiva: 0, dano: 0 },
+    player2: { defesa: 0, esquiva: 0, dano: 0 },
+  },
 
-// Function to update health bar
-function atualizarBarraVida(jogador, vidaAtual, vidaMaxima) {
-  const porcentagemVida = (vidaAtual / vidaMaxima) * 100;
-  const barraVida = document.getElementById(`player${jogador}HealthBar`);
-
-  if (barraVida) {
-    barraVida.style.width = `${porcentagemVida}%`;
-
-    if (porcentagemVida < 20) {
-      barraVida.classList.remove("bg-success", "bg-warning");
-      barraVida.classList.add("bg-danger");
-    } else if (porcentagemVida < 50) {
-      barraVida.classList.remove("bg-success", "bg-danger");
-      barraVida.classList.add("bg-warning");
-    } else {
-      barraVida.classList.remove("bg-warning", "bg-danger");
-      barraVida.classList.add("bg-success");
+  /**
+   * Converte dano para número
+   */
+  parseDanoBase: function (dano) {
+    if (typeof dano === "number") return dano;
+    if (typeof dano === "string") {
+      const num = parseInt(dano.replace(/\D/g, ""));
+      return isNaN(num) ? 0 : num;
     }
-  }
-}
-
-// Function to add battle log messages
-function adicionarLogBatalha(mensagem) {
-  const logElement = document.getElementById("logBatalha");
-  if (logElement) {
-    const novoLog = document.createElement("p");
-    novoLog.textContent = mensagem;
-    logElement.appendChild(novoLog);
-    logElement.scrollTop = logElement.scrollHeight;
-  }
-}
-
-// Main damage calculation function
-function calcularDano(jogador, tipoDado, resultado) {
-  const atacante =
-    jogador === 1 ? window.player1Character : window.player2Character;
-  const defensor =
-    jogador === 1 ? window.player2Character : window.player1Character;
-
-  // Get base values
-  const danoBase = parseDanoBase(atacante.danoBase);
-  const armaduraDefensor = parseDanoBase(defensor.armadura);
-  const esquivaDefensor = parseDanoBase(defensor.esquiva);
-
-  let danoTotal = danoBase + resultado;
-  let mensagemExtra = "";
-  let bloqueado = false;
-
-  // Apply class-specific abilities
-  switch (atacante.classe) {
-    case "Guerreiro":
-      if (tipoDado === "D8") {
-        if (atacante.staminaMana >= 2) {
-          danoTotal += 2;
-          mensagemExtra = " (Golpe Poderoso +2)";
-          registrarPenalidade(jogador, "defesa", 1);
-          atacante.staminaMana -= 2;
-        } else {
-          bloqueado = true;
-          alert("Stamina insuficiente para Golpe Poderoso!");
-        }
-      }
-      break;
-
-    case "Ladino":
-      if (tipoDado === "D10") {
-        if (atacante.foiAtacado) {
-          alert("Ataque Sorrateiro bloqueado: Você foi atacado este turno!");
-          bloqueado = true;
-        } else if (atacante.usosRestantes <= 0) {
-          alert("Ataque Sorrateiro bloqueado: Recarregue por 1 turno!");
-          bloqueado = true;
-        } else if (atacante.staminaMana < 3) {
-          alert("Stamina insuficiente para Ataque Sorrateiro!");
-          bloqueado = true;
-        } else {
-          danoTotal += 3;
-          mensagemExtra = " (Ataque Sorrateiro +3)";
-          atacante.usosRestantes--;
-          atacante.staminaMana -= 3;
-        }
-      }
-      break;
-
-    case "Bárbaro":
-      if (tipoDado === "D10") {
-        if (atacante.vida >= 15) {
-          alert("Fúria bloqueada: Vida deve estar abaixo de 15!");
-          bloqueado = true;
-        } else if (atacante.usosRestantes <= 0) {
-          alert("Fúria bloqueada: Já usou neste combate!");
-          bloqueado = true;
-        } else if (atacante.staminaMana < 3) {
-          alert("Stamina insuficiente para Fúria!");
-          bloqueado = true;
-        } else {
-          danoTotal += 4;
-          mensagemExtra = " (Fúria +4)";
-          atacante.usosRestantes--;
-          atacante.staminaMana -= 3;
-        }
-      }
-      break;
-
-    case "Mago":
-      if (tipoDado === "D12") {
-        if (atacante.staminaMana < 3) {
-          alert("Mana insuficiente para Bola de Fogo!");
-          bloqueado = true;
-        } else {
-          danoTotal += 4;
-          mensagemExtra = " (Bola de Fogo +4)";
-          registrarPenalidade(jogador, "esquiva", 1);
-          atacante.staminaMana -= 3;
-        }
-      }
-      break;
-
-    case "Assassino":
-      if (
-        tipoDado === "D12" &&
-        window.DadosManager?.dadosRolados[`player${jogador}`]?.d20 === 20
-      ) {
-        if (atacante.staminaMana < 3) {
-          alert("Stamina insuficiente para Golpe Mortal!");
-          bloqueado = true;
-        } else {
-          danoTotal += 5;
-          mensagemExtra = " (Golpe Mortal +5)";
-          atacante.staminaMana -= 3;
-        }
-      }
-      break;
-
-    case "Samurai":
-      if (tipoDado === "D10") {
-        if (atacante.usosRestantes <= 0) {
-          alert("Foco Perfeito bloqueado: Máximo 2 usos por combate!");
-          bloqueado = true;
-        } else if (atacante.staminaMana < 3) {
-          alert("Stamina insuficiente para Foco Perfeito!");
-          bloqueado = true;
-        } else {
-          danoTotal += 3;
-          mensagemExtra = " (Foco Perfeito +3)";
-          atacante.usosRestantes--;
-          atacante.staminaMana -= 3;
-        }
-      }
-      break;
-
-    case "Paladino":
-      if (tipoDado === "D8") {
-        if (atacante.staminaMana < 2) {
-          alert("Stamina insuficiente para Proteção Divina!");
-          bloqueado = true;
-        } else {
-          danoTotal += 2;
-          mensagemExtra = " (Proteção Divina +2)";
-          registrarPenalidade(jogador, "dano", 2);
-          atacante.staminaMana -= 2;
-        }
-      }
-      break;
-
-    case "Arqueiro":
-      if (tipoDado === "D8") {
-        if (atacante.staminaMana < 2) {
-          alert("Stamina insuficiente para Tiro Preciso!");
-          bloqueado = true;
-        } else {
-          danoTotal += 2;
-          mensagemExtra = " (Tiro Preciso +2)";
-          registrarPenalidade(jogador, "esquiva", 1);
-          atacante.staminaMana -= 2;
-        }
-      }
-      break;
-
-    case "Druida":
-      if (tipoDado === "D8") {
-        if (atacante.staminaMana < 3) {
-          alert("Mana insuficiente para Cura Natural!");
-          bloqueado = true;
-        } else {
-          const cura = Math.floor(resultado / 2) + 2;
-          atacante.vida = Math.min(atacante.vidaMaxima, atacante.vida + cura);
-          document.getElementById(`player${jogador}Vida`).textContent =
-            atacante.vida;
-          atualizarBarraVida(jogador, atacante.vida, atacante.vidaMaxima);
-          mensagemExtra = ` (Cura Natural +${cura})`;
-          adicionarLogBatalha(`${atacante.nome} curou ${cura} de vida!`);
-          atacante.staminaMana -= 3;
-          return 0;
-        }
-      }
-      break;
-  }
-
-  if (bloqueado) return 0;
-
-  // Dodge check - NEW SYSTEM
-  if (danoTotal <= esquivaDefensor) {
-    mensagemExtra += ` (ESQUIVOU! ${danoTotal} ≤ ${esquivaDefensor})`;
-    atacante.foiAtacado = true;
-
-    // Mercenary counter-attack
-    if (defensor.classe === "Mercenário" && defensor.staminaMana >= 2) {
-      defensor.staminaMana -= 2;
-      const contraAtaque = Math.max(
-        1,
-        Math.floor(Math.random() * 6) +
-          1 +
-          parseDanoBase(defensor.danoBase) -
-          parseDanoBase(atacante.armadura)
-      );
-      mensagemExtra += ` | ${defensor.nome} contra-ataca: ${contraAtaque} de dano!`;
-      adicionarLogBatalha(
-        `${atacante.nome} usou ${tipoDado} (${resultado})${mensagemExtra}`
-      );
-      return -contraAtaque;
-    }
-
-    adicionarLogBatalha(
-      `${atacante.nome} usou ${tipoDado} (${resultado})${mensagemExtra}`
-    );
     return 0;
+  },
+
+  /**
+   * Calcula o dano total de um ataque
+   */
+  calcularDano: function (jogador, tipoDado, resultado) {
+    const atacante =
+      jogador === 1 ? window.player1Character : window.player2Character;
+    const defensor =
+      jogador === 1 ? window.player2Character : window.player1Character;
+
+    if (!atacante || !defensor) {
+      console.error("Personagens não definidos!");
+      return 0;
+    }
+
+    const config = this.ClassConfig[atacante.classe] || {};
+
+    // 1. Verificar esquiva com penalidades
+    const esquivaTotal = Math.max(
+      0,
+      defensor.esquiva -
+        (this.Penalties[`player${jogador === 1 ? 2 : 1}`].esquiva || 0)
+    );
+    if (Math.random() < esquivaTotal / 100) {
+      this.logAction(`${defensor.nome} esquivou do ataque!`);
+      return 0;
+    }
+
+    // 2. Calcular dano base
+    const danoBase = this.parseDanoBase(atacante.danoBase);
+    const bonusDado = parseInt(resultado) || 0;
+    const armadura = Math.max(
+      0,
+      this.parseDanoBase(defensor.armadura) -
+        (this.Penalties[`player${jogador === 1 ? 2 : 1}`].defesa || 0)
+    );
+
+    // 3. Cálculo inicial
+    let danoTotal = Math.max(1, danoBase + bonusDado - armadura);
+
+    // 4. Verificar crítico
+    const faces = parseInt(tipoDado.substring(1));
+    if (resultado === faces) {
+      danoTotal = Math.floor(danoTotal * 1.5);
+      this.logAction(`${atacante.nome} acertou um golpe crítico!`);
+    }
+
+    // 5. Aplicar modificadores de classe
+    if (tipoDado === config.dice && config.modifier) {
+      danoTotal = config.modifier(danoTotal);
+    }
+
+    // 6. Aplicar penalidades de dano
+    danoTotal += this.Penalties[`player${jogador === 1 ? 2 : 1}`].dano || 0;
+
+    return Math.max(0, danoTotal);
+  },
+
+  /**
+   * Verifica restrições especiais de habilidades
+   */
+  verificarRestricoes: function (jogador, tipoDado) {
+    const personagem =
+      jogador === 1 ? window.player1Character : window.player2Character;
+    if (!personagem) return false;
+
+    const config = this.ClassConfig[personagem.classe] || {};
+
+    // Verifica se é um ataque especial
+    if (tipoDado === config.dice) {
+      // Verifica todas as condições
+      for (const condicao of config.conditions || []) {
+        if (condicao.condicao(personagem)) {
+          this.showAlert(condicao.mensagem);
+          return false;
+        }
+      }
+
+      // Verifica usos restantes
+      if (config.maxUses && (personagem.usosRestantes || 0) <= 0) {
+        this.showAlert(
+          `Habilidade já foi usada o máximo de ${config.maxUses} vezes!`
+        );
+        return false;
+      }
+    }
+
+    return true;
+  },
+
+  /**
+   * Aplica custo de habilidade e verifica recursos
+   */
+  aplicarCustoHabilidade: function (jogador, tipoDado) {
+    const personagem =
+      jogador === 1 ? window.player1Character : window.player2Character;
+    if (!personagem) return false;
+
+    const config = this.ClassConfig[personagem.classe] || {};
+
+    // Verifica se é um ataque especial
+    if (tipoDado === config.dice) {
+      if ((personagem[config.resource] || 0) < config.cost) {
+        this.showAlert("Recursos insuficientes para usar esta habilidade!");
+        return false;
+      }
+
+      // Deduz recursos
+      personagem[config.resource] =
+        (personagem[config.resource] || 0) - config.cost;
+      const staminaElement = document.getElementById(`player${jogador}Stamina`);
+      if (staminaElement) {
+        staminaElement.textContent = `${personagem[config.resource]}/${
+          personagem.staminaManaMax
+        }`;
+      }
+    }
+
+    return true;
+  },
+
+  /**
+   * Aplica efeitos pós-habilidade
+   */
+  aplicarEfeitosPosHabilidade: function (jogador, tipoDado) {
+    const personagem =
+      jogador === 1 ? window.player1Character : window.player2Character;
+    if (!personagem) return;
+
+    const config = this.ClassConfig[personagem.classe] || {};
+
+    // Verifica se é um ataque especial
+    if (tipoDado === config.dice && config.effect) {
+      try {
+        config.effect(personagem);
+      } catch (e) {
+        console.error("Erro ao aplicar efeito da habilidade:", e);
+      }
+    }
+
+    // Marca que foi atacado para efeitos como do Ladino
+    personagem.foiAtacado = true;
+  },
+
+  /**
+   * Registra uma penalidade
+   */
+  registerPenalty: function (playerId, type, value) {
+    const numJogador =
+      typeof playerId === "number" ? playerId : playerId === "player1" ? 1 : 2;
+
+    if (!this.Penalties[`player${numJogador}`]) {
+      this.Penalties[`player${numJogador}`] = {
+        defesa: 0,
+        esquiva: 0,
+        dano: 0,
+      };
+    }
+
+    if (typeof this.Penalties[`player${numJogador}`][type] === "number") {
+      this.Penalties[`player${numJogador}`][type] += value;
+    }
+
+    // Atualiza a interface
+    if (window.atualizarPenalidadesInterface) {
+      atualizarPenalidadesInterface(numJogador);
+    }
+  },
+
+  /**
+   * Adiciona mensagem ao log de batalha
+   */
+  logAction: function (message) {
+    console.log(message); // Log no console para depuração
+    const logElement = document.getElementById("logBatalha");
+    if (logElement) {
+      const newLog = document.createElement("p");
+      newLog.textContent = message;
+      logElement.appendChild(newLog);
+      logElement.scrollTop = logElement.scrollHeight;
+    }
+  },
+
+  /**
+   * Mostra um alerta
+   */
+  showAlert: function (message) {
+    console.warn(message);
+    if (window.showCustomAlert) {
+      window.showCustomAlert(message);
+    } else {
+      alert(message);
+    }
+  },
+
+  /**
+   * Reseta todas as penalidades
+   */
+  resetPenalties: function () {
+    this.Penalties.player1 = { defesa: 0, esquiva: 0, dano: 0 };
+    this.Penalties.player2 = { defesa: 0, esquiva: 0, dano: 0 };
+
+    if (window.atualizarPenalidadesInterface) {
+      atualizarPenalidadesInterface(1);
+      atualizarPenalidadesInterface(2);
+    }
+  },
+
+  /**
+   * Obtém informações da habilidade de uma classe
+   */
+  getAbilityInfo: function (className) {
+    const config = this.ClassConfig[className] || {};
+    return {
+      dice: config.dice,
+      cost: config.cost,
+      description: config.description || "Ataque básico",
+      maxUses: config.maxUses,
+    };
+  },
+};
+
+// Inicializa o sistema de dano
+document.addEventListener("DOMContentLoaded", function () {
+  if (!window.DanoSystem) {
+    window.DanoSystem = DanoSystem;
   }
-
-  // Calculate final damage if not dodged
-  const danoFinal = Math.max(1, danoTotal - armaduraDefensor);
-  mensagemExtra += ` [${danoBase}+${resultado}-${armaduraDefensor}=${danoFinal}]`;
-
-  // Update stamina display
-  document.getElementById(
-    `player${jogador}Stamina`
-  ).textContent = `${atacante.staminaMana}/${atacante.staminaManaMax}`;
-
-  adicionarLogBatalha(
-    `${atacante.nome} usou ${tipoDado} (${resultado})${mensagemExtra}`
-  );
-  return danoFinal;
-}
-
-// Export the main function for use in other files
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = { calcularDano };
-} else {
-  window.calcularDano = calcularDano;
-}
+});
