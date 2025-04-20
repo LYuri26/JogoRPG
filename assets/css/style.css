@@ -1,39 +1,48 @@
 :root {
+  /* Cores do tema */
+  --dark-900: #121212;
   --dark-800: #1a1a1a;
   --dark-700: #222222;
   --dark-600: #2a2a2a;
-  --dark-900: #121212;
+  --light-text: #f8f9fa;
+  --muted-text: #adb5bd;
+  --rpg-gold: #ffc107;
+  --rpg-red: #dc3545;
+  --rpg-blue: #0d6efd;
+  --rpg-green: #28a745;
+  --rpg-cyan: #17a2b8;
+  --rpg-purple: #6f42c1;
 }
 
+/* Base Styles */
 body {
   font-family: "Poppins", sans-serif;
   background-color: var(--dark-900);
-  color: #f8f9fa;
+  color: var(--light-text);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Hero Section */
+/* Header Styles */
 .hero-section {
   background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-    url("https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80");
+    url("https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80");
   background-size: cover;
   background-position: center;
   border-bottom: 4px solid #6c757d;
+  color: var(--light-text);
 }
 
 .game-title {
   font-family: "MedievalSharp", cursive;
-  color: #ffc107;
-  text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000,
-    -1px 1px 0 #000, 1px 1px 0 #000;
-  letter-spacing: 2px;
+  color: var(--rpg-gold);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .section-title {
   font-family: "MedievalSharp", cursive;
-  color: #ffc107;
+  color: var(--rpg-gold);
   position: relative;
   padding-bottom: 10px;
 }
@@ -46,30 +55,39 @@ body {
   transform: translateX(-50%);
   width: 100px;
   height: 3px;
-  background: linear-gradient(to right, transparent, #ffc107, transparent);
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--rpg-gold),
+    transparent
+  );
 }
 
-/* Cards de Personagem */
-.character-card {
+/* Card Styles */
+.character-card,
+.player-card {
   background: var(--dark-800);
-  border: 1px solid #444;
+  border: 1px solid var(--dark-600);
   transition: all 0.3s ease;
-  overflow: hidden;
+  height: 100%;
+  color: var(--light-text);
 }
 
 .character-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(255, 193, 7, 0.2);
-  border-color: #ffc107;
+  border-color: var(--rpg-gold);
 }
 
 .card-img-container {
   position: relative;
   overflow: hidden;
+  height: 250px;
 }
 
 .card-img-top {
-  height: 250px;
+  height: 100%;
+  width: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
 }
@@ -87,94 +105,132 @@ body {
   font-weight: bold;
   font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  color: white;
 }
 
-.character-name {
-  font-family: "MedievalSharp", cursive;
-  color: #ffc107;
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.character-desc {
-  color: #adb5bd;
-  font-size: 0.9rem;
-  min-height: 40px;
-}
-
-.character-stats .badge {
-  font-size: 0.8rem;
-  padding: 5px 10px;
-}
-
-/* Player Status */
-.player-status {
-  background: var(--dark-800);
+/* Player Selection Area */
+.player-selection {
+  background: var(--dark-700);
+  border: 1px solid var(--dark-600);
+  color: var(--light-text);
 }
 
 .player-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Text Elements */
+.text-muted {
+  color: var(--muted-text) !important;
+}
+
+/* Button Styles */
+.btn-dice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 10px 20px;
+  font-weight: bold;
+  border: 2px solid var(--dark-600);
   transition: all 0.3s ease;
+  color: white;
 }
 
-.player-card:hover {
-  background: var(--dark-600);
+.btn-dice-primary {
+  background-color: var(--rpg-green);
 }
 
-/* Modal */
-.bg-dark-800 {
+.btn-dice-primary:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  color: white;
+}
+
+.btn-dice-primary:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  color: var(--muted-text);
+}
+
+/* Modal Styles */
+.modal-content {
   background-color: var(--dark-800);
+  border: 2px solid var(--rpg-gold);
+  color: var(--light-text);
 }
 
-.stat-box {
-  border-left: 3px solid;
+.modal-header {
+  border-bottom: 1px solid var(--dark-600);
 }
 
-.stat-box:nth-child(1) {
-  border-left-color: #dc3545;
+.modal-footer {
+  border-top: 1px solid var(--dark-600);
 }
 
-.stat-box:nth-child(2) {
-  border-left-color: #fd7e14;
+/* Selection Indicator */
+.selected-character::after {
+  content: "\f00c";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: var(--rpg-green);
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
 }
 
-.stat-box:nth-child(3) {
-  border-left-color: #0dcaf0;
+/* Animations */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
-.stat-box:nth-child(4) {
-  border-left-color: #20c997;
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
 }
 
-.stat-box:nth-child(5) {
-  border-left-color: #6c757d;
+.feedback-pulse {
+  animation: pulse 1.5s infinite;
+}
+.feedback-shake {
+  animation: shake 0.3s ease-in-out;
 }
 
-.stat-box:nth-child(6) {
-  border-left-color: #dc3545;
-}
-
-.special-ability {
-  border-left: 3px solid #ffc107;
-}
-
-/* Responsividade */
+/* Responsive Adjustments */
 @media (max-width: 768px) {
-  .game-title {
-    font-size: 2.5rem;
-  }
-
-  .character-name {
-    font-size: 1.3rem;
-  }
-}
-
-@media (max-width: 576px) {
   .game-title {
     font-size: 2rem;
   }
-
-  .hero-section {
-    padding: 2rem 0;
+  .card-img-container {
+    height: 200px;
+  }
+  .player-selection .row > div:first-child {
+    margin-bottom: 1.5rem;
   }
 }

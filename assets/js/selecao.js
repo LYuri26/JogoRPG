@@ -1,149 +1,190 @@
-let currentPlayer = 1;
-let player1Character = null;
-let player2Character = null;
-let previousPlayer1Character = null;
-let previousPlayer2Character = null;
+let currentSelectingPlayer = 1;
+const selectedCharacters = { player1: null, player2: null };
 
-// Função para selecionar o personagem
+// Função para criar o card de um personagem
+function createCharacterCard(character, data) {
+  return `
+    <div class="col">
+      <div class="card character-card h-100" id="${character}Card">
+        <div class="card-img-container">
+          <img src="./assets/images/${character.toLowerCase()}.jpeg" alt="${
+    data.title
+  }" class="card-img-top">
+          <div class="character-badge bg-${data.badgeColor}">${
+    data.badgeText
+  }</div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title character-name">${data.title}</h3>
+          <p class="card-text character-desc">${data.description}</p>
+          <div class="character-stats d-flex justify-content-between mb-3">
+            <span class="badge bg-dark"><i class="fas fa-heart text-danger me-1"></i> ${
+              data.life
+            }</span>
+            <span class="badge bg-dark"><i class="fas fa-fist-raised text-warning me-1"></i> ${
+              data.damage
+            }</span>
+            <span class="badge bg-dark"><i class="fas fa-shield-alt text-primary me-1"></i> ${
+              data.armor
+            }</span>
+          </div>
+          <button id="${character}Btn" class="btn btn-primary w-100" onclick="openModal('${character}')">
+            <i class="fas fa-search me-2"></i>Detalhes
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Função para carregar os personagens na página
+function loadCharactersToPage() {
+  const grid = document.getElementById("charactersGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  personagens.forEach((personagem) => {
+    const script = document.createElement("script");
+    script.src = `./assets/js/personagens/${personagem.toLowerCase()}.js`;
+    script.onload = () => {
+      characterData[personagem] = window[personagem.toLowerCase()];
+      characterData[personagem].badgeColor = getBadgeColor(personagem);
+      characterData[personagem].badgeText = getBadgeText(personagem);
+
+      grid.innerHTML += createCharacterCard(
+        personagem,
+        characterData[personagem]
+      );
+    };
+    script.onerror = () =>
+      console.error(`Erro ao carregar personagem: ${personagem}`);
+    document.head.appendChild(script);
+  });
+}
+
+// Funções auxiliares para estilização
+function getBadgeColor(character) {
+  const colors = {
+    Guerreiro: "danger",
+    Ladino: "success",
+    Mago: "info",
+    Paladino: "primary",
+    Barbaro: "danger",
+    Arqueiro: "success",
+    Monge: "warning",
+    Cavaleiro: "primary",
+    Assassino: "danger",
+    Druida: "success",
+    Gladiador: "warning",
+    Cacador: "success",
+    Mercenario: "secondary",
+    Feiticeiro: "info",
+    Samurai: "danger",
+  };
+  return colors[character] || "primary";
+}
+
+function getBadgeText(character) {
+  const texts = {
+    Guerreiro: "FORÇA",
+    Ladino: "AGILIDADE",
+    Mago: "MAGIA",
+    Paladino: "PROTEÇÃO",
+    Barbaro: "FÚRIA",
+    Arqueiro: "PRECISÃO",
+    Monge: "DESTREZA",
+    Cavaleiro: "DEFESA",
+    Assassino: "PRECISÃO",
+    Druida: "NATUREZA",
+    Gladiador: "COMBATE",
+    Cacador: "RASTREIO",
+    Mercenario: "VERSÁTIL",
+    Feiticeiro: "ARCANO",
+    Samurai: "HONRA",
+  };
+  return texts[character] || character.toUpperCase();
+}
+
+// Funções para seleção de jogadores
+function setSelectingPlayer(playerNumber) {
+  currentSelectingPlayer = playerNumber;
+  document.querySelectorAll('[id^="selectPlayer"]').forEach((btn) => {
+    btn.classList.remove("active");
+  });
+  document
+    .getElementById(`selectPlayer${playerNumber}Btn`)
+    .classList.add("active");
+}
+
 function selectCharacter() {
-  const character = document.getElementById("characterTitle").textContent;
-  console.log("Personagem selecionado:", character);
+  const modalTitle = document.querySelector("#characterModal .modal-title");
+  if (modalTitle && window.characterData) {
+    const characterName = modalTitle.textContent;
+    const charData = window.characterData[characterName];
 
-  // Se o jogador já tiver escolhido um personagem antes, restaura o anterior
-  if (currentPlayer === 1 && player1Character) {
-    previousPlayer1Character = player1Character;
-    resetCharacter(previousPlayer1Character);
-  } else if (currentPlayer === 2 && player2Character) {
-    previousPlayer2Character = player2Character;
-    resetCharacter(previousPlayer2Character);
-  }
+    if (charData) {
+      selectedCharacters[`player${currentSelectingPlayer}`] = {
+        character: characterName,
+        data: charData,
+        currentLife: charData.life,
+        currentStamina: charData.stamina,
+        usedSpecial: 0,
+      };
 
-  // Armazena o novo personagem selecionado pelo jogador atual
-  if (currentPlayer === 1) {
-    player1Character = character;
-    console.log("Jogador 1 escolheu:", player1Character);
-    document.getElementById("player1Status").textContent =
-      "Jogador 1: " + player1Character + " selecionado!";
-    document.getElementById("continueButton").style.display = "block";
-    loadCharacterScript(player1Character);
-
-    localStorage.setItem(
-      "player1Character",
-      JSON.stringify(characterData[character])
-    );
-    localStorage.setItem("player1Name", "Jogador 1");
-  } else {
-    player2Character = character;
-    console.log("Jogador 2 escolheu:", player2Character);
-    document.getElementById("player2Status").textContent =
-      "Jogador 2: " + player2Character + " selecionado!";
-    loadCharacterScript(player2Character);
-
-    localStorage.setItem(
-      "player2Character",
-      JSON.stringify(characterData[character])
-    );
-    localStorage.setItem("player2Name", "Jogador 2");
-  }
-
-  updateCardSelection(character);
-
-  if (player1Character !== null && player2Character !== null) {
-    document.getElementById("startGameButton").style.display = "block";
-  }
-
-  atualizarStatusJogador();
-  closeModal();
-}
-
-// Funções auxiliares
-function resetCharacter(character) {
-  const card = document.getElementById(character + "Card");
-  if (card) {
-    card.classList.remove("selected-character");
-    card.style.opacity = 1;
-  }
-
-  const button = document.getElementById(character + "Btn");
-  if (button) {
-    button.style.display = "block";
-    button.disabled = false;
+      updatePlayerDisplay(currentSelectingPlayer, charData);
+      closeModal();
+      checkReadyToStart();
+    }
   }
 }
 
-function updateCardSelection(character) {
-  const card = document.getElementById(character + "Card");
-  if (card) {
-    card.classList.add("selected-character");
-    card.style.opacity = "0.7";
-  }
-
-  const button = document.getElementById(character + "Btn");
-  if (button) {
-    button.style.display = "none";
-  }
-}
-
-function loadCharacterScript(character) {
-  const script = document.createElement("script");
-  script.src = `./assets/js/personagens/${character.toLowerCase()}.js`;
-  script.type = "module";
-  document.head.appendChild(script);
-}
-
-function continueGame() {
-  if (currentPlayer === 1 && player1Character !== null) {
-    currentPlayer = 2;
-    atualizarStatusJogador();
-    document.getElementById("continueButton").style.display = "none";
+function updatePlayerDisplay(playerNumber, characterData) {
+  const playerElement = document.getElementById(
+    `player${playerNumber}Selection`
+  );
+  if (playerElement) {
+    playerElement.innerHTML = `
+      <img src="./assets/images/${characterData.title.toLowerCase()}.jpeg" alt="${
+      characterData.title
+    }" 
+           class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;">
+      <h4>${characterData.title}</h4>
+      <div class="d-flex justify-content-center gap-2">
+        <span class="badge bg-dark"><i class="fas fa-heart text-danger"></i> ${
+          characterData.life
+        }</span>
+        <span class="badge bg-dark"><i class="fas fa-fist-raised text-warning"></i> ${
+          characterData.damage
+        }</span>
+        <span class="badge bg-dark"><i class="fas fa-shield-alt text-primary"></i> ${
+          characterData.armor
+        }</span>
+      </div>
+    `;
   }
 }
 
-function atualizarStatusJogador() {
-  let statusText =
-    currentPlayer === 1
-      ? "Jogador 1 Selecionando Personagem"
-      : "Jogador 2 Selecionando Personagem";
-
-  document.getElementById("player1Status").textContent = player1Character
-    ? "Jogador 1: " + player1Character + " selecionado!"
-    : statusText;
-  document.getElementById("player2Status").textContent = player2Character
-    ? "Jogador 2: " + player2Character + " selecionado!"
-    : "Jogador 2 Aguardando...";
-
-  let playerStatusTitle = document.getElementById("playerStatusTitle");
-  if (playerStatusTitle) {
-    playerStatusTitle.textContent = statusText;
-  }
+function checkReadyToStart() {
+  const startBtn = document.getElementById("startGameBtn");
+  startBtn.disabled = !(
+    selectedCharacters.player1 && selectedCharacters.player2
+  );
 }
 
 function startGame() {
-  if (!player1Character || !player2Character) {
-    alert("Ambos os jogadores precisam selecionar um personagem!");
-    return;
+  if (selectedCharacters.player1 && selectedCharacters.player2) {
+    localStorage.setItem("player1", JSON.stringify(selectedCharacters.player1));
+    localStorage.setItem("player2", JSON.stringify(selectedCharacters.player2));
+    window.location.href = "jogo.html";
   }
-
-  loadCharacterScript(player1Character);
-  loadCharacterScript(player2Character);
-  alert("Iniciando o jogo com " + player1Character + " e " + player2Character);
-  window.location.href = "../jogo.html";
 }
 
 // Inicialização
-document.addEventListener("DOMContentLoaded", function () {
-  currentPlayer = 1;
-  document.getElementById("player1Status").textContent =
-    "Jogador 1 Selecionando Personagem";
-  document.getElementById("player2Status").textContent =
-    "Jogador 2 Aguardando...";
-
-  console.log(
-    "Jogador 1 selecionou:",
-    localStorage.getItem("player1Character")
-  );
-  console.log(
-    "Jogador 2 selecionou:",
-    localStorage.getItem("player2Character")
-  );
+document.addEventListener("DOMContentLoaded", () => {
+  loadCharactersToPage();
+  setSelectingPlayer(1);
 });
+
+// Exporta funções para escopo global
+window.selectCharacter = selectCharacter;
