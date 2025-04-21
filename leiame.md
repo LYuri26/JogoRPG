@@ -53,7 +53,7 @@ Cada classe possui um conjunto fixo de atributos e uma habilidade especial que p
 | **Gladiador**  | 34       | 4        | 4            | 2           | 3        | 6 Stamina    | **Força Impiedosa**: +1D8 no ataque  | 2 Stamina     | Máx. 3 vezes por combate. Fica indisponível no próximo turno |
 | **Caçador**    | 27       | 3        | 3            | 4           | 2        | 6 Stamina    | **Disparo Selvagem**: +1D12 ataque   | 3 Stamina     | Só pode usar a cada 5 turnos                         |
 | **Mercenário** | 30       | 3        | 4            | 3           | 3        | 6 Stamina    | **Retaliação Precisa**: +1D10 no ataque após esquiva bem-sucedida | 2 Stamina | Só se tiver >30% da Vida. Máx. 3 usos por combate   |
-| **Feiticeiro** | 20       | 4        | 1            | 3           | 2        | 6 Mana       | **Explosão Arcana**: +1D12 ataque    | 3 Mana        | Perde 50% da Vida atual. Não pode usar com 1 de Vida |
+| **Feiticeiro** | 20       | 4        | 1            | 4           | 2        | 6 Mana       | **Explosão Arcana**: +1D12 ataque    | 3 Mana        | Perde 50% da Vida atual. Não pode usar com 1 de Vida |
 | **Samurai**    | 30       | 4        | 4            | 3           | 3        | 6 Stamina    | **Espírito Afiado**: +1D10 ataque    | 3 Stamina     | Só se não usou habilidade no turno anterior. Máx. 2 vezes por combate |
 
 ---

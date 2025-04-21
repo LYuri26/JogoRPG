@@ -8,7 +8,7 @@ var guerreiro = {
   dodge: 2,
   weight: 4,
   stamina: 6,
-  specialDice: "Golpe Brutal: +1D8 no ataque",
+  specialDice: "Golpe Brutal (+1D8 no ataque)",
   cost: "2 Stamina",
   penalty: "-1 Armadura no próximo turno",
   description: "Força e resistência",

@@ -842,3 +842,38 @@ img {
     opacity: 0;
   }
 }
+
+.log-entry {
+  padding: 8px 12px;
+  border-bottom: 1px solid #444;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.log-entry:last-child {
+  border-bottom: none;
+}
+
+/* Ícones para diferentes tipos de mensagem */
+.log-entry[data-type="attack"]::before {
+  content: "⚔️ ";
+}
+.log-entry[data-type="damage"]::before {
+  content: "💥 ";
+}
+.log-entry[data-type="turn"]::before {
+  content: "🔄 ";
+}
+.log-entry[data-type="special"]::before {
+  content: "✨ ";
+}

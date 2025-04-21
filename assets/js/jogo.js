@@ -1,7 +1,3 @@
-// =============================================
-// FUNÇÕES PRINCIPAIS DO JOGO
-// =============================================
-
 // Função chamada quando o DOM estiver completamente carregado
 document.addEventListener("DOMContentLoaded", function () {
   const player1 = JSON.parse(localStorage.getItem("player1"));
@@ -73,34 +69,42 @@ function initGame(player1, player2) {
     document.getElementById(`player2${dice}Btn`).disabled = true;
   });
 
-  // Inicia o log de combate
-  const gameLog = document.getElementById("battleLog");
+  // Limpa e inicializa o log de batalha
+  gameLog = [];
+  const battleLogElement = document.getElementById("battleLog");
+  if (battleLogElement) {
+    battleLogElement.innerHTML = ""; // Limpa o log existente
+  }
+
   updateBattleLog(
-    `Começa o combate! ${verifiedPlayer1.character} vs ${verifiedPlayer2.character}`,
-    gameLog
+    `🏁 Começa o combate: ${verifiedPlayer1.character} vs ${verifiedPlayer2.character}`
   );
   updateBattleLog(
-    `${verifiedPlayer1.character}, role seu D20 para começar o ataque!`,
-    gameLog
+    `🔔 ${verifiedPlayer1.character}, role seu D20 para começar o ataque!`
   );
 
   // Inicializa o turno como 1 (caso não exista)
   localStorage.setItem("currentTurn", "1");
+
+  // Configura os botões do primeiro turno
+  if (typeof setupTurnButtons === "function") {
+    setupTurnButtons();
+  }
 }
 
 // Função para atualizar o log de batalha
-function updateBattleLog(message, logElementId) {
+function updateBattleLog(message, logElementId = "battleLog") {
   // Adiciona a mensagem ao array de log
   gameLog.push(message);
 
   // Atualiza a exibição do log na tela
-  var logElement = document.getElementById(logElementId);
+  const logElement = document.getElementById(logElementId);
   if (logElement) {
-    var logEntry = document.createElement("div");
+    const logEntry = document.createElement("div");
     logEntry.className = "log-entry";
     logEntry.textContent = message;
-    logElement.insertBefore(logEntry, logElement.firstChild);
-    logElement.scrollTop = 0;
+    logElement.appendChild(logEntry); // Adiciona no final
+    logElement.scrollTop = logElement.scrollHeight; // Rolagem automática
   }
 }
 
