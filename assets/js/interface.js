@@ -51,24 +51,37 @@ function updatePlayerUI(playerNum, playerData) {
 }
 
 function setupButtons(player1, player2, currentAttacker) {
-  // Limpa event listeners anteriores
-  const clearButtons = () => {
+  // Variável para armazenar o roll do atacante
+  let attackRoll = 0;
+
+  // Limpa event listeners anteriores e reinicia os valores dos dados
+  const resetButtons = () => {
     ["D20", "D6", "D8", "D10", "D12"].forEach((dice) => {
       const btn = document.getElementById(`player${currentAttacker}${dice}Btn`);
+      const resultDisplay = document.getElementById(
+        `player${currentAttacker}${dice}`
+      );
+
       if (btn) {
-        btn.replaceWith(btn.cloneNode(true));
+        // Remove e recria o botão para limpar event listeners
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        // Só habilita o D20 inicialmente
+        newBtn.disabled = dice !== "D20";
+      }
+
+      if (resultDisplay) {
+        resultDisplay.textContent = "0"; // Reseta o valor exibido
       }
     });
   };
-  clearButtons();
+  resetButtons();
 
   // Configura botões para o atacante atual
   const attacker = currentAttacker === 1 ? player1 : player2;
   const defender = currentAttacker === 1 ? player2 : player1;
-
-  // Variáveis para armazenar os resultados dos dados
-  let attackRoll = null;
-  let defenseRoll = null;
+  const defenderNum = currentAttacker === 1 ? 2 : 1;
 
   // Botão D20 do atacante
   const attackerD20Btn = document.getElementById(
@@ -82,12 +95,11 @@ function setupButtons(player1, player2, currentAttacker) {
     attackRoll = rollDice("D20", currentAttacker);
     updateBattleLog(
       `${attacker.character} rolou um D20: ${attackRoll}`,
-      gameLog
+      "battleLog"
     );
 
     // Habilita o botão do defensor após 1 segundo
     setTimeout(() => {
-      const defenderNum = currentAttacker === 1 ? 2 : 1;
       const defenderD20Btn = document.getElementById(
         `player${defenderNum}D20Btn`
       );
@@ -98,7 +110,6 @@ function setupButtons(player1, player2, currentAttacker) {
   });
 
   // Botão D20 do defensor (inicialmente desabilitado)
-  const defenderNum = currentAttacker === 1 ? 2 : 1;
   const defenderD20Btn = document.getElementById(`player${defenderNum}D20Btn`);
   if (defenderD20Btn) {
     defenderD20Btn.disabled = true;
@@ -107,10 +118,10 @@ function setupButtons(player1, player2, currentAttacker) {
       defenderD20Btn.disabled = true;
 
       // Rolagem do defensor
-      defenseRoll = rollDice("D20", defenderNum);
+      const defenseRoll = rollDice("D20", defenderNum);
       updateBattleLog(
         `${defender.character} rolou um D20: ${defenseRoll}`,
-        gameLog
+        "battleLog"
       );
 
       // Processa o resultado após 1 segundo
@@ -126,18 +137,40 @@ function setupButtons(player1, player2, currentAttacker) {
     });
   }
 
-  // Configura botões de ação (inicialmente desabilitados)
+  // Configura botões de ataque (D6 e dado especial)
   ["D6", "D8", "D10", "D12"].forEach((dice) => {
     const btn = document.getElementById(`player${currentAttacker}${dice}Btn`);
     if (btn) {
       btn.addEventListener("click", () => {
-        if (dice === "D6") {
-          executeAttack(currentAttacker);
-        } else {
-          rollDice(dice, currentAttacker);
-        }
+        // Executa o ataque com o dado correspondente
+        const damageRoll = rollDice(dice, currentAttacker);
+        const attackPower = damageRoll + attacker.data.damage;
+        const damage = Math.max(1, attackPower - defender.data.armor);
+
+        updateBattleLog(
+          `${attacker.character} atacou com ${dice}: ${damageRoll} + ${attacker.data.damage} (Dano) = ${attackPower}`,
+          "battleLog"
+        );
+        updateBattleLog(
+          `Dano final: ${attackPower} - ${defender.data.armor} (Armadura) = ${damage}`,
+          "battleLog"
+        );
+
+        applyDamage(defenderNum, damage);
+
+        // Desabilita todos os botões de ataque após o uso
+        ["D6", "D8", "D10", "D12"].forEach((d) => {
+          const attackBtn = document.getElementById(
+            `player${currentAttacker}${d}Btn`
+          );
+          if (attackBtn) attackBtn.disabled = true;
+        });
+
+        // Alterna o turno após 1.5 segundos
+        setTimeout(() => {
+          switchTurn(defenderNum);
+        }, 1500);
       });
-      btn.disabled = true;
     }
   });
 }
@@ -152,16 +185,16 @@ function processCombatResult(
   const defenderNum = attackerNum === 1 ? 2 : 1;
 
   if (attackRoll > defenseRoll) {
-    // Atacante venceu
+    // Atacante venceu a disputa
     updateBattleLog(
       `${attacker.character} venceu a disputa! (${attackRoll} > ${defenseRoll})`,
-      gameLog
+      "battleLog"
     );
 
-    // Habilita botões de ataque
+    // Habilita botão de ataque básico (D6)
     document.getElementById(`player${attackerNum}D6Btn`).disabled = false;
 
-    // Habilita dado especial se o personagem tiver stamina suficiente
+    // Habilita dado especial se tiver stamina suficiente
     if (attacker.currentStamina >= getStaminaCost(attacker.data.cost)) {
       const specialDice = getSpecialDice(attacker.data.specialDice);
       document.getElementById(
@@ -169,16 +202,20 @@ function processCombatResult(
       ).disabled = false;
     }
   } else {
-    // Defensor venceu
+    // Defensor venceu a disputa
     updateBattleLog(
       `${defender.character} defendeu com sucesso! (${defenseRoll} >= ${attackRoll})`,
-      gameLog
+      "battleLog"
     );
 
-    // Alterna o turno
-    setTimeout(() => {
-      switchTurn(defenderNum);
-    }, 1500);
+    // Desabilita todos os botões de ataque do atacante atual
+    ["D6", "D8", "D10", "D12"].forEach((dice) => {
+      const btn = document.getElementById(`player${attackerNum}${dice}Btn`);
+      if (btn) btn.disabled = true;
+    });
+
+    // Alterna o turno para o defensor
+    switchTurn(defenderNum);
   }
 }
 

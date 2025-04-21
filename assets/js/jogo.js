@@ -4,20 +4,15 @@
 
 // Função chamada quando o DOM estiver completamente carregado
 document.addEventListener("DOMContentLoaded", function () {
-  // Recupera os dados dos jogadores do localStorage
-  var player1 = JSON.parse(localStorage.getItem("player1"));
-  var player2 = JSON.parse(localStorage.getItem("player2"));
+  const player1 = JSON.parse(localStorage.getItem("player1"));
+  const player2 = JSON.parse(localStorage.getItem("player2"));
 
-  // Verifica se os dados dos jogadores existem
   if (!player1 || !player2) {
-    alert(
-      "Dados dos jogadores não encontrados! Por favor, selecione os personagens novamente."
-    );
+    alert("Dados dos jogadores não encontrados!");
     window.location.href = "index.html";
     return;
   }
 
-  // Inicia o jogo com os jogadores carregados
   initGame(player1, player2);
 });
 
@@ -30,13 +25,13 @@ function initGame(player1, player2) {
     return;
   }
 
-  // Garante que os dados tenham a estrutura mínima necessária
+  // Função auxiliar para garantir estrutura mínima do jogador
   const ensurePlayerStructure = (player) => {
     return {
       ...player,
       data: {
         ...player.data,
-        title: player.data.title || player.character, // Garante que title exista
+        title: player.data.title || player.character,
         specialDice: player.data.specialDice || "D6",
         cost: player.data.cost || "1 Stamina",
         stamina: player.data.stamina || 10,
@@ -47,21 +42,39 @@ function initGame(player1, player2) {
     };
   };
 
+  // Verifica e completa a estrutura dos jogadores
   const verifiedPlayer1 = ensurePlayerStructure(player1);
   const verifiedPlayer2 = ensurePlayerStructure(player2);
 
-  // Salva os jogadores com a estrutura completa
+  // Salva os jogadores no localStorage
   localStorage.setItem("player1", JSON.stringify(verifiedPlayer1));
   localStorage.setItem("player2", JSON.stringify(verifiedPlayer2));
 
-  // Atualiza a interface
+  // Atualiza a interface dos jogadores
   updatePlayerUI(1, verifiedPlayer1);
   updatePlayerUI(2, verifiedPlayer2);
 
   // Configura os botões para o primeiro turno
   setupButtons(verifiedPlayer1, verifiedPlayer2, 1);
-  document.getElementById("player2D20Btn").disabled = true;
+
+  // Inicializa todos os valores dos dados como 0
+  ["D20", "D6", "D8", "D10", "D12"].forEach((dice) => {
+    document.getElementById(`player1${dice}`).textContent = "0";
+    document.getElementById(`player2${dice}`).textContent = "0";
+  });
+
+  // Habilita apenas o D20 do Jogador 1 (iniciante)
   document.getElementById("player1D20Btn").disabled = false;
+  document.getElementById("player2D20Btn").disabled = true;
+
+  // Desabilita todos os outros botões inicialmente
+  ["D6", "D8", "D10", "D12"].forEach((dice) => {
+    document.getElementById(`player1${dice}Btn`).disabled = true;
+    document.getElementById(`player2${dice}Btn`).disabled = true;
+  });
+
+  // Inicia o log de combate
+  const gameLog = document.getElementById("battleLog");
   updateBattleLog(
     `Começa o combate! ${verifiedPlayer1.character} vs ${verifiedPlayer2.character}`,
     gameLog
@@ -70,30 +83,28 @@ function initGame(player1, player2) {
     `${verifiedPlayer1.character}, role seu D20 para começar o ataque!`,
     gameLog
   );
+
+  // Inicializa o turno como 1 (caso não exista)
+  localStorage.setItem("currentTurn", "1");
 }
 
 // Função para atualizar o log de batalha
-function updateBattleLog(message, logArray) {
+function updateBattleLog(message, logElementId) {
   // Adiciona a mensagem ao array de log
-  logArray.push(message);
+  gameLog.push(message);
 
   // Atualiza a exibição do log na tela
-  var logElement = document.getElementById("logBatalha");
+  var logElement = document.getElementById(logElementId);
   if (logElement) {
-    // Cria um novo elemento para a mensagem
     var logEntry = document.createElement("div");
     logEntry.className = "log-entry";
     logEntry.textContent = message;
-
-    // Adiciona ao topo do log
     logElement.insertBefore(logEntry, logElement.firstChild);
-
-    // Mantém o scroll no topo
     logElement.scrollTop = 0;
   }
 }
 
-// Disponibiliza todas as funções e variáveis necessárias no escopo global
+// Variáveis e funções expostas globalmente
 window.currentAttacker = currentAttacker;
 window.gameLog = gameLog;
 window.initGame = initGame;

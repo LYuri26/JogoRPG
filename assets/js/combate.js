@@ -209,34 +209,57 @@ function switchTurn(newAttacker) {
   [1, 2].forEach((playerNum) => {
     const player = JSON.parse(localStorage.getItem(`player${playerNum}`));
 
+    if (!player) return;
+
     // Reduz cooldown se existir
     if (player.cooldown > 0) {
       player.cooldown--;
+      updateBattleLog(
+        `${player.character} cooldown reduzido para ${player.cooldown}`,
+        gameLog
+      );
     }
 
-    // Reseta penalidades de turno único
+    // Reseta penalidades de armadura se não for Monge
     if (player.armorPenalty && player.character !== "Monge") {
       player.data.armor += player.armorPenalty;
+      updateBattleLog(
+        `${player.character} resetou penalidade de armadura (+${player.armorPenalty})`,
+        gameLog
+      );
       delete player.armorPenalty;
     }
 
+    // Reseta penalidades de esquiva se não for Mago, Arqueiro ou Cavaleiro
     if (
       player.dodgePenalty &&
       !["Mago", "Arqueiro", "Cavaleiro"].includes(player.character)
     ) {
       player.data.dodge += player.dodgePenalty;
+      updateBattleLog(
+        `${player.character} resetou penalidade de esquiva (+${player.dodgePenalty})`,
+        gameLog
+      );
       delete player.dodgePenalty;
     }
 
-    // Reseta flag de turno anterior para Samurai
-    if (player.character === "Samurai") {
+    // Reseta flag de turno anterior do Samurai
+    if (player.character === "Samurai" && player.usedLastTurn) {
       player.usedLastTurn = false;
+      updateBattleLog(
+        `${player.character} pode usar habilidades novamente`,
+        gameLog
+      );
     }
 
-    // Pula turno se necessário (Gladiador)
+    // Gladiador pula o turno se necessário
     if (player.skipNextTurn) {
       delete player.skipNextTurn;
       newAttacker = newAttacker === 1 ? 2 : 1;
+      updateBattleLog(
+        `${player.character} pula turno! Novo atacante: Jogador ${newAttacker}`,
+        gameLog
+      );
     }
 
     localStorage.setItem(`player${playerNum}`, JSON.stringify(player));
@@ -244,6 +267,19 @@ function switchTurn(newAttacker) {
   });
 
   currentAttacker = newAttacker;
+
+  // Reseta todos os valores dos dados visuais
+  ["D20", "D6", "D8", "D10", "D12"].forEach((dice) => {
+    const attackerDice = document.getElementById(`player${newAttacker}${dice}`);
+    const defenderDice = document.getElementById(
+      `player${newAttacker === 1 ? 2 : 1}${dice}`
+    );
+
+    if (attackerDice) attackerDice.textContent = "0";
+    if (defenderDice) defenderDice.textContent = "0";
+  });
+
+  // Atualiza a interface para o novo turno
   document.getElementById("currentPhase").textContent =
     "Turno: " + currentAttacker;
   updateBattleLog(
@@ -251,9 +287,43 @@ function switchTurn(newAttacker) {
     gameLog
   );
 
+  // Configura os botões para o novo atacante
   const player1 = JSON.parse(localStorage.getItem("player1"));
   const player2 = JSON.parse(localStorage.getItem("player2"));
-  setupButtons(player1, player2, currentAttacker, gameLog);
+
+  // Habilita apenas o D20 do atacante atual
+  const attackerD20Btn = document.getElementById(`player${newAttacker}D20Btn`);
+  if (attackerD20Btn) {
+    attackerD20Btn.disabled = false;
+  }
+
+  // Desabilita o D20 do defensor
+  const defenderNum = newAttacker === 1 ? 2 : 1;
+  const defenderD20Btn = document.getElementById(`player${defenderNum}D20Btn`);
+  if (defenderD20Btn) {
+    defenderD20Btn.disabled = true;
+  }
+
+  // Desabilita todos os outros botões do atacante
+  ["D6", "D8", "D10", "D12"].forEach((dice) => {
+    const btn = document.getElementById(`player${newAttacker}${dice}Btn`);
+    if (btn) {
+      btn.disabled = true;
+    }
+  });
+
+  // Mensagem para iniciar o ataque
+  const currentPlayer = newAttacker === 1 ? player1 : player2;
+  if (currentPlayer) {
+    updateBattleLog(
+      `${currentPlayer.character}, role seu D20 para começar o ataque!`,
+      gameLog
+    );
+  }
+
+  // Atualiza a UI para ambos jogadores
+  updatePlayerUI(1, player1);
+  updatePlayerUI(2, player2);
 }
 
 // Função para finalizar o jogo
