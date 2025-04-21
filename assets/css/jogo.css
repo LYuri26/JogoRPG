@@ -692,3 +692,153 @@ img {
     padding: var(--space-md);
   }
 }
+
+/* Adicione ao seu jogo.css */
+.dice-roll-feedback {
+  position: absolute;
+  font-weight: bold;
+  font-size: 1.5rem;
+  opacity: 0;
+  transition: all 0.5s ease;
+  z-index: 100;
+}
+
+.dice-roll-feedback.dice-critical {
+  color: gold;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
+}
+
+.dice-roll-feedback.dice-fail {
+  color: red;
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+}
+
+.feedback-shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-10px);
+  }
+  40%,
+  80% {
+    transform: translateX(10px);
+  }
+}
+
+.feedback-pulse {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
+  }
+}
+
+.feedback-damage {
+  position: absolute;
+  color: red;
+  font-weight: bold;
+  font-size: 1.5rem;
+  animation: floatUp 1s forwards;
+}
+
+@keyframes floatUp {
+  to {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+}
+
+/* Adicione ao seu jogo.css */
+.dice-roll-feedback {
+  position: absolute;
+  font-weight: bold;
+  font-size: 1.5rem;
+  opacity: 0;
+  transition: all 0.5s ease;
+  z-index: 100;
+}
+
+.dice-roll-feedback.normal {
+  color: white;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+}
+
+.dice-roll-feedback.critical {
+  color: gold;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
+}
+
+.dice-roll-feedback.fail {
+  color: red;
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+}
+
+.dice-roll-feedback.special {
+  color: #00ff00;
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+}
+
+.feedback-shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-10px);
+  }
+  40%,
+  80% {
+    transform: translateX(10px);
+  }
+}
+
+.feedback-pulse {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
+  }
+}
+
+.feedback-damage {
+  position: absolute;
+  color: red;
+  font-weight: bold;
+  font-size: 1.5rem;
+  animation: floatUp 1s forwards;
+}
+
+@keyframes floatUp {
+  to {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+}

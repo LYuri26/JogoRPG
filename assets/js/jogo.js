@@ -1,6 +1,3 @@
-var currentAttacker = 1; // Controla de quem é o turno (1 ou 2)
-var gameLog = []; // Armazena o histórico da batalha
-
 // =============================================
 // FUNÇÕES PRINCIPAIS DO JOGO
 // =============================================
@@ -26,11 +23,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Função para inicializar o jogo
 function initGame(player1, player2) {
-  // Garante que os jogadores tenham a estrutura correta
+  // Verificação crítica de dados
+  if (!player1 || !player2 || !player1.title || !player2.title) {
+    alert("Dados dos jogadores corrompidos! Redirecionando...");
+    window.location.href = "index.html";
+    return;
+  } // Garante que os jogadores tenham a estrutura correta
   if (!player1.data) {
     player1 = {
       character: player1.title,
-      data: player1,
+      data: {
+        ...player1,
+        // Garante que os campos obrigatórios existam
+        specialDice: player1.specialDice || "D6",
+        cost: player1.cost || "1 Stamina",
+      },
       currentLife: player1.life,
       currentStamina: player1.stamina,
       usedSpecial: 0,
@@ -40,21 +47,28 @@ function initGame(player1, player2) {
   if (!player2.data) {
     player2 = {
       character: player2.title,
-      data: player2,
+      data: {
+        ...player2,
+        specialDice: player2.specialDice || "D6",
+        cost: player2.cost || "1 Stamina",
+      },
       currentLife: player2.life,
       currentStamina: player2.stamina,
       usedSpecial: 0,
     };
   }
+
+  // Salva os jogadores com a estrutura completa
+  localStorage.setItem("player1", JSON.stringify(player1));
+  localStorage.setItem("player2", JSON.stringify(player2));
+
+  // Atualiza a interface
+  updatePlayerUI(1, player1);
+  updatePlayerUI(2, player2);
+
+  // Configura os botões para o primeiro turno
+  setupButtons(player1, player2, 1);
 }
-
-// Salva os jogadores com a estrutura completa
-localStorage.setItem("player1", JSON.stringify(player1));
-localStorage.setItem("player2", JSON.stringify(player2));
-
-// Atualiza a interface
-updatePlayerUI(1, player1);
-updatePlayerUI(2, player2);
 
 // Função para atualizar o log de batalha
 function updateBattleLog(message, logArray) {
@@ -76,21 +90,6 @@ function updateBattleLog(message, logArray) {
     logElement.scrollTop = 0;
   }
 }
-
-// FUNÇÕES AUXILIARES (serão implementadas em outros arquivos)
-
-// Funções placeholder (serão sobrescritas quando outros scripts carregarem)
-function updatePlayerUI(playerNum, playerData) {
-  console.warn(
-    "updatePlayerUI não implementado ainda para jogador " + playerNum
-  );
-}
-
-function setupButtons(player1, player2, currentAttacker, gameLog) {
-  console.warn("setupButtons não implementado ainda");
-}
-
-// EXPOSIÇÃO DAS FUNÇÕES GLOBAIS
 
 // Disponibiliza todas as funções e variáveis necessárias no escopo global
 window.currentAttacker = currentAttacker;

@@ -1,47 +1,135 @@
-// Função para atualizar a interface do jogador
 function updatePlayerUI(playerNum, playerData) {
-  // Verifica se playerData.data existe (para compatibilidade)
-  const data = playerData.data || playerData;
+  // Verifica se os dados existem
+  if (!playerData || !playerData.data) {
+    console.error("Dados do jogador inválidos:", playerData);
+    return;
+  }
 
-  document.getElementById(`player${playerNum}Character`).textContent =
-    playerData.character || data.title;
-  document.getElementById(`player${playerNum}Vida`).textContent =
-    playerData.currentLife || data.life;
-  document.getElementById(`player${playerNum}Dano`).textContent = data.damage;
-  document.getElementById(`player${playerNum}Armadura`).textContent =
-    data.armor;
-  document.getElementById(`player${playerNum}Esquiva`).textContent = data.dodge;
-  document.getElementById(`player${playerNum}Stamina`).textContent = `${
-    playerData.currentStamina || data.stamina
-  }/${data.stamina}`;
-  document.getElementById(`player${playerNum}DadoEspecial`).textContent =
-    getSpecialDice(data.specialDice);
-  document.getElementById(`player${playerNum}Custo`).textContent = data.cost;
+  // Atualiza os elementos básicos
+  const elements = {
+    character: `player${playerNum}Character`,
+    vida: `player${playerNum}Vida`,
+    dano: `player${playerNum}Dano`,
+    armadura: `player${playerNum}Armadura`,
+    esquiva: `player${playerNum}Esquiva`,
+    stamina: `player${playerNum}Stamina`,
+    dadoEspecial: `player${playerNum}DadoEspecial`,
+    custo: `player${playerNum}Custo`,
+    healthBar: `player${playerNum}HealthBar`,
+  };
+
+  // Atualiza os textos
+  document.getElementById(elements.character).textContent =
+    playerData.character || playerData.data.title;
+  document.getElementById(
+    elements.vida
+  ).textContent = `${playerData.currentLife}/${playerData.data.life}`;
+  document.getElementById(elements.dano).textContent = playerData.data.damage;
+  document.getElementById(elements.armadura).textContent =
+    playerData.data.armor;
+  document.getElementById(elements.esquiva).textContent = playerData.data.dodge;
+  document.getElementById(
+    elements.stamina
+  ).textContent = `${playerData.currentStamina}/${playerData.data.stamina}`;
+  document.getElementById(elements.dadoEspecial).textContent =
+    playerData.data.specialDice;
+  document.getElementById(elements.custo).textContent = playerData.data.cost;
 
   // Atualiza a barra de vida
-  const maxLife = data.life;
-  const currentLife = playerData.currentLife || maxLife;
-  const healthPercent = (currentLife / maxLife) * 100;
-  document.getElementById(
-    `player${playerNum}HealthBar`
-  ).style.width = `${healthPercent}%`;
+  const healthBar = document.getElementById(elements.healthBar);
+  const healthPercent = (playerData.currentLife / playerData.data.life) * 100;
+  healthBar.style.width = `${healthPercent}%`;
+  healthBar.className = `progress-bar ${
+    healthPercent > 30 ? "bg-danger" : "bg-warning"
+  }`;
+
+  // Atualiza penalidades visíveis
+  document.getElementById(`player${playerNum}ArmaduraPenalidade`).textContent =
+    playerData.armorPenalty ? `(-${playerData.armorPenalty})` : "";
+  document.getElementById(`player${playerNum}EsquivaPenalidade`).textContent =
+    playerData.dodgePenalty ? `(-${playerData.dodgePenalty})` : "";
 }
 
-// Função para mostrar feedback visual (crítico, falha, normal)
-function showFeedback(elementId, text, type) {
-  type = type || "normal"; // Valor padrão se não fornecido
+function setupButtons(player1, player2, currentAttacker) {
+  // Limpa event listeners anteriores
+  const clearButtons = () => {
+    ["D20", "D6", "D8", "D10", "D12"].forEach((dice) => {
+      const btn = document.getElementById(`player${currentAttacker}${dice}Btn`);
+      if (btn) {
+        btn.replaceWith(btn.cloneNode(true));
+      }
+    });
+  };
+  clearButtons();
 
+  // Configura botões para o atacante atual
+  const attacker = currentAttacker === 1 ? player1 : player2;
+  const defender = currentAttacker === 1 ? player2 : player1;
+
+  // Botão D20 (disputa de turno)
+  document
+    .getElementById(`player${currentAttacker}D20Btn`)
+    .addEventListener("click", () => {
+      // Rolagem do atacante
+      const attackRoll = rollDice("D20", currentAttacker);
+
+      // Rolagem do defensor
+      const defenseRoll = rollDice("D20", currentAttacker === 1 ? 2 : 1);
+
+      // Determina quem ganha o turno
+      if (attackRoll > defenseRoll) {
+        // Atacante mantém o turno
+        updateBattleLog(
+          `${attacker.character} venceu a disputa do turno! (${attackRoll} vs ${defenseRoll})`,
+          gameLog
+        );
+        // Permite escolher entre ataque normal ou habilidade especial
+        document.getElementById(
+          `player${currentAttacker}D6Btn`
+        ).disabled = false;
+      } else {
+        // Defensor ganha o turno
+        updateBattleLog(
+          `${defender.character} venceu a disputa do turno! (${defenseRoll} vs ${attackRoll})`,
+          gameLog
+        );
+        // Alterna o turno
+        setTimeout(() => {
+          switchTurn(currentAttacker === 1 ? 2 : 1);
+        }, 1500);
+      }
+    });
+
+  // Configura botões de ação (após vencer a disputa)
+  ["D6", "D8", "D10", "D12"].forEach((dice) => {
+    const btn = document.getElementById(`player${currentAttacker}${dice}Btn`);
+    if (btn) {
+      btn.addEventListener("click", () => {
+        if (dice === "D6") {
+          // Ataque básico
+          executeAttack(currentAttacker);
+        } else {
+          // Habilidade especial
+          rollDice(dice, currentAttacker);
+        }
+      });
+      btn.disabled = true; // Inicialmente desabilitados
+    }
+  });
+}
+
+// Função para mostrar feedback visual
+function showFeedback(elementId, text, type = "normal") {
   const element = document.getElementById(elementId);
   if (!element) return;
 
   const feedback = document.createElement("div");
-  feedback.className = `dice-roll-feedback ${
-    type === "critical" ? "dice-critical" : ""
-  } ${type === "fail" ? "dice-fail" : ""}`;
+  feedback.className = `dice-roll-feedback ${type}`;
   feedback.textContent = text;
 
   element.appendChild(feedback);
 
+  // Animação
   setTimeout(() => {
     feedback.style.opacity = "1";
     feedback.style.transform = "translateY(-30px)";
@@ -49,62 +137,29 @@ function showFeedback(elementId, text, type) {
 
   setTimeout(() => {
     feedback.style.opacity = "0";
-    feedback.style.transform = "translateY(-60px)";
     setTimeout(() => feedback.remove(), 500);
   }, 1000);
 }
 
-// Função para rolar dados
 function rollDice(diceType, playerNum) {
   const sides = parseInt(diceType.substring(1));
   const result = Math.floor(Math.random() * sides) + 1;
 
-  const diceBtn = document.getElementById(`player${playerNum}${diceType}Btn`);
+  // Atualiza a interface
+  document.getElementById(`player${playerNum}${diceType}`).textContent = result;
+
+  // Feedback visual
   showFeedback(
     `player${playerNum}${diceType}Btn`,
     result.toString(),
     result === sides ? "critical" : result === 1 ? "fail" : "normal"
   );
 
-  document.getElementById(`player${playerNum}${diceType}`).textContent = result;
-
   return result;
 }
 
-// Função para configurar os botões de ação
-function setupButtons(player1, player2, currentAttacker) {
-  const attacker = currentAttacker === 1 ? player1 : player2;
-  const defender = currentAttacker === 1 ? player2 : player1;
-
-  // Configura botão de habilidade especial (D20)
-  document
-    .getElementById(`player${currentAttacker}D20Btn`)
-    .addEventListener("click", function () {
-      useSpecialAbility(attacker, defender, currentAttacker);
-    });
-
-  // Configura botões de dados normais (D6, D8, D10, D12)
-  ["D6", "D8", "D10", "D12"].forEach(function (dice) {
-    const btn = document.getElementById(`player${currentAttacker}${dice}Btn`);
-    if (btn) {
-      btn.addEventListener("click", function () {
-        rollDice(dice, currentAttacker);
-      });
-    }
-  });
-}
-
-// Função auxiliar para obter o tipo de dado especial
-function getSpecialDice(specialText) {
-  if (specialText.includes("D12")) return "D12";
-  if (specialText.includes("D10")) return "D10";
-  if (specialText.includes("D8")) return "D8";
-  return "D6";
-}
-
-// Registra funções no escopo global
+// Exporta funções globais
 window.updatePlayerUI = updatePlayerUI;
-window.showFeedback = showFeedback;
-window.rollDice = rollDice;
 window.setupButtons = setupButtons;
-window.getSpecialDice = getSpecialDice;
+window.rollDice = rollDice;
+window.showFeedback = showFeedback;

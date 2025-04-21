@@ -1,21 +1,14 @@
-// Função para usar habilidade especial
 function useSpecialAbility(attacker, defender, attackerNum) {
-  var cost = parseInt(attacker.data.cost);
-
-  // Verifica se tem stamina suficiente
-  if (attacker.currentStamina < cost) {
+  // Verificação adicional
+  if (!attacker.data || !attacker.data.specialDice || !attacker.data.cost) {
+    console.error("Dados de habilidade especial inválidos para:", attacker);
     showFeedback(
-      "player" + attackerNum + "D20Btn",
-      "Sem stamina suficiente!",
+      `player${attackerNum}D20Btn`,
+      "Habilidade não disponível!",
       "fail"
     );
-    updateBattleLog(
-      attacker.character + " não tem stamina suficiente!",
-      gameLog
-    );
-    return;
+    return false;
   }
-
   // Gasta a stamina e incrementa contador
   attacker.currentStamina -= cost;
   attacker.usedSpecial++;
@@ -56,6 +49,7 @@ function useSpecialAbility(attacker, defender, attackerNum) {
 
 // Função auxiliar para obter o tipo de dado especial
 function getSpecialDice(specialText) {
+  if (!specialText || typeof specialText !== "string") return "D6";
   if (specialText.includes("D12")) return "D12";
   if (specialText.includes("D10")) return "D10";
   if (specialText.includes("D8")) return "D8";

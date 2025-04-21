@@ -72,20 +72,56 @@ Cada classe possui um conjunto fixo de atributos e uma habilidade especial que p
 ## 📂 Estrutura de Diretórios
 
 ```
-/sistema-combate-rpg
-│
-├── /recursos
-│   ├── /imagens            # Imagens do projeto (opcional)
-│   ├── /fontes             # Fontes personalizadas
-│   ├── /estilos
-│   │   ├── estilo.css      # Estilo principal
-│   │   └── classes/*.css   # Arquivos CSS por classe
-│   ├── /scripts
-│       ├── dados.js        # Lógica de rolagens e combate
-│       └── classes/*.js    # Funções por classe (guerreiro.js, mago.js etc)
-│
-├── index.html              # Página principal
-└── README.md               # Este arquivo
+JogoRPG/
+├── .gitattributes
+├── index.html
+├── jogo.html
+├── leiame.md
+├── assets/
+│   ├── css/
+│   │   ├── jogo.css
+│   │   └── style.css
+│   ├── images/
+│   │   ├── arqueiro.jpeg
+│   │   ├── assassino.jpeg
+│   │   ├── barbaro.jpeg
+│   │   ├── cacador.jpeg
+│   │   ├── cavaleiro.jpeg
+│   │   ├── druida.jpeg
+│   │   ├── feiticeiro.jpeg
+│   │   ├── gladiador.jpeg
+│   │   ├── guerreiro.jpeg
+│   │   ├── ladino.jpeg
+│   │   ├── mago.jpeg
+│   │   ├── mercenario.jpeg
+│   │   ├── monge.jpeg
+│   │   ├── paladino.jpeg
+│   │   └── samurai.jpeg
+│   └── js/
+│       ├── combate.js
+│       ├── habilidades.js
+│       ├── interface.js
+│       ├── jogo.js
+│       ├── modalpersonagens.js
+│       ├── personagens_loader.js
+│       ├── selecao.js
+│       └── personagens/
+│           ├── arqueiro.js
+│           ├── assassino.js
+│           ├── barbaro.js
+│           ├── cacador.js
+│           ├── cavaleiro.js
+│           ├── druida.js
+│           ├── feiticeiro.js
+│           ├── gladiador.js
+│           ├── guerreiro.js
+│           ├── ladino.js
+│           ├── mago.js
+│           ├── mercenario.js
+│           ├── monge.js
+│           ├── paladino.js
+│           └── samurai.js
+
 ```
 
 ---
