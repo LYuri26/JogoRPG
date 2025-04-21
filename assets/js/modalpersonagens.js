@@ -78,23 +78,6 @@ function openModal(character) {
   }
 }
 
-function selectCharacter() {
-  const modalTitle = document.querySelector("#characterModal .modal-title");
-  if (modalTitle && window.characterData) {
-    const characterName = modalTitle.textContent;
-    const charData = window.characterData[characterName];
-
-    if (charData) {
-      closeModal();
-
-      // Dispara evento ou chama função global
-      if (window.handleCharacterSelection) {
-        window.handleCharacterSelection(currentSelectingPlayer, charData);
-      }
-    }
-  }
-}
-
 // Mantém a função closeModal existente
 function closeModal() {
   const modal = bootstrap.Modal.getInstance(

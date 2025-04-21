@@ -1,6 +1,6 @@
 // mercenario.js
 var mercenario = {
-  title: "Mercenário",
+  title: "Mercenario",
   name: "Bronn",
   life: 31,
   damage: 4,

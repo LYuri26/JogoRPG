@@ -1,6 +1,6 @@
 // barbaro.js
 var barbaro = {
-  title: "Bárbaro",
+  title: "Barbaro",
   name: "Conan",
   life: 35,
   damage: 5,

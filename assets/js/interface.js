@@ -66,56 +66,126 @@ function setupButtons(player1, player2, currentAttacker) {
   const attacker = currentAttacker === 1 ? player1 : player2;
   const defender = currentAttacker === 1 ? player2 : player1;
 
-  // Botão D20 (disputa de turno)
-  document
-    .getElementById(`player${currentAttacker}D20Btn`)
-    .addEventListener("click", () => {
-      // Rolagem do atacante
-      const attackRoll = rollDice("D20", currentAttacker);
+  // Variáveis para armazenar os resultados dos dados
+  let attackRoll = null;
+  let defenseRoll = null;
+
+  // Botão D20 do atacante
+  const attackerD20Btn = document.getElementById(
+    `player${currentAttacker}D20Btn`
+  );
+  attackerD20Btn.addEventListener("click", async () => {
+    // Desabilita o botão do atacante
+    attackerD20Btn.disabled = true;
+
+    // Rolagem do atacante
+    attackRoll = rollDice("D20", currentAttacker);
+    updateBattleLog(
+      `${attacker.character} rolou um D20: ${attackRoll}`,
+      gameLog
+    );
+
+    // Habilita o botão do defensor após 1 segundo
+    setTimeout(() => {
+      const defenderNum = currentAttacker === 1 ? 2 : 1;
+      const defenderD20Btn = document.getElementById(
+        `player${defenderNum}D20Btn`
+      );
+      if (defenderD20Btn) {
+        defenderD20Btn.disabled = false;
+      }
+    }, 1000);
+  });
+
+  // Botão D20 do defensor (inicialmente desabilitado)
+  const defenderNum = currentAttacker === 1 ? 2 : 1;
+  const defenderD20Btn = document.getElementById(`player${defenderNum}D20Btn`);
+  if (defenderD20Btn) {
+    defenderD20Btn.disabled = true;
+    defenderD20Btn.addEventListener("click", async () => {
+      // Desabilita o botão do defensor
+      defenderD20Btn.disabled = true;
 
       // Rolagem do defensor
-      const defenseRoll = rollDice("D20", currentAttacker === 1 ? 2 : 1);
+      defenseRoll = rollDice("D20", defenderNum);
+      updateBattleLog(
+        `${defender.character} rolou um D20: ${defenseRoll}`,
+        gameLog
+      );
 
-      // Determina quem ganha o turno
-      if (attackRoll > defenseRoll) {
-        // Atacante mantém o turno
-        updateBattleLog(
-          `${attacker.character} venceu a disputa do turno! (${attackRoll} vs ${defenseRoll})`,
-          gameLog
+      // Processa o resultado após 1 segundo
+      setTimeout(() => {
+        processCombatResult(
+          attacker,
+          defender,
+          currentAttacker,
+          attackRoll,
+          defenseRoll
         );
-        // Permite escolher entre ataque normal ou habilidade especial
-        document.getElementById(
-          `player${currentAttacker}D6Btn`
-        ).disabled = false;
-      } else {
-        // Defensor ganha o turno
-        updateBattleLog(
-          `${defender.character} venceu a disputa do turno! (${defenseRoll} vs ${attackRoll})`,
-          gameLog
-        );
-        // Alterna o turno
-        setTimeout(() => {
-          switchTurn(currentAttacker === 1 ? 2 : 1);
-        }, 1500);
-      }
+      }, 1000);
     });
+  }
 
-  // Configura botões de ação (após vencer a disputa)
+  // Configura botões de ação (inicialmente desabilitados)
   ["D6", "D8", "D10", "D12"].forEach((dice) => {
     const btn = document.getElementById(`player${currentAttacker}${dice}Btn`);
     if (btn) {
       btn.addEventListener("click", () => {
         if (dice === "D6") {
-          // Ataque básico
           executeAttack(currentAttacker);
         } else {
-          // Habilidade especial
           rollDice(dice, currentAttacker);
         }
       });
-      btn.disabled = true; // Inicialmente desabilitados
+      btn.disabled = true;
     }
   });
+}
+
+function processCombatResult(
+  attacker,
+  defender,
+  attackerNum,
+  attackRoll,
+  defenseRoll
+) {
+  const defenderNum = attackerNum === 1 ? 2 : 1;
+
+  if (attackRoll > defenseRoll) {
+    // Atacante venceu
+    updateBattleLog(
+      `${attacker.character} venceu a disputa! (${attackRoll} > ${defenseRoll})`,
+      gameLog
+    );
+
+    // Habilita botões de ataque
+    document.getElementById(`player${attackerNum}D6Btn`).disabled = false;
+
+    // Habilita dado especial se o personagem tiver stamina suficiente
+    if (attacker.currentStamina >= getStaminaCost(attacker.data.cost)) {
+      const specialDice = getSpecialDice(attacker.data.specialDice);
+      document.getElementById(
+        `player${attackerNum}${specialDice}Btn`
+      ).disabled = false;
+    }
+  } else {
+    // Defensor venceu
+    updateBattleLog(
+      `${defender.character} defendeu com sucesso! (${defenseRoll} >= ${attackRoll})`,
+      gameLog
+    );
+
+    // Alterna o turno
+    setTimeout(() => {
+      switchTurn(defenderNum);
+    }, 1500);
+  }
+}
+
+function getStaminaCost(costText) {
+  // Extrai o valor numérico do custo (ex: "2 Stamina" → 2)
+  const match = costText.match(/\d+/);
+  return match ? parseInt(match[0]) : 1;
 }
 
 // Função para mostrar feedback visual

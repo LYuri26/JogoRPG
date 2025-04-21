@@ -124,15 +124,24 @@ function selectCharacter() {
     const charData = window.characterData[characterName];
 
     if (charData) {
-      selectedCharacters[`player${currentSelectingPlayer}`] = {
+      // Garante que a estrutura de dados seja consistente com o que o jogo espera
+      const playerData = {
         character: characterName,
-        data: charData,
+        title: characterName, // Adiciona title para compatibilidade
+        data: {
+          ...charData,
+          title: characterName, // Garante que title exista no data
+          specialDice: charData.specialDice || "D6", // Valores padrão
+          cost: charData.cost || "1 Stamina",
+          stamina: charData.stamina || 10, // Valor padrão se não existir
+        },
         currentLife: charData.life,
-        currentStamina: charData.stamina,
+        currentStamina: charData.stamina || 10,
         usedSpecial: 0,
       };
 
-      updatePlayerDisplay(currentSelectingPlayer, charData);
+      selectedCharacters[`player${currentSelectingPlayer}`] = playerData;
+      updatePlayerDisplay(currentSelectingPlayer, playerData.data);
       closeModal();
       checkReadyToStart();
     }
@@ -185,6 +194,3 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCharactersToPage();
   setSelectingPlayer(1);
 });
-
-// Exporta funções para escopo global
-window.selectCharacter = selectCharacter;

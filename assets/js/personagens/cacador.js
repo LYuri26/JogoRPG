@@ -1,6 +1,6 @@
 // cacador.js
 var cacador = {
-  title: "Caçador",
+  title: "Cacador",
   name: "Aragorn",
   life: 30,
   damage: 4,

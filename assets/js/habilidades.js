@@ -9,6 +9,15 @@ function useSpecialAbility(attacker, defender, attackerNum) {
     );
     return false;
   }
+
+  const cost = getStaminaCost(attacker.data.cost);
+
+  // Verifica se tem stamina suficiente
+  if (attacker.currentStamina < cost) {
+    showFeedback(`player${attackerNum}D20Btn`, "Stamina insuficiente!", "fail");
+    return false;
+  }
+
   // Gasta a stamina e incrementa contador
   attacker.currentStamina -= cost;
   attacker.usedSpecial++;

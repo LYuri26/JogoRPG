@@ -7,18 +7,38 @@ function executeAttack(attackerNum) {
   const defenderNum = attackerNum === 1 ? 2 : 1;
   const defender = JSON.parse(localStorage.getItem(`player${defenderNum}`));
 
-  // Verifica se há dados válidos
   if (!attacker.data || !defender.data) {
     console.error("Dados dos jogadores inválidos!");
     return;
   }
 
-  // Ataque básico (já rolou D20 na disputa)
+  // Rolagem do dado de dano
   const damageRoll = rollDice("D6", attackerNum);
-  let damage = damageRoll + attacker.data.damage - defender.data.armor;
-  damage = Math.max(1, damage); // Mínimo de 1 de dano
+
+  // Cálculo do poder de ataque
+  const attackPower = damageRoll + attacker.data.damage;
+
+  // Cálculo do dano final
+  let damage = Math.max(1, attackPower - defender.data.armor);
+
+  updateBattleLog(
+    `${attacker.character} atacou com poder ${attackPower} (D6:${damageRoll} + Dano:${attacker.data.damage})`,
+    gameLog
+  );
+
+  updateBattleLog(
+    `Dano final: ${damage} (Poder ${attackPower} - Armadura ${defender.data.armor})`,
+    gameLog
+  );
 
   applyDamage(defenderNum, damage);
+
+  // Desabilita botões de ataque após o uso
+  document.getElementById(`player${attackerNum}D6Btn`).disabled = true;
+  const specialDice = getSpecialDice(attacker.data.specialDice);
+  document.getElementById(
+    `player${attackerNum}${specialDice}Btn`
+  ).disabled = true;
 
   // Alterna o turno após o ataque
   setTimeout(() => {
@@ -154,21 +174,23 @@ function applyDamage(playerNum, damage) {
   // Atualiza no localStorage
   localStorage.setItem(`player${playerNum}`, JSON.stringify(player));
 
-  // Feedback visual
-  var playerCard = document.getElementById("player" + playerNum + "Card");
-  playerCard.classList.add("feedback-shake");
-  setTimeout(function () {
-    playerCard.classList.remove("feedback-shake");
-  }, 300);
+  // Feedback visual - verifica se o elemento existe
+  var playerCard = document.getElementById(`player${playerNum}Card`);
+  if (playerCard) {
+    playerCard.classList.add("feedback-shake");
+    setTimeout(function () {
+      playerCard.classList.remove("feedback-shake");
+    }, 300);
 
-  // Mostra o valor do dano
-  var damageFeedback = document.createElement("div");
-  damageFeedback.className = "feedback-damage";
-  damageFeedback.textContent = "-" + damage;
-  playerCard.appendChild(damageFeedback);
-  setTimeout(function () {
-    damageFeedback.remove();
-  }, 1000);
+    // Mostra o valor do dano
+    var damageFeedback = document.createElement("div");
+    damageFeedback.className = "feedback-damage";
+    damageFeedback.textContent = "-" + damage;
+    playerCard.appendChild(damageFeedback);
+    setTimeout(function () {
+      damageFeedback.remove();
+    }, 1000);
+  }
 
   updatePlayerUI(playerNum, player);
   updateBattleLog(
