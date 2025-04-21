@@ -9,7 +9,7 @@ var mago = {
   weight: 1,
   stamina: 8,
   specialDice: "Bola de Fogo (+1D12 no ataque)",
-  cost: "3 Stamina",
+  cost: "3 Mana",
   penalty: "-2 Esquiva no próximo turno",
   description: "Conhecimento arcano e poder mágico",
 };

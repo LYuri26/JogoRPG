@@ -9,7 +9,7 @@ var druida = {
   weight: 2,
   stamina: 6,
   specialDice: "Espinhos Naturais (+1D8 no ataque)",
-  cost: "3 Stamina",
+  cost: "3 Mana",
   penalty: "Causa 1 de dano ao usuário",
   description: "Cura e conexão com a natureza",
 };
