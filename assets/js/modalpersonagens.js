@@ -53,7 +53,7 @@ function createModalContent(character, data) {
           </div>
       </div>
       <div class="modal-footer border-secondary justify-content-center">
-          <button class="btn btn-primary btn-lg px-4" onclick="selectCharacter()">
+          <button class="btn btn-primary btn-lg px-4" onclick="window.selectCharacter && window.selectCharacter()">
               <i class="fas fa-check me-2"></i>Selecionar Personagem
           </button>
       </div>
@@ -89,4 +89,3 @@ function closeModal() {
 // Expõe as funções para o escopo global
 window.openModal = openModal;
 window.closeModal = closeModal;
-window.selectCharacter = selectCharacter;

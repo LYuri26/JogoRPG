@@ -194,3 +194,5 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCharactersToPage();
   setSelectingPlayer(1);
 });
+
+window.selectCharacter = selectCharacter;

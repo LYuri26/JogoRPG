@@ -169,11 +169,6 @@ function setupAttackButtons(attacker, defender, attackerNum, defenderNum) {
   }
 }
 
-function getStaminaCost(costText) {
-  const match = costText.match(/\d+/);
-  return match ? parseInt(match[0]) : 1;
-}
-
 function showFeedback(elementId, text, type = "normal") {
   const element = document.getElementById(elementId);
   if (!element) return;
