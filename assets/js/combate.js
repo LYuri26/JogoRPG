@@ -69,8 +69,17 @@ function applyDamage(playerNum, damage) {
 }
 
 function switchTurn(newAttacker) {
+  // Limpa penalidades do jogador atual
   const player1 = JSON.parse(localStorage.getItem("player1"));
   const player2 = JSON.parse(localStorage.getItem("player2"));
+
+  if (player1.data.armorPenalty) delete player1.data.armorPenalty;
+  if (player1.data.dodgePenalty) delete player1.data.dodgePenalty;
+  if (player2.data.armorPenalty) delete player2.data.armorPenalty;
+  if (player2.data.dodgePenalty) delete player2.data.dodgePenalty;
+
+  localStorage.setItem("player1", JSON.stringify(player1));
+  localStorage.setItem("player2", JSON.stringify(player2));
   const attacker = newAttacker === 1 ? player1 : player2;
 
   currentAttacker = newAttacker;

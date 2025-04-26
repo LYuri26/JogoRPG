@@ -143,21 +143,25 @@ function setupAttackButtons(attacker, defender, attackerNum, defenderNum) {
         "click",
         function () {
           this.disabled = true;
-          if (useSpecialAbility(attacker, defender, attackerNum)) {
-            const damageRoll = rollDice(specialDice, attackerNum);
-            const attackPower = damageRoll + attacker.data.damage;
-            const damage = Math.max(1, attackPower - defender.data.armor);
+          const damageRoll = rollDice(specialDice, attackerNum);
+          const attackPower = damageRoll + attacker.data.damage;
 
-            updateBattleLog(
-              `⚔️ ${attacker.character} usou ${specialDice}: ${damageRoll} + ${attacker.data.damage} = ${attackPower}`
-            );
-            updateBattleLog(
-              `🛡️ Dano final: ${attackPower} - ${defender.data.armor} = ${damage}`
-            );
+          // Aplica penalidades se existirem
+          const armorReduction = defender.data.armorPenalty
+            ? defender.data.armor - parseInt(defender.data.armorPenalty)
+            : defender.data.armor;
 
-            applyDamage(defenderNum, damage);
-            setTimeout(() => switchTurn(defenderNum), 1500);
-          }
+          const damage = Math.max(1, attackPower - armorReduction);
+
+          updateBattleLog(
+            `⚡ ${attacker.character} usou habilidade especial (${specialDice}): ${damageRoll} + ${attacker.data.damage} = ${attackPower}`
+          );
+          updateBattleLog(
+            `🛡️ Dano final: ${attackPower} - ${armorReduction} = ${damage}`
+          );
+
+          applyDamage(defenderNum, damage);
+          setTimeout(() => switchTurn(defenderNum), 1500);
         },
         { once: true }
       );
