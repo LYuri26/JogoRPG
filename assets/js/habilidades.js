@@ -1,11 +1,11 @@
 const SPECIAL_CONDITIONS = {
-  Guerreiro: () => ({ canUse: true }), // Sem condições especiais
+  Guerreiro: () => ({ canUse: true }), // Sem condições prévias
   Ladino: (attacker) => ({
     canUse: attacker.usedSpecial % 2 === 0,
     failMessage: "Só pode usar a cada 2 turnos!",
   }),
-  Mago: () => ({ canUse: true }), // Penalidade é aplicada após o uso
-  Paladino: () => ({ canUse: true }), // Penalidade é aplicada após o uso
+  Mago: () => ({ canUse: true }), // Penalidade aplicada após uso
+  Paladino: () => ({ canUse: true }), // Penalidade aplicada após uso
   Barbaro: (attacker) => ({
     canUse: attacker.currentLife <= 15 && !attacker.hasUsedUltimate,
     failMessage:
@@ -13,9 +13,9 @@ const SPECIAL_CONDITIONS = {
         ? "Só pode usar com 15 ou menos de vida!"
         : "Só pode usar 1x por combate!",
   }),
-  Arqueiro: () => ({ canUse: true }), // Penalidade é aplicada após o uso
-  Monge: () => ({ canUse: true }), // Penalidade é aplicada após o uso
-  Cavaleiro: () => ({ canUse: true }), // Penalidade é aplicada após o uso
+  Arqueiro: () => ({ canUse: true }), // Penalidade aplicada após uso
+  Monge: () => ({ canUse: true }), // Penalidade aplicada após uso
+  Cavaleiro: () => ({ canUse: true }), // Penalidade aplicada após uso
   Assassino: (attacker, attackerNum) => {
     const d20Roll = parseInt(
       document.getElementById(`player${attackerNum}D20`).textContent
@@ -26,7 +26,8 @@ const SPECIAL_CONDITIONS = {
     };
   },
   Druida: (attacker) => ({
-    canUse: (attacker.specialUses || 0) < 2,
+    canUse: true, // Penalidade aplicada após uso
+    maxUses: 2,
     failMessage: "Máximo de usos atingido (2)!",
   }),
   Gladiador: (attacker) => ({
@@ -66,7 +67,7 @@ const PENALTY_HANDLERS = {
     attacker.data.armorPenalty = 1;
     return `⚠️ ${attacker.character} perdeu 1 de Armadura no próximo turno!`;
   },
-  Ladino: () => {}, // Condição é verificada antes do uso
+  Ladino: () => {}, // Condição verificada antes do uso
   Mago: (attacker) => {
     attacker.data.dodgePenalty = 2;
     return `⚠️ ${attacker.character} perdeu 2 de Esquiva no próximo turno!`;
@@ -92,7 +93,7 @@ const PENALTY_HANDLERS = {
     attacker.data.dodgePenalty = 1;
     return `⚠️ ${attacker.character} perdeu 1 de Esquiva no próximo turno!`;
   },
-  Assassino: () => {}, // Condição é verificada antes do uso
+  Assassino: () => {}, // Condição verificada antes do uso
   Druida: (attacker) => {
     const damage = 1;
     attacker.currentLife = Math.max(1, attacker.currentLife - damage);
@@ -102,17 +103,18 @@ const PENALTY_HANDLERS = {
     attacker.data.specialDisabled = true;
     return `⏳ ${attacker.character} não poderá usar habilidades no próximo turno!`;
   },
-  Cacador: () => {}, // Condição é verificada antes do uso
-  Mercenario: () => {}, // Condição é verificada antes do uso
+  Cacador: () => {}, // Condição verificada antes do uso
+  Mercenario: () => {}, // Condição verificada antes do uso
   Feiticeiro: (attacker) => {
     const damage = Math.floor(attacker.currentLife / 2);
-    attacker.currentLife = Math.max(1, damage);
+    attacker.currentLife = Math.max(1, attacker.currentLife - damage);
     return `⚡ ${attacker.character} perdeu 50% da vida (${damage})!`;
   },
-  Samurai: () => {}, // Condição é verificada antes do uso
+  Samurai: () => {}, // Condição verificada antes do uso
 };
 
 function useSpecialAbility(attacker, defender, attackerNum) {
+  // Verificação básica de dados
   if (!attacker.data || !attacker.data.specialDice || !attacker.data.cost) {
     console.error("Dados de habilidade especial inválidos para:", attacker);
     showFeedback(
@@ -129,6 +131,12 @@ function useSpecialAbility(attacker, defender, attackerNum) {
     attackerNum
   ) || { canUse: true };
   if (!condition.canUse) {
+    showFeedback(`player${attackerNum}D20Btn`, condition.failMessage, "fail");
+    return false;
+  }
+
+  // Verifica limite de usos
+  if (condition.maxUses && (attacker.specialUses || 0) >= condition.maxUses) {
     showFeedback(`player${attackerNum}D20Btn`, condition.failMessage, "fail");
     return false;
   }
@@ -153,9 +161,13 @@ function useSpecialAbility(attacker, defender, attackerNum) {
   attacker.specialUses = (attacker.specialUses || 0) + 1;
 
   // Aplica penalidades específicas da classe
-  if (PENALTY_HANDLERS[attacker.character]) {
-    const message = PENALTY_HANDLERS[attacker.character](attacker);
-    if (message) updateBattleLog(message);
+  const penaltyMessage = applyCharacterPenalties(
+    attacker,
+    defender,
+    attackerNum
+  );
+  if (penaltyMessage) {
+    updateBattleLog(penaltyMessage);
   }
 
   // Atualiza dados e UI
@@ -166,30 +178,28 @@ function useSpecialAbility(attacker, defender, attackerNum) {
   const specialDice = getSpecialDice(attacker.data.specialDice);
   showFeedback(`player${attackerNum}Card`, "HABILIDADE ESPECIAL!", "special");
   updateBattleLog(
-    `⚡ ${attacker.character} usou ${specialDice}! (Custo: ${attacker.data.cost})`
+    `⚡ ${attacker.character} usou ${specialDice}! (Custo: ${cost} ${resourceType})`
   );
 
   return true;
 }
 
 function applyCharacterPenalties(attacker, defender, attackerNum) {
-  const penalty = attacker.data.penalty;
   const defenderNum = attackerNum === 1 ? 2 : 1;
 
-  // Processa cada tipo de penalidade
-  for (const [key, handler] of Object.entries(PENALTY_HANDLERS)) {
-    if (penalty.includes(key)) {
-      const value = penalty.match(/\d+/)?.[0];
-      const message = handler(attacker, value ? parseInt(value) : null);
-      if (message) updateBattleLog(message);
-    }
-  }
+  // Aplica penalidade baseada na classe
+  if (PENALTY_HANDLERS[attacker.character]) {
+    const message = PENALTY_HANDLERS[attacker.character](attacker);
 
-  // Atualiza defensor se necessário
-  if (penalty.includes("Armadura") || penalty.includes("Esquiva")) {
-    localStorage.setItem(`player${defenderNum}`, JSON.stringify(defender));
-    updatePlayerUI(defenderNum, defender);
+    // Atualiza defensor se a penalidade afetar atributos de defesa
+    if (attacker.data.armorPenalty || attacker.data.dodgePenalty) {
+      localStorage.setItem(`player${defenderNum}`, JSON.stringify(defender));
+      updatePlayerUI(defenderNum, defender);
+    }
+
+    return message;
   }
+  return null;
 }
 
 function getSpecialDice(specialText) {

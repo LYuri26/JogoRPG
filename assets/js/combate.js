@@ -77,6 +77,8 @@ function switchTurn(newAttacker) {
   if (player1.data.dodgePenalty) delete player1.data.dodgePenalty;
   if (player2.data.armorPenalty) delete player2.data.armorPenalty;
   if (player2.data.dodgePenalty) delete player2.data.dodgePenalty;
+  if (player1.data.specialDisabled) delete player1.data.specialDisabled;
+  if (player2.data.specialDisabled) delete player2.data.specialDisabled;
 
   localStorage.setItem("player1", JSON.stringify(player1));
   localStorage.setItem("player2", JSON.stringify(player2));

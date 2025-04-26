@@ -7,7 +7,7 @@ var mago = {
   armor: 1,
   dodge: 2,
   weight: 1,
-  stamina: 8,
+  stamina: 6,
   specialDice: "Bola de Fogo (+1D12 no ataque)",
   cost: "3 Mana",
   penalty: "-2 Esquiva no próximo turno",

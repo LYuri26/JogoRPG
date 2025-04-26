@@ -137,12 +137,19 @@ function setupAttackButtons(attacker, defender, attackerNum, defenderNum) {
     const specialBtn = document.getElementById(
       `player${attackerNum}${specialDice}Btn`
     );
+
     if (specialBtn) {
       specialBtn.disabled = false;
       specialBtn.addEventListener(
         "click",
         function () {
           this.disabled = true;
+
+          // Verifica se pode usar a habilidade
+          if (!useSpecialAbility(attacker, defender, attackerNum)) {
+            return; // Se não puder usar, retorna sem executar o ataque
+          }
+
           const damageRoll = rollDice(specialDice, attackerNum);
           const attackPower = damageRoll + attacker.data.damage;
 
