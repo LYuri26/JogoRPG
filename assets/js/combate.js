@@ -69,10 +69,22 @@ function applyDamage(playerNum, damage) {
 }
 
 function switchTurn(newAttacker) {
-  // Limpa penalidades do jogador atual
+  // Obtém o turno atual
+  const currentTurn = parseInt(localStorage.getItem("currentTurn") || 1);
+  const newTurn = currentTurn + 1;
+
+  // Atualiza o turno no localStorage
+  localStorage.setItem("currentTurn", newTurn.toString());
+
+  // Atualiza os jogadores
   const player1 = JSON.parse(localStorage.getItem("player1"));
   const player2 = JSON.parse(localStorage.getItem("player2"));
 
+  // Atualiza o turno para ambos os jogadores
+  player1.currentTurn = newTurn;
+  player2.currentTurn = newTurn;
+
+  // Limpa penalidades
   if (player1.data.armorPenalty) delete player1.data.armorPenalty;
   if (player1.data.dodgePenalty) delete player1.data.dodgePenalty;
   if (player2.data.armorPenalty) delete player2.data.armorPenalty;
@@ -80,12 +92,11 @@ function switchTurn(newAttacker) {
   if (player1.data.specialDisabled) delete player1.data.specialDisabled;
   if (player2.data.specialDisabled) delete player2.data.specialDisabled;
 
+  // Salva os jogadores atualizados
   localStorage.setItem("player1", JSON.stringify(player1));
   localStorage.setItem("player2", JSON.stringify(player2));
-  const attacker = newAttacker === 1 ? player1 : player2;
 
   currentAttacker = newAttacker;
-  localStorage.setItem("currentTurn", newAttacker.toString());
 
   // Reseta os valores dos dados visuais
   ["D20", "D6", "D8", "D10", "D12"].forEach((dice) => {
@@ -96,6 +107,7 @@ function switchTurn(newAttacker) {
   });
 
   // Atualiza a interface
+  const attacker = newAttacker === 1 ? player1 : player2;
   document.getElementById(
     "currentPhase"
   ).textContent = `Turno: ${attacker.character}`;

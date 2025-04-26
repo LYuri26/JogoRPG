@@ -22,6 +22,7 @@ function initGame(player1, player2) {
   }
 
   // Função auxiliar para garantir estrutura mínima do jogador
+
   const ensurePlayerStructure = (player) => {
     return {
       ...player,
@@ -35,6 +36,9 @@ function initGame(player1, player2) {
       currentLife: player.currentLife || player.data.life,
       currentStamina: player.currentStamina || player.data.stamina || 10,
       usedSpecial: player.usedSpecial || 0,
+      specialUses: player.specialUses || 0, // Adicionado
+      lastSpecialTurn: player.lastSpecialTurn || 0, // Adicionado
+      currentTurn: player.currentTurn || 1, // Adicionado
     };
   };
 

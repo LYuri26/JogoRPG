@@ -877,3 +877,26 @@ img {
 .log-entry[data-type="special"]::before {
   content: "✨ ";
 }
+
+/* Estilo para penalidades */
+.penalty-active {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Estilo para recursos baixos */
+.resource-low {
+  color: #ff6b6b !important;
+  font-weight: bold;
+}

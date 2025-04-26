@@ -42,6 +42,34 @@ function updatePlayerUI(playerNum, playerData) {
     healthPercent > 30 ? "bg-danger" : "bg-warning"
   }`;
 
+  // Mostrar penalidades de forma mais visível
+  const armorElement = document.getElementById(elements.armadura);
+  const dodgeElement = document.getElementById(elements.esquiva);
+
+  if (playerData.data.armorPenalty) {
+    armorElement.innerHTML = `${playerData.data.armor} <span class="text-danger">(-${playerData.data.armorPenalty})</span>`;
+    armorElement.classList.add("penalty-active");
+  } else {
+    armorElement.textContent = playerData.data.armor;
+    armorElement.classList.remove("penalty-active");
+  }
+
+  if (playerData.data.dodgePenalty) {
+    dodgeElement.innerHTML = `${playerData.data.dodge} <span class="text-danger">(-${playerData.data.dodgePenalty})</span>`;
+    dodgeElement.classList.add("penalty-active");
+  } else {
+    dodgeElement.textContent = playerData.data.dodge;
+    dodgeElement.classList.remove("penalty-active");
+  }
+
+  // Adicionar estilo para mostrar redução de stamina/mana
+  const staminaElement = document.getElementById(elements.stamina);
+  if (playerData.currentStamina < playerData.data.stamina) {
+    staminaElement.classList.add("resource-low");
+  } else {
+    staminaElement.classList.remove("resource-low");
+  }
+
   // Penalidades
   document.getElementById(`player${playerNum}ArmaduraPenalidade`).textContent =
     playerData.armorPenalty ? `(-${playerData.armorPenalty})` : "";
