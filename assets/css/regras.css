@@ -1,0 +1,213 @@
+/* assets/css/regras.css - Versão Atualizada com Tema Escuro */
+
+.modal-rpg {
+  font-family: "Poppins", sans-serif;
+  color: #f8f9fa;
+}
+
+.modal-rpg .modal-content {
+  background-color: var(--dark-800);
+  border: 2px solid var(--dark-600);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+}
+
+.modal-rpg .modal-header {
+  background: linear-gradient(135deg, var(--dark-700), var(--dark-600));
+  border-bottom: 3px solid var(--rpg-gold);
+  padding: 1.5rem;
+}
+
+.modal-rpg .modal-title {
+  font-family: "MedievalSharp", cursive;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: var(--rpg-gold);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 1px;
+}
+
+.modal-rpg .modal-body {
+  background-color: var(--dark-700);
+  padding: 2rem;
+  color: var(--light-text);
+}
+
+.modal-rpg .section-title {
+  font-family: "MedievalSharp", cursive;
+  color: var(--rpg-gold);
+  border-left: 4px solid var(--rpg-gold);
+  padding-left: 15px;
+  margin: 25px 0 20px;
+  font-size: 1.5rem;
+}
+
+.modal-rpg .table {
+  background-color: var(--dark-600);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  color: var(--light-text);
+  border: 1px solid var(--dark-600);
+}
+
+.modal-rpg .table th {
+  background-color: var(--dark-800);
+  color: var(--rpg-gold);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  padding: 12px 8px;
+  border-bottom: 2px solid var(--rpg-gold);
+}
+
+.modal-rpg .table td {
+  vertical-align: middle;
+  padding: 10px 8px;
+  font-size: 0.9rem;
+  border-top: 1px solid var(--dark-600);
+}
+
+.modal-rpg .table tr:hover td {
+  background-color: rgba(233, 69, 96, 0.1);
+  color: var(--light-text); /* Garante que o texto permaneça claro */
+}
+
+.modal-rpg .table tr:hover td * {
+  color: inherit; /* Herda a cor do texto do elemento pai */
+}
+
+.modal-rpg .badge-resource {
+  font-size: 0.75rem;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.modal-rpg .badge-stamina {
+  background-color: var(--rpg-green);
+  color: white;
+}
+
+.modal-rpg .badge-mana {
+  background-color: var(--rpg-cyan);
+  color: white;
+}
+
+.modal-rpg .dice-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  filter: brightness(0) invert(1);
+}
+
+.modal-rpg .modal-footer {
+  background-color: var(--dark-800);
+  border-top: 2px solid var(--rpg-gold);
+  padding: 1.2rem;
+}
+
+.modal-rpg .btn-close {
+  filter: invert(1);
+  opacity: 0.8;
+}
+
+.modal-rpg .btn-close:hover {
+  opacity: 1;
+}
+
+/* Cards dentro do modal */
+.modal-rpg .card {
+  background-color: var(--dark-600);
+  border: 1px solid var(--dark-600);
+  color: var(--light-text);
+}
+
+.modal-rpg .card-header {
+  background-color: var(--dark-800);
+  border-bottom: 1px solid var(--rpg-gold);
+  color: var(--rpg-gold);
+}
+
+.modal-rpg .alert {
+  background-color: rgba(26, 26, 46, 0.7);
+  border: 1px solid var(--dark-600);
+  color: var(--light-text);
+}
+
+.modal-rpg .alert-secondary {
+  background-color: rgba(15, 52, 96, 0.3);
+  border-color: var(--dark-600);
+}
+
+.modal-rpg .alert-info {
+  background-color: rgba(8, 217, 214, 0.1);
+  border-color: var(--rpg-cyan);
+  color: var(--light-text);
+}
+
+/* Ícones */
+.modal-rpg .fa-dice {
+  color: var(--rpg-gold);
+}
+
+/* Text colors */
+.modal-rpg .text-primary {
+  color: var(--rpg-gold) !important;
+}
+
+.modal-rpg .text-muted {
+  color: var(--muted-text) !important;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+  .modal-rpg .modal-dialog {
+    margin: 1rem auto;
+  }
+
+  .modal-rpg .table-responsive {
+    font-size: 0.85rem;
+  }
+
+  .modal-rpg .table th,
+  .modal-rpg .table td {
+    padding: 8px 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-rpg .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-rpg .modal-title {
+    font-size: 1.4rem;
+  }
+
+  .modal-rpg .section-title {
+    font-size: 1.3rem;
+  }
+
+  .modal-rpg .modal-body {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-rpg .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .modal-rpg .table th {
+    font-size: 0.7rem;
+  }
+
+  .modal-rpg .table td {
+    font-size: 0.75rem;
+  }
+
+  .modal-rpg .badge-resource {
+    font-size: 0.65rem;
+  }
+}

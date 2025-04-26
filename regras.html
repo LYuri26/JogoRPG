@@ -1,0 +1,285 @@
+<!-- Seção de Objetivo -->
+<section>
+    <h3 class="section-title text-primary">🎯 Objetivo do Jogo</h3>
+    <div class="alert alert-secondary">
+        <p class="mb-0">Derrote o oponente em um combate estratégico por turnos, utilizando as habilidades únicas da sua
+            classe e gerenciando seus recursos (Stamina/Mana) com sabedoria.</p>
+    </div>
+</section>
+
+<!-- Seção de Mecânica Geral -->
+<section>
+    <h3 class="section-title text-primary">⚔️ Mecânica de Combate</h3>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="fas fa-list-ol me-2"></i> Fluxo do Turno</h4>
+                </div>
+                <div class="card-body">
+                    <ol class="mb-0">
+                        <li class="mb-2">Decisão de usar habilidade especial (Atacante)</li>
+                        <li class="mb-2">Decisão de usar habilidade especial (Defensor)</li>
+                        <li class="mb-2">Rolagem de ataque (D20 pelo Atacante)</li>
+                        <li class="mb-2">Rolagem de esquiva (D20 pelo Defensor)</li>
+                        <li class="mb-2">Comparação dos resultados</li>
+                        <li class="mb-2">Cálculo de dano (se aplicável)</li>
+                        <li>Aplicação de penalidades</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-circle me-2"></i> Regras Chave</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li class="mb-2"><strong>Habilidades:</strong> Declaradas antes da rolagem</li>
+                        <li class="mb-2"><strong>Recursos:</strong> Gastos imediatamente</li>
+                        <li class="mb-2"><strong>Penalidades:</strong> Aplicam-se mesmo em esquivas</li>
+                        <li><strong>Restrições:</strong> Algumas habilidades têm condições especiais</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção de Classes -->
+<section>
+    <h3 class="section-title text-primary">🛡️ Classes Disponíveis</h3>
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i> Clique em "Detalhes" na seleção de personagens para ver informações
+        específicas de cada classe.
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Classe</th>
+                    <th class="text-center">Vida</th>
+                    <th class="text-center">Dano</th>
+                    <th class="text-center">Armadura</th>
+                    <th class="text-center">Esquiva</th>
+                    <th>Habilidade Especial</th>
+                    <th class="text-center">Recurso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Guerreiro -->
+                <tr>
+                    <td><strong>Guerreiro</strong></td>
+                    <td class="text-center">32</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">2</td>
+                    <td>Golpe Brutal (+1D8)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Ladino -->
+                <tr>
+                    <td><strong>Ladino</strong></td>
+                    <td class="text-center">26</td>
+                    <td class="text-center">2</td>
+                    <td class="text-center">2</td>
+                    <td class="text-center">5</td>
+                    <td>Ataque Furtivo (+1D10)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Mago -->
+                <tr>
+                    <td><strong>Mago</strong></td>
+                    <td class="text-center">20</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">1</td>
+                    <td class="text-center">4</td>
+                    <td>Bola de Fogo (+1D12)</td>
+                    <td class="text-center"><span class="badge badge-mana">Mana</span></td>
+                </tr>
+                <!-- Paladino -->
+                <tr>
+                    <td><strong>Paladino</strong></td>
+                    <td class="text-center">36</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">2</td>
+                    <td>Ira Sagrada (+1D8)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Bárbaro -->
+                <tr>
+                    <td><strong>Bárbaro</strong></td>
+                    <td class="text-center">34</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">2</td>
+                    <td>Fúria Primordial (+1D12)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Arqueiro -->
+                <tr>
+                    <td><strong>Arqueiro</strong></td>
+                    <td class="text-center">26</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">2</td>
+                    <td class="text-center">4</td>
+                    <td>Tiro Certeiro (+1D8)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Monge -->
+                <tr>
+                    <td><strong>Monge</strong></td>
+                    <td class="text-center">30</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">5</td>
+                    <td>Golpe Interior (+1D8)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Cavaleiro -->
+                <tr>
+                    <td><strong>Cavaleiro</strong></td>
+                    <td class="text-center">35</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">5</td>
+                    <td class="text-center">2</td>
+                    <td>Investida de Ferro (+1D8)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Assassino -->
+                <tr>
+                    <td><strong>Assassino</strong></td>
+                    <td class="text-center">25</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">2</td>
+                    <td class="text-center">4</td>
+                    <td>Execução Silenciosa (+1D10)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Druida -->
+                <tr>
+                    <td><strong>Druida</strong></td>
+                    <td class="text-center">30</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">3</td>
+                    <td>Espinhos Naturais (+1D8)</td>
+                    <td class="text-center"><span class="badge badge-mana">Mana</span></td>
+                </tr>
+                <!-- Gladiador -->
+                <tr>
+                    <td><strong>Gladiador</strong></td>
+                    <td class="text-center">34</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">2</td>
+                    <td>Força Impiedosa (+1D8)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Caçador -->
+                <tr>
+                    <td><strong>Caçador</strong></td>
+                    <td class="text-center">27</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">4</td>
+                    <td>Disparo Selvagem (+1D12)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Mercenário -->
+                <tr>
+                    <td><strong>Mercenário</strong></td>
+                    <td class="text-center">30</td>
+                    <td class="text-center">3</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">3</td>
+                    <td>Retaliação Precisa (+1D10)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+                <!-- Feiticeiro -->
+                <tr>
+                    <td><strong>Feiticeiro</strong></td>
+                    <td class="text-center">20</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">1</td>
+                    <td class="text-center">4</td>
+                    <td>Explosão Arcana (+1D12)</td>
+                    <td class="text-center"><span class="badge badge-mana">Mana</span></td>
+                </tr>
+                <!-- Samurai -->
+                <tr>
+                    <td><strong>Samurai</strong></td>
+                    <td class="text-center">30</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">4</td>
+                    <td class="text-center">3</td>
+                    <td>Espírito Afiado (+1D10)</td>
+                    <td class="text-center"><span class="badge badge-stamina">Stamina</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>.
+
+<!-- Seção de Dados -->
+<section>
+    <h3 class="section-title text-primary">🎲 Sistema de Dados</h3>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="fas fa-dice me-2"></i> Tipos de Dados</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4 mb-3">
+                            <i class="fas fa-dice-d20 fa-2x text-primary mb-2"></i>
+                            <div>D20</div>
+                            <small class="text-muted">Ataque/Esquiva</small>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <i class="fas fa-dice-six fa-2x text-secondary mb-2"></i>
+                            <div>D6</div>
+                            <small class="text-muted">Dano Base</small>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <i class="fas fa-dice-eight fa-2x text-success mb-2"></i>
+                            <div>D8</div>
+                            <small class="text-muted">Habilidades</small>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-dice-ten fa-2x text-warning mb-2"></i>
+                            <div>D10</div>
+                            <small class="text-muted">Habilidades</small>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-dice-twelve fa-2x text-danger mb-2"></i>
+                            <div>D12</div>
+                            <small class="text-muted">Habilidades</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="fas fa-calculator me-2"></i> Cálculo de Dano</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Fórmula:</strong></p>
+                    <p class="ps-3 mb-1">Dano Total = (D6 + Dano Base)</p>
+                    <p class="ps-3 mb-1">+ Dado da Habilidade (se usada)</p>
+                    <p class="ps-3">- Armadura do Defensor</p>
+                    <hr>
+                    <p class="mb-0"><small><strong>Exemplo:</strong> Guerreiro (Dano 3) usando Golpe Brutal (+1D8)
+                            contra defensor com Armadura 2:</small></p>
+                    <p class="mb-0"><small>(D6 + 3 + D8) - 2</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

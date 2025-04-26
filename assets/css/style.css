@@ -1,17 +1,32 @@
+/* assets/css/style.css - Versão Otimizada */
+
 :root {
-  /* Cores do tema */
-  --dark-900: #121212;
-  --dark-800: #1a1a1a;
-  --dark-700: #222222;
-  --dark-600: #2a2a2a;
+  /* Cores atualizadas */
+  --dark-900: #0f0f13;
+  --dark-800: #1a1a2e;
+  --dark-700: #16213e;
+  --dark-600: #0f3460;
   --light-text: #f8f9fa;
-  --muted-text: #adb5bd;
-  --rpg-gold: #ffc107;
-  --rpg-red: #dc3545;
-  --rpg-blue: #0d6efd;
+  --muted-text: #a0a8b0;
+  --rpg-gold: #e94560;
+  --rpg-gold-dark: #c2334d;
+  --rpg-red: #ff2e63;
+  --rpg-blue: #1a73e8;
   --rpg-green: #28a745;
-  --rpg-cyan: #17a2b8;
-  --rpg-purple: #6f42c1;
+  --rpg-cyan: #08d9d6;
+  --rpg-purple: #6a2c70;
+  --player1-color: #4e9af1;
+  --player2-color: #e94560;
+
+  /* Transições */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Sombras */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 /* Base Styles */
@@ -22,29 +37,62 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  line-height: 1.6;
 }
 
 /* Header Styles */
 .hero-section {
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-    url("https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80");
-  background-size: cover;
-  background-position: center;
-  border-bottom: 4px solid #6c757d;
+  background: linear-gradient(135deg, var(--dark-700), var(--dark-600));
+  border-bottom: 4px solid var(--rpg-gold);
   color: var(--light-text);
+  position: relative;
+  overflow: hidden;
+  padding: 3rem 0;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80")
+    center/cover;
+  opacity: 0.15;
+  z-index: 0;
+}
+
+.hero-section > .container {
+  position: relative;
+  z-index: 1;
 }
 
 .game-title {
   font-family: "MedievalSharp", cursive;
   color: var(--rpg-gold);
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.8rem, 5vw, 3rem);
 }
 
+.hero-section .lead {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Main Content */
+main {
+  padding: 2rem 0;
+}
+
+/* Section Titles */
 .section-title {
   font-family: "MedievalSharp", cursive;
   color: var(--rpg-gold);
   position: relative;
-  padding-bottom: 10px;
+  padding-bottom: 15px;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: clamp(1.5rem, 4vw, 2rem);
 }
 
 .section-title::after {
@@ -54,183 +102,358 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 100px;
-  height: 3px;
+  height: 4px;
   background: linear-gradient(
     to right,
     transparent,
     var(--rpg-gold),
     transparent
   );
+  border-radius: 2px;
 }
 
-/* Card Styles */
-.character-card,
+/* Player Selection */
+.player-selection {
+  background: rgba(26, 26, 46, 0.8);
+  border: 2px solid var(--dark-600);
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+}
+
 .player-card {
-  background: var(--dark-800);
-  border: 1px solid var(--dark-600);
-  transition: all 0.3s ease;
+  background: rgba(15, 52, 96, 0.3);
+  border: 2px solid var(--dark-600);
+  border-radius: 10px;
+  transition: all var(--transition-normal);
   height: 100%;
   color: var(--light-text);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player-card h3 {
+  font-family: "MedievalSharp", cursive;
+  color: var(--light-text);
+  margin-bottom: 1.5rem;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  text-align: center;
+}
+
+#player1Selection,
+#player2Selection {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.player-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid;
+  margin-bottom: 1rem;
+  transition: transform var(--transition-normal);
+}
+
+.player-card img:hover {
+  transform: scale(1.05);
+}
+
+/* Character Grid */
+.character-selection {
+  margin-bottom: 3rem;
+}
+
+.character-card {
+  background: rgba(26, 26, 46, 0.6);
+  border: 2px solid var(--dark-600);
+  border-radius: 12px;
+  transition: all var(--transition-normal);
+  height: 100%;
+  color: var(--light-text);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .character-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(255, 193, 7, 0.2);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
   border-color: var(--rpg-gold);
 }
 
 .card-img-container {
   position: relative;
   overflow: hidden;
-  height: 250px;
+  height: clamp(180px, 25vw, 220px);
 }
 
 .card-img-top {
   height: 100%;
   width: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform var(--transition-slow);
 }
 
 .character-card:hover .card-img-top {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .character-badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 5px 10px;
+  top: 15px;
+  right: 15px;
+  padding: 6px 12px;
   border-radius: 20px;
   font-weight: bold;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   color: white;
+  box-shadow: var(--shadow-sm);
 }
 
-/* Player Selection Area */
-.player-selection {
-  background: var(--dark-700);
-  border: 1px solid var(--dark-600);
-  color: var(--light-text);
-}
-
-.player-card {
+.card-body {
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
 }
 
-/* Text Elements */
-.text-muted {
-  color: var(--muted-text) !important;
+.character-name {
+  font-family: "MedievalSharp", cursive;
+  font-size: clamp(1.2rem, 3vw, 1.4rem);
+  margin-bottom: 0.75rem;
+  color: var(--rpg-gold);
 }
 
-/* Button Styles */
-.btn-dice {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 10px 20px;
-  font-weight: bold;
-  border: 2px solid var(--dark-600);
-  transition: all 0.3s ease;
-  color: white;
-}
-
-.btn-dice-primary {
-  background-color: var(--rpg-green);
-}
-
-.btn-dice-primary:hover {
-  background-color: #218838;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  color: white;
-}
-
-.btn-dice-primary:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
+.character-desc {
   color: var(--muted-text);
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
 }
 
-/* Modal Styles */
-.modal-content {
-  background-color: var(--dark-800);
-  border: 2px solid var(--rpg-gold);
+.character-stats {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.character-stats .badge {
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  background-color: var(--dark-700);
+}
+
+/* Buttons */
+.btn {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all var(--transition-normal);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+}
+
+.btn-outline-primary {
+  border: 2px solid var(--player1-color);
+  color: var(--player1-color);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: var(--player1-color);
+  color: white;
+}
+
+.btn-outline-danger {
+  border: 2px solid var(--player2-color);
+  color: var(--player2-color);
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+  background-color: var(--player2-color);
+  color: white;
+}
+
+#startGameBtn {
+  font-size: clamp(1.1rem, 3vw, 1.25rem);
+  padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2.5rem);
+  background-color: var(--rpg-green);
+  border: none;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+#startGameBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+}
+
+#startGameBtn:disabled {
+  background-color: var(--muted-text);
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Rules Button */
+.rules-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  border: 2px solid var(--light-text);
   color: var(--light-text);
+  background-color: rgba(15, 52, 96, 0.7);
+  backdrop-filter: blur(5px);
 }
 
-.modal-header {
-  border-bottom: 1px solid var(--dark-600);
+.rules-btn:hover {
+  background-color: var(--light-text);
+  color: var(--dark-900);
 }
 
-.modal-footer {
+/* Footer */
+footer {
+  background-color: var(--dark-800);
+  color: var(--muted-text);
+  padding: 1.5rem 0;
+  margin-top: auto;
+  font-size: 0.9rem;
   border-top: 1px solid var(--dark-600);
 }
 
-/* Selection Indicator */
-.selected-character::after {
-  content: "\f00c";
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: var(--rpg-green);
-  color: white;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
+.developer-info {
+  padding: 0.5rem;
+  border-radius: 6px;
+  background-color: rgba(15, 52, 96, 0.3);
 }
 
-/* Animations */
+/* Modal de Personagens */
+#characterModal .modal-content {
+  background-color: var(--dark-800);
+  border: 2px solid var(--dark-600);
+  color: var(--light-text);
+  box-shadow: var(--shadow-lg);
+}
+
+#characterModal .modal-header {
+  background: linear-gradient(135deg, var(--dark-700), var(--dark-600));
+  border-bottom: 2px solid var(--rpg-gold);
+  padding: 1.5rem;
+}
+
+#characterModal .modal-title {
+  font-family: "MedievalSharp", cursive;
+  color: var(--rpg-gold);
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#characterModal .modal-body {
+  background-color: var(--dark-700);
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+#characterModal .stat-box {
+  background-color: var(--dark-600);
+  border: 1px solid var(--dark-600);
+  transition: all var(--transition-normal);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+#characterModal .stat-box:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
+}
+
+#characterModal .special-ability {
+  background-color: var(--dark-600);
+  border: 1px solid var(--rpg-gold);
+  border-left: 4px solid var(--rpg-gold);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+/* Responsividade Otimizada */
+@media (max-width: 767.98px) {
+  .player-selection {
+    padding: 1rem;
+  }
+
+  .player-card {
+    padding: 1rem;
+  }
+
+  .character-card {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .card-img-container {
+    height: 180px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hero-section {
+    padding: 2rem 0;
+  }
+
+  .player-selection {
+    padding: 0.75rem;
+  }
+
+  .player-card img {
+    width: 80px;
+    height: 80px;
+  }
+
+  #startGameBtn {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+/* Animações */
 @keyframes pulse {
-  0% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
     transform: scale(1.05);
   }
-  100% {
-    transform: scale(1);
-  }
 }
 
-@keyframes shake {
+@keyframes float {
   0%,
   100% {
-    transform: translateX(0);
+    transform: translateY(0);
   }
-  25% {
-    transform: translateX(-5px);
-  }
-  75% {
-    transform: translateX(5px);
+  50% {
+    transform: translateY(-10px);
   }
 }
 
 .feedback-pulse {
   animation: pulse 1.5s infinite;
 }
-.feedback-shake {
-  animation: shake 0.3s ease-in-out;
-}
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .game-title {
-    font-size: 2rem;
-  }
-  .card-img-container {
-    height: 200px;
-  }
-  .player-selection .row > div:first-child {
-    margin-bottom: 1.5rem;
-  }
+.feedback-float {
+  animation: float 3s ease-in-out infinite;
 }
