@@ -7,7 +7,7 @@ var feiticeiro = {
   armor: 1,
   dodge: 3,
   weight: 2,
-  stamina: 6,
+  stamina: 8,
   specialDice: "Explosão Arcana (+1D12 no ataque)",
   cost: "4 Stamina",
   penalty: "Perde 50% da Vida atual. Não pode usar com 1 de Vida",
