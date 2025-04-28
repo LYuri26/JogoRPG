@@ -125,25 +125,42 @@ function endGame(winnerNum) {
 
   if (!winner) return;
 
-  // Desabilita todos os botões
-  document.querySelectorAll(".dice-button").forEach((btn) => {
+  // Desabilita todos os botões de dados
+  document.querySelectorAll(".btn-dice").forEach((btn) => {
     btn.disabled = true;
   });
 
-  // Efeito visual
+  // Efeito visual no vencedor
   const winnerCard = document.getElementById(`player${winnerNum}Card`);
   if (winnerCard) winnerCard.classList.add("feedback-pulse");
 
   updateBattleLog(`🏆 FIM DE JOGO! ${winner.character} venceu a batalha!`);
 
-  // Botão para reiniciar
-  const restartBtn = document.createElement("button");
-  restartBtn.className = "btn btn-success mt-3";
-  restartBtn.textContent = "Jogar Novamente";
-  restartBtn.onclick = () => (window.location.href = "index.html");
-
+  // Cria botões de ação pós-jogo
   const turnInfo = document.querySelector(".turn-info");
-  if (turnInfo) turnInfo.appendChild(restartBtn);
+  if (turnInfo) {
+    turnInfo.innerHTML = `
+      <div class="text-center">
+        <h3 class="text-success mb-4">🏆 ${winner.character} venceu! 🏆</h3>
+        <div class="d-flex justify-content-center gap-3">
+          <button id="restartBtn" class="btn btn-success">
+            <i class="fas fa-redo me-2"></i>Jogar Novamente
+          </button>
+          <button id="menuBtn" class="btn btn-primary">
+            <i class="fas fa-home me-2"></i>Voltar ao Menu
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Adiciona eventos aos botões
+    document.getElementById("restartBtn").onclick = () => {
+      window.location.href = "jogo.html";
+    };
+    document.getElementById("menuBtn").onclick = () => {
+      window.location.href = "index.html";
+    };
+  }
 }
 
 // Exporta funções globais

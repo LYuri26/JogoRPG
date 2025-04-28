@@ -92,11 +92,17 @@ const SPECIAL_CONDITIONS = {
   }),
 
   // 12. Caçador - Só pode usar a cada 5 turnos
-  Cacador: (attacker) => ({
-    canUse: (attacker.usedSpecial || 0) % 5 === 0,
-    failMessage: "Só pode usar a cada 5 turnos!",
-    maxUses: Infinity,
-  }),
+  Cacador: (attacker) => {
+    const lastUsed = attacker.lastSpecialTurn || 0;
+    const currentTurn = attacker.currentTurn || 1;
+    const canUse = currentTurn - lastUsed >= 5;
+
+    return {
+      canUse,
+      failMessage: "Só pode usar a cada 5 turnos!",
+      maxUses: Infinity,
+    };
+  },
 
   // 13. Mercenário - Vida >30% e máximo 3 usos
   Mercenario: (attacker) => ({
@@ -201,8 +207,11 @@ const PENALTY_HANDLERS = {
     return `⏳ ${attacker.character} não poderá usar habilidades no próximo turno!`;
   },
 
-  // 12. Caçador: Nenhuma penalidade (condição pré-uso)
-  Cacador: () => null,
+  // 12. Caçador: Marca o turno de uso
+  Cacador: (attacker) => {
+    attacker.lastSpecialTurn = attacker.currentTurn;
+    return `⏳ ${attacker.character} só poderá usar a habilidade novamente em 5 turnos!`;
+  },
 
   // 13. Mercenário: Nenhuma penalidade (condição pré-uso)
   Mercenario: () => null,

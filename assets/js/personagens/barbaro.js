@@ -10,6 +10,6 @@ var barbaro = {
   stamina: 6,
   specialDice: "Fúria Primordial (+1D12 no ataque)",
   cost: "6 Stamina",
-  penalty: "Só pode usar com 15 ou menos de Vida. Usável apenas 1x por combate",
+  penalty: "Só pode usar com 15 ou menos de Vida.",
   description: "Força bruta e resistência",
 };
