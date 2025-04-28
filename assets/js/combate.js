@@ -108,9 +108,11 @@ function switchTurn(newAttacker) {
 
   // Atualiza a interface
   const attacker = newAttacker === 1 ? player1 : player2;
+  document.getElementById("contadorTurno").textContent = newTurn;
+  document.getElementById("currentPhase").textContent = attacker.character;
   document.getElementById(
-    "currentPhase"
-  ).textContent = `Turno: ${attacker.character}`;
+    "resultadoTurno"
+  ).textContent = `Turno de ${attacker.character}`;
   updateBattleLog(`🔄 Turno de ${attacker.character}`);
 
   // Configura os botões para o novo turno
@@ -143,24 +145,40 @@ function endGame(winnerNum) {
       <div class="text-center">
         <h3 class="text-success mb-4">🏆 ${winner.character} venceu! 🏆</h3>
         <div class="d-flex justify-content-center gap-3">
-          <button id="restartBtn" class="btn btn-success">
+          <button id="restartBtn" class="btn btn-success btn-lg">
             <i class="fas fa-redo me-2"></i>Jogar Novamente
           </button>
-          <button id="menuBtn" class="btn btn-primary">
+          <button id="menuBtn" class="btn btn-primary btn-lg">
             <i class="fas fa-home me-2"></i>Voltar ao Menu
           </button>
         </div>
       </div>
     `;
 
+    // Garante que os botões estejam acima de outros elementos
+    document.getElementById("restartBtn").style.zIndex = "1000";
+    document.getElementById("menuBtn").style.zIndex = "1000";
+
     // Adiciona eventos aos botões
-    document.getElementById("restartBtn").onclick = () => {
+    document.getElementById("restartBtn").onclick = function () {
       window.location.href = "jogo.html";
     };
-    document.getElementById("menuBtn").onclick = () => {
+    document.getElementById("menuBtn").onclick = function () {
       window.location.href = "index.html";
     };
   }
+
+  // Adiciona overlay para garantir que nada interfira com os botões
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.right = "0";
+  overlay.style.bottom = "0";
+  overlay.style.backgroundColor = "rgba(0,0,0,0.5)";
+  overlay.style.zIndex = "999";
+  overlay.style.pointerEvents = "none"; // Permite clicar nos elementos abaixo
+  document.body.appendChild(overlay);
 }
 
 // Exporta funções globais

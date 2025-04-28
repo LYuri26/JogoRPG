@@ -752,6 +752,31 @@ img {
   z-index: 1;
 }
 
+/* Estilo para os botões de final de jogo */
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.25rem;
+  position: relative;
+  z-index: 1001 !important; /* Garante que fique acima de tudo */
+}
+
+.turn-info {
+  position: relative;
+  z-index: 1000;
+}
+
+/* Garante que os botões sejam clicáveis */
+#restartBtn,
+#menuBtn {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Remove qualquer overlay que possa estar bloqueando */
+.victory-overlay {
+  display: none !important;
+}
+
 /* BATTLE LOG */
 .battle-log {
   background-color: var(--dark-700);
